@@ -1,0 +1,13 @@
+/control/verbose 2
+/run/verbose 2
+/event/verbose 0
+/tracking/verbose 0
+
+/shieldingsim/tree/setOutputFilePath /home/aleder/geant4_workdir/shieldingsim_build/outputfiles/
+#/shieldingsim/tree/setOutputFileName shieldingsim_neutrontest500eV_polyshielding1925_5Mevents.root
+/shieldingsim/tree/setOutputFileName shieldingsim_test.root
+/shieldingsim/shielding/setPolyshielding 19. 25. 1. cm 
+/shieldingsim/generator/setsourceradius 30 cm
+/shieldingsim/generator/neutronsource 500 eV
+
+/run/beamOn 50
