@@ -126,9 +126,9 @@ void PrimaryGeneratorAction::setGammaPosition()
 {
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
-  G4double d_ADRheight = 20*cm; 
+  G4double d_shieldingheight = 6660.0*mm; 
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
-  G4double randz =  2.0*d_ADRheight*(G4UniformRand()-0.5);
+  G4double randz =  d_shieldingheight*(G4UniformRand()-0.5);
   //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
   randz = 0;
   G4double shiftLength = 2.*m;
@@ -136,7 +136,6 @@ void PrimaryGeneratorAction::setGammaPosition()
   G4ThreeVector randomShift(shiftLength*(G4UniformRand() - 0.5),
                             shiftLength*(G4UniformRand() - 0.5),
                             0.);
-  G4ThreeVector Shiftup(0,0,0.75*cm);
   G4ThreeVector gammaSourcePos(gammaradius * TMath::Cos(randPhi)*mm,
                                gammaradius * TMath::Sin(randPhi)*mm,
                                randz);
@@ -148,40 +147,37 @@ void PrimaryGeneratorAction::setGammaPosition()
   gammaMomentum *= -1.;
 
   fParticleGun->SetParticleMomentumDirection(gammaMomentum);
-  fParticleGun->SetParticlePosition(gammaSourcePos+Shiftup);
+  fParticleGun->SetParticlePosition(gammaSourcePos);
 }
 
 void PrimaryGeneratorAction::setPointNeutronPosition()
 {
-  G4ThreeVector Shiftup(0,0,0.75*cm);
   G4ThreeVector neutronMomentum = neutronsourcepos;
   neutronMomentum.setMag(1.);
   neutronMomentum *= -1.;
 
   fParticleGun->SetParticleMomentumDirection(neutronMomentum);
-  fParticleGun->SetParticlePosition(neutronsourcepos+Shiftup);  
+  fParticleGun->SetParticlePosition(neutronsourcepos);  
 }
 
 void PrimaryGeneratorAction::setPointGammaPosition()
 {
-  G4ThreeVector Shiftup(0,0,0.75*cm);
   G4ThreeVector gammaMomentum = gammasourcepos;
   gammaMomentum.setMag(1.);
   gammaMomentum *= -1.;
 
   fParticleGun->SetParticleMomentumDirection(gammaMomentum);
-  fParticleGun->SetParticlePosition(gammasourcepos+Shiftup);  
+  fParticleGun->SetParticlePosition(gammasourcepos);  
 }
 
 void PrimaryGeneratorAction::setNeutronPosition()
 {
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
-  G4double d_ADRheight = 20*cm; 
+  G4double d_shieldingheight = 6660.0*mm; 
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
-  G4double randz =  2.0*d_ADRheight*(G4UniformRand()-0.5);
+  G4double randz =  d_shieldingheight*(G4UniformRand()-0.5);
   //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
-  G4ThreeVector Shiftup(0,0,0.75*cm);
   G4ThreeVector neutronSourcePos(neutronradius * TMath::Cos(randPhi)*mm,
                                neutronradius * TMath::Sin(randPhi)*mm,
                                randz);
@@ -195,7 +191,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
   neutronMomentum *= -1.;
 
   fParticleGun->SetParticleMomentumDirection(neutronMomentum);
-  fParticleGun->SetParticlePosition(neutronSourcePos+Shiftup);
+  fParticleGun->SetParticlePosition(neutronSourcePos);
 }
 
 void PrimaryGeneratorAction::setSourceRadius(G4double radius)

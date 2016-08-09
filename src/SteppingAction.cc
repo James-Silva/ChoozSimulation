@@ -19,13 +19,14 @@ SteppingAction::~SteppingAction()
 
 void SteppingAction::UserSteppingAction(const G4Step* aStep)
 {
-  // get volume of the current step
+  // get volume and particle name of the current step
   G4VPhysicalVolume* volume = aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-
+  G4String name = aStep->GetTrack()->GetDefinition()->GetParticleName();
   // collect energy and track length step by step
 
   //aStep->GetTotalEnergyDeposit()/keV
-  if(volume->GetName() == "Crystal_1")
+ 
+  if(volume->GetName() == "NuDetector" && name == "neutron")
   {
     //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
     //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;

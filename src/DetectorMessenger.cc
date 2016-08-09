@@ -13,15 +13,15 @@ using namespace std;
 DetectorMessenger::DetectorMessenger( DetectorConstruction* Det)
 : G4UImessenger(), fDetector(Det)
 {
-  fDetDir = new G4UIdirectory("/shieldingsim/detector/", this);
+  fDetDir = new G4UIdirectory("/choozsim/detector/", this);
   fDetDir->SetGuidance("detector control");
-  fshieldDir = new G4UIdirectory("/shieldingsim/shielding/", this);
+  fshieldDir = new G4UIdirectory("/choozsim/shielding/", this);
   fshieldDir->SetGuidance("shielding control");
-  shieldingCmdPb = new G4UIcmdWith3VectorAndUnit("/shieldingsim/shielding/setPbshielding", this);
+  shieldingCmdPb = new G4UIcmdWith3VectorAndUnit("/choozsim/shielding/setPbshielding", this);
   shieldingCmdPb->SetGuidance("Determine inner and outer shielding (syntax: inner radius outer radius top thickness cm)");
-  shieldingCmdPoly = new G4UIcmdWith3VectorAndUnit("/shieldingsim/shielding/setPolyshielding", this);
+  shieldingCmdPoly = new G4UIcmdWith3VectorAndUnit("/choozsim/shielding/setPolyshielding", this);
   shieldingCmdPoly->SetGuidance("Determine inner and outer shielding (syntax: inner radius outer radius top thickness cm)");
-  fTypeCmd_setcrystalmaterial = new G4UIcmdWithAString("/shieldingsim/detector/setcrystalmaterial",this);
+  fTypeCmd_setcrystalmaterial = new G4UIcmdWithAString("/choozsim/detector/setcrystalmaterial",this);
   fTypeCmd_setcrystalmaterial->SetGuidance("Set Crystal Material (Zn,Zr or Default = Os)");
   fTypeCmd_setcrystalmaterial->SetDefaultValue("Os");
 

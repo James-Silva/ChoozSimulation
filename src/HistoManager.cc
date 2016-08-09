@@ -48,7 +48,7 @@ void HistoManager::book(const G4Run* aRun)
   primarytree->Branch("PDGID", &primaryPDGID);
 
   eventtree = new TTree("eventtree", "eventtree");
-  eventtree->Branch("Crystal1", &edep);
+  eventtree->Branch("NuDetector", &edep);
 
   G4cout << "\n----> Histogram file is opened in " << fileName << G4endl;
 }

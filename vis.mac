@@ -17,7 +17,6 @@
 
 # Draw geometry:
 /vis/drawVolume
-/shieldingsim/shielding/setPolyshielding 19. 29. 1. cm 
 
 # Specify view angle:
 #/vis/viewer/set/viewpointThetaPhi 90. 0.
@@ -52,15 +51,15 @@
 # For file-based drivers, use this to create an empty detector view:
 #/vis/viewer/flush
 
-/shieldingsim/tree/setOutputFilePath /home/aleder/geant4_workdir/shieldingsim_build/outputfiles
-/shieldingsim/tree/setOutputFileName shieldingsim_test.root
+/shieldingsim/tree/setOutputFilePath /home/aleder/geant4_workdir/choozsimulation_build
+/shieldingsim/tree/setOutputFileName choozsim_test.root
 
-/shieldingsim/generator/setsourceradius 30 cm
-#/shieldingsim/generator/neutronsource 500 keV
-/shieldingsim/generator/SetNeutronSource true
-/shieldingsim/generator/SetNeutronSource_xlog true
-/shieldingsim/generator/setneutronsourcespectrum Rxspectrum_shieldingsim_input.txt
+/shieldingsim/generator/setsourceradius 1000 mm
+/shieldingsim/generator/neutronsource 5000 keV
+#/shieldingsim/generator/SetNeutronSource true
+#/shieldingsim/generator/SetNeutronSource_xlog true
+#/shieldingsim/generator/setneutronsourcespectrum Rxspectrum_shieldingsim_input.txt
 
-/run/beamOn 5
+/run/beamOn 10
 
 
