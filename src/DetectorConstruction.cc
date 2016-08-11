@@ -104,27 +104,27 @@ void DetectorConstruction::DefineMaterials()
   fMaterialPoly_Borated->AddMaterial(fMaterialPoly,95.0*perCent);
   fMaterialPoly_Borated->AddElement(elB,5.0*perCent);
   
-  fMaterialQuartz = new G4Material("Quartz",2.70*g/cm3,2);
+  fMaterialQuartz = new G4Material("Quartz",2.81*g/cm3,2);
   fMaterialQuartz->AddElement(elSi,1);
   fMaterialQuartz->AddElement(elO,2);
   
-  fMaterialCorundum = new G4Material("Corundum",2.70*g/cm3,2);
+  fMaterialCorundum = new G4Material("Corundum",2.81*g/cm3,2);
   fMaterialCorundum->AddElement(elAl,2);
   fMaterialCorundum->AddElement(elO,3);
   
-  fMaterialIronOxide = new G4Material("IronOxide",2.70*g/cm3,2);
+  fMaterialIronOxide = new G4Material("IronOxide",2.81*g/cm3,2);
   fMaterialIronOxide->AddElement(elFe,1);
   fMaterialIronOxide->AddElement(elO,1);
   
-  fMaterialMgOxide = new G4Material("MgOxide",2.70*g/cm3,2);
+  fMaterialMgOxide = new G4Material("MgOxide",2.81*g/cm3,2);
   fMaterialMgOxide->AddElement(elMg,1);
   fMaterialMgOxide->AddElement(elO,1);
   
-  fMaterialKOxide = new G4Material("KOxide",2.70*g/cm3,2);
+  fMaterialKOxide = new G4Material("KOxide",2.81*g/cm3,2);
   fMaterialKOxide->AddElement(elK,2);
   fMaterialKOxide->AddElement(elO,1);
 
-  fMaterialChoozRock = new G4Material("ChoozRock",2.70*g/cm3,5);
+  fMaterialChoozRock = new G4Material("ChoozRock",2.81*g/cm3,5);
   fMaterialChoozRock->AddMaterial(fMaterialQuartz,58.0*perCent);
   fMaterialChoozRock->AddMaterial(fMaterialCorundum,19.0*perCent);
   fMaterialChoozRock->AddMaterial(fMaterialIronOxide,17.0*perCent);
@@ -152,7 +152,7 @@ void DetectorConstruction::DefineMaterials()
   fMaterialPPO->AddElement(elH,6);
   fMaterialPPO->AddElement(elO,1);
   
-  fMaterialNuTarget = new G4Material("NuTargerLiquid",804.59*kg/m3,4);
+  fMaterialNuTarget = new G4Material("NuTargetLiquid",804.59*kg/m3,4);
   fMaterialNuTarget->AddMaterial(fMaterialDodecane,74.5*perCent);
   fMaterialNuTarget->AddMaterial(fMaterialPXE,24.6*perCent);
   fMaterialNuTarget->AddMaterial(fMaterialPPO,0.8*perCent);
