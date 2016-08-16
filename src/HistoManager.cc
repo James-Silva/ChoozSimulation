@@ -127,14 +127,15 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   bool b_gdflag = false;
   bool b_ncapflag = false;
   edep_nudetector = 0.;
+  GdCaptureX0  = -99999;
+  GdCaptureY0  = -99999;
+  GdCaptureZ0  = -99999;
   i_Gdflag = 0;
 
   if (!anEvent || !theHits)
     return;
-  std::cout << "Successfully entered Fill Tree" << std::endl;
 
   G4int nhits = theHits->entries();
-  std::cout << "Number of hits: " << nhits << std::endl;
   primaryX0 = anEvent->GetPrimaryVertex()->GetX0();
   primaryY0 = anEvent->GetPrimaryVertex()->GetY0();
   primaryZ0 = anEvent->GetPrimaryVertex()->GetZ0();
@@ -142,9 +143,9 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
                                           anEvent->GetPrimaryVertex()->GetY0(),
                                           anEvent->GetPrimaryVertex()->GetZ0());  
   primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
+  primaryEnergy = primaryEnergy/keV;
   for(G4int i_hitcounter = 0; i_hitcounter < nhits; i_hitcounter++)
   {
-
     s_currentvol = (*theHits)[i_hitcounter]->GetVolume();
     s_currentprocess = (*theHits)[i_hitcounter]->GetProcessID();
     i_PDGID = (*theHits)[i_hitcounter]->GetPDGID();
@@ -152,26 +153,28 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
     {
        b_gdflag = true;
        std::cout << "Gd Detected" <<  std::endl;
+       GdCaptureX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
+       GdCaptureY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
+       GdCaptureZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
        std::cout << "Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
     }  
-    if (i_PDGID == 2112)
+    if (i_PDGID == 2112 && s_currentvol == "NuDetector")
     {  
       edep_nudetector += (*theHits)[i_hitcounter]->GetEdep();
+      if (s_currentprocess == "nCapture")
+      {
+        b_ncapflag = true;
+        std::cout << "Neutron Capture Detected" <<  std::endl;
+      }  
     }  
-    if (s_currentprocess == "nCapture")
-    {
-       b_ncapflag = true;
-       std::cout << "Neutron Capture Detected" <<  std::endl;
-    }  
+
   }   
   if (b_ncapflag == true && b_gdflag == true)
   {
     i_Gdflag = 1;
   }  
   edep_nudetector = edep_nudetector/keV;
-  //G4String name = aStep->GetTrack()->GetDefinition()->GetParticleName();
-  //primaryEnergy = 
-  std::cout << "Primary Energy: " << G4BestUnit(primaryEnergy,"Energy") << std::endl;
+  std::cout << "Primary Energy: " << primaryEnergy << " keV"  <<  std::endl;
   std::cout << "Total: " << edep_nudetector << " keV"  << std::endl;
 
   if(eventtree)

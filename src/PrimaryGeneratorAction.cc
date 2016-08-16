@@ -174,7 +174,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
 {
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
-  G4double d_shieldingheight = 1000.0*mm; 
+  G4double d_shieldingheight = 7000.0*mm; 
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
   G4double randz =  d_shieldingheight*(G4UniformRand()-0.5);
   //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
