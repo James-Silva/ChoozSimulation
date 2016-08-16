@@ -174,8 +174,8 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
     i_Gdflag = 1;
   }  
   edep_nudetector = edep_nudetector/keV;
-  std::cout << "Primary Energy: " << primaryEnergy << " keV"  <<  std::endl;
-  std::cout << "Total: " << edep_nudetector << " keV"  << std::endl;
+  //std::cout << "Primary Energy: " << primaryEnergy << " keV"  <<  std::endl;
+  //std::cout << "Total: " << edep_nudetector << " keV"  << std::endl;
 
   if(eventtree)
     eventtree->Fill();
