@@ -41,12 +41,35 @@ G4bool CrystalSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*)
 {
 	G4double edep = aStep->GetTotalEnergyDeposit();
 	G4StepPoint* postPoint = aStep->GetPostStepPoint();
+    const G4VProcess* proc = postPoint->GetProcessDefinedStep();
 	CrystalHit* newHit = new CrystalHit();
 	newHit->SetEdep(edep);
 	newHit->SetPos(postPoint->GetPosition());
+	newHit->SetPDGID(aStep->GetTrack()->GetDefinition()->GetPDGEncoding());
+	newHit->SetProcessID(proc->GetProcessName());
+	newHit->SetTrackID(aStep->GetTrack()->GetTrackID());
+	newHit->SetStepNum(aStep->GetTrack()->GetCurrentStepNumber());
+	newHit->SetVolume(aStep->GetTrack()->GetVolume()->GetName());
+	newHit->SetPosition0(aStep->GetPreStepPoint()->GetPosition());
+	newHit->SetPositionf(aStep->GetPostStepPoint()->GetPosition());
+	newHit->SetMomentum(aStep->GetTrack()->GetMomentum());
+	newHit->SetKE(aStep->GetTrack()->GetKineticEnergy());
+	newHit->SetVertexKE(aStep->GetTrack()->GetVertexKineticEnergy());
+	newHit->SetParentID(aStep->GetTrack()->GetParentID());
+	newHit->SetTrackLength(aStep->GetTrack()->GetTrackLength());
+	newHit->SetStepTime(aStep->GetTrack()->GetGlobalTime());
 
-	trackerCollection->insert( newHit );
-
+	G4TrackVector* secondaries = aStep->GetfSecondary();
+	std::vector<G4int> secondaryTracks, secondaryPDGIDs;
+	for(int jTrack = 0; jTrack < int((*secondaries).size()); jTrack++)
+	{
+		secondaryPDGIDs.push_back((*secondaries)[jTrack]->GetDefinition()->GetPDGEncoding());
+		secondaryTracks.push_back((*secondaries)[jTrack]->GetTrackID());
+	}
+	newHit->SetSecondaryPDGID(secondaryPDGIDs);
+	newHit->SetSecondaryTrackID(secondaryTracks);
+    trackerCollection->insert(newHit);
+    //std:: cout << "Processing hits" << std::endl;
 	return true;
 }
 

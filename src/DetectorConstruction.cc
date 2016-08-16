@@ -261,11 +261,11 @@ void DetectorConstruction::ConstructOuterDetectors()
   BufferTubeLog->SetVisAttributes(visBufferTube);
   TempTube_inner=0;
   TempTube_outer=0;
-  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 2761.0*mm, 2837.0*mm, startAngle, spanningAngleFull);
-  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 3305.0*mm, 3320.0-10*mm,startAngle, spanningAngleFull);
-  this->VetoTubeSolid = new G4SubtractionSolid("Veto",TempTube_outer,TempTube_inner);
-  this->VetoTubeLog = new G4LogicalVolume(VetoTubeSolid, mineraloil, "Veto");
-  this->VetoTubePhys = new G4PVPlacement(0,vec_zero, VetoTubeLog, "Veto",fLogicWorld, false,0);
+  TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 2761.0*mm, 2837.0*mm, startAngle, spanningAngleFull);
+  TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 3305.0*mm, 3320.0-10*mm,startAngle, spanningAngleFull);
+  VetoTubeSolid = new G4SubtractionSolid("Veto",TempTube_outer,TempTube_inner);
+  VetoTubeLog = new G4LogicalVolume(VetoTubeSolid, mineraloil, "Veto");
+  VetoTubePhys = new G4PVPlacement(0,vec_zero, VetoTubeLog, "Veto",fLogicWorld, false,0);
   G4VisAttributes visVetoTube(G4Colour(0.0,0.0,1.0));
   visVetoTube.SetForceWireframe(true);
   visVetoTube.SetForceAuxEdgeVisible(true);

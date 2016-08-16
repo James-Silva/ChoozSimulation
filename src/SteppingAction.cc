@@ -18,19 +18,27 @@ SteppingAction::~SteppingAction()
 
 
 void SteppingAction::UserSteppingAction(const G4Step* aStep)
-{
+{ 
   // get volume and particle name of the current step
   G4VPhysicalVolume* volume = aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
   G4String name = aStep->GetTrack()->GetDefinition()->GetParticleName();
   // collect energy and track length step by step
-
+  G4double d_stepenergy = aStep->GetTotalEnergyDeposit()/keV;
   //aStep->GetTotalEnergyDeposit()/keV
  
-  if(volume->GetName() == "NuDetector" && name == "neutron")
+  if(volume->GetName() == "Veto" && d_stepenergy > 0 && name == "neutron")
   {
     //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
     //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
-  	//std::cout << "in if statement" << std::endl;
-    fEventAction->accumulateEdep(aStep->GetTotalEnergyDeposit()/keV);
+    //std::cout << "in if statement" << std::endl;
+    fEventAction->accumulateEdep_Veto(d_stepenergy);
   }
+  if(volume->GetName() == "NuDetector" && d_stepenergy > 0  && name == "neutron")
+  {
+    //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+    //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
+    //std::cout << "in if statement" << std::endl;
+    fEventAction->accumulateEdep_Nudetector(d_stepenergy);
+  }
+
 }

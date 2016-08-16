@@ -5,9 +5,11 @@
 #include "globals.hh"
 #include "TFile.h"
 #include "TTree.h"
+#include "G4Event.hh"
 
 #include "G4ThreeVector.hh"
 #include "HistoManagerMessenger.hh"
+#include "CrystalHit.hh"
 
 class G4Run;
 class TFile;
@@ -27,22 +29,31 @@ class HistoManager
     void SetOutputName(const G4String name);
     void setPrimaryEnergy(double energy);
     void setPrimaryPDGID(int id);
-    void setEnergy(double energy);
+    void setEnergy_Nudetector(double energy);
+    void setEnergy_Veto(double energy);
     void fill();
+    void FillTree(const G4Event* anEvent, CrystalHitsCollection* theHits);
 
   private:
     HistoManagerMessenger* fHistoMessenger;
     TFile* outfile;
     TTree* eventtree;
+    TTree* othervolumestree;
     TTree* primarytree;
     
     G4String      outputPath;
     G4String      outputName;    
 
     double primaryEnergy;
+    double primaryX0,primaryY0,primaryZ0;
+    double GdCaptureX0,GdCaptureY0,GdCaptureZ0;
     int primaryPDGID;
+    int i_Gdflag;
 
-    double edep;
+
+    double edep_nudetector;
+    double edep_nudetector_crosscheck;
+    double edep_veto;
 };
 
 

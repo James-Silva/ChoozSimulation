@@ -78,7 +78,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   {  
     randomenergy = TMath::Power(10,h_Spectrum.GetRandom());
     //cout << "Random Energy (Log) selected: " << randomenergy << endl;
-    buildNeutronSource(randomenergy*CLHEP::GeV);
+    buildNeutronSource(randomenergy*CLHEP::MeV);
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } 
@@ -86,7 +86,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   {  
     randomenergy = h_Spectrum.GetRandom();
     //cout << "Random Energy selected: " << randomenergy << endl;
-    buildNeutronSource(randomenergy*CLHEP::GeV);
+    buildNeutronSource(randomenergy*CLHEP::MeV);
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } 
@@ -109,7 +109,7 @@ void PrimaryGeneratorAction::buildGammaSource(G4double energy)
   G4ParticleDefinition* particle
                     = particleTable->FindParticle(particleName="gamma");
   fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleEnergy(energy*GeV);
+  fParticleGun->SetParticleEnergy(energy*MeV);
 }
 
 void PrimaryGeneratorAction::buildNeutronSource(G4double energy)
@@ -119,7 +119,7 @@ void PrimaryGeneratorAction::buildNeutronSource(G4double energy)
   G4ParticleDefinition* particle
                     = particleTable->FindParticle(particleName="neutron");
   fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleEnergy(energy*GeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
+  fParticleGun->SetParticleEnergy(energy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
 }
 
 void PrimaryGeneratorAction::setGammaPosition()
@@ -174,7 +174,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
 {
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
-  G4double d_shieldingheight = 7000.0*mm; 
+  G4double d_shieldingheight = 1000.0*mm; 
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
   G4double randz =  d_shieldingheight*(G4UniformRand()-0.5);
   //G4ThreeVector test_vec(9*cm,9*cm,0*cm);

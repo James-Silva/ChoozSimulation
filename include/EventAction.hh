@@ -19,15 +19,19 @@ public:
   virtual void    BeginOfEventAction(const G4Event*);
   virtual void    EndOfEventAction(const G4Event*);
 
-  void accumulateEdep(G4double dEdep);
+  void accumulateEdep_Veto(G4double dEdep);
+  void accumulateEdep_Nudetector(G4double dEdep);
 
 private:
    RunAction*       fRunAct;
    HistoManager*    fHistoManager;
 
-   G4double         fedep;
+   G4double         fedep_veto;
+   G4double         fedep_nudetector;
+   G4double         fedep_nudetector_crosscheck;
 
    G4int            fPrintModulo;
+   G4int            CrystalHCID;  
 };
 
 
