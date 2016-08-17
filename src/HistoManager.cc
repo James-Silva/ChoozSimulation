@@ -59,7 +59,9 @@ void HistoManager::book(const G4Run* aRun)
   eventtree = new TTree("eventtree", "eventtree");
   eventtree->Branch("NuDetector", &edep_nudetector);
   eventtree->Branch("int_Gdflag", &i_Gdflag);
-  
+  eventtree->Branch("InteractionX0", &GdCaptureX0);
+  eventtree->Branch("InteractionY0", &GdCaptureY0);
+  eventtree->Branch("InteractionZ0", &GdCaptureZ0);
   othervolumestree = new TTree("othervolumetree", "eventtree");
   othervolumestree->Branch("NuDetector_crosscheck", &edep_nudetector_crosscheck);
   othervolumestree->Branch("Vetodetector", &edep_veto);
@@ -144,6 +146,7 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
                                           anEvent->GetPrimaryVertex()->GetZ0());  
   primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
   primaryEnergy = primaryEnergy/keV;
+  //std::cout << "Primary Energy (keV): " << primaryEnergy << std::endl;
   for(G4int i_hitcounter = 0; i_hitcounter < nhits; i_hitcounter++)
   {
     s_currentvol = (*theHits)[i_hitcounter]->GetVolume();
@@ -158,7 +161,7 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
        GdCaptureZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
        std::cout << "Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
     }  
-    if (i_PDGID == 2112 && s_currentvol == "NuDetector")
+    if (s_currentvol == "NuDetector")
     {  
       edep_nudetector += (*theHits)[i_hitcounter]->GetEdep();
       if (s_currentprocess == "nCapture")

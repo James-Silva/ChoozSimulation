@@ -25,7 +25,8 @@ class PrimaryGeneratorMessenger: public G4UImessenger
     G4UIdirectory*        			fGeneratorDir;     
     G4UIcmdWithADoubleAndUnit*	fTypeCmd_neutron;    
     G4UIcmdWithADoubleAndUnit*	fTypeCmd_gamma;  
-    G4UIcmdWithADoubleAndUnit*	fTypeCmd_radius; 
+    G4UIcmdWithADoubleAndUnit*	fTypeCmd_radius;
+    G4UIcmdWithADoubleAndUnit*  fTypeCmd_height;  
     G4UIcmdWithAString*	        fTypeCmd_spectrum; 
     G4UIcmdWithABool*	        fTypeCmd_spectrum_bool;
     G4UIcmdWithABool*           fTypeCmd_spectrumxlog_bool;

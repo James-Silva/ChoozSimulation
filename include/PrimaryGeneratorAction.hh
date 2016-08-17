@@ -39,6 +39,7 @@ public:
 	void setNewNeutronSource(G4double energy);
     void setNewGammaSource(G4double energy);
 	void setSourceRadius(G4double radius);
+	void setSourceHeight(G4double radius);
 	void SetSpectralData(G4String filename);
 	void setNewNeutronSpectrumSource();
 	void setNewNeutronSpectrumSource_LogX();
@@ -47,12 +48,16 @@ public:
 	void SetNeutronPointSource(G4ThreeVector pos);
 	void SetGammaPointSource(G4ThreeVector pos);
 	void SetGenerator(G4String generatorType);
+	G4ThreeVector GenerateSideWallEvent(G4double radius,G4double height);
+    G4ThreeVector GenerateTopEvent(G4double radius,G4double height);
 private:
     TH1D 							h_Spectrum;
     std::vector<double> 			vec_SpectralEnergies;
 	std::vector<double> 			vec_SpectralVals;
 	G4double                        neutronradius;
 	G4double                        gammaradius;
+	G4double                        neutronheight;
+	G4double                        gammaheight;
 	PrimaryGeneratorMessenger*		fMessenger;
 	G4ParticleGun*           		fParticleGun;  //pointer a to G4 class
 	DetectorConstruction*    		fDetector;     //pointer to the geometry

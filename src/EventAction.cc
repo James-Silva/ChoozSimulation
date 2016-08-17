@@ -49,8 +49,8 @@ void EventAction::EndOfEventAction(const G4Event* anEvent)
   }
   fHistoManager->setEnergy_Nudetector(fedep_nudetector_crosscheck);
   fHistoManager->setEnergy_Veto(fedep_veto);
-  std::cout << "Edep Veto: " << fedep_veto << std::endl;
-  std::cout << "Edep setEnergy_Nudetector_crosscheck: " << fedep_nudetector_crosscheck << std::endl;
+  //std::cout << "Edep Veto: " << fedep_veto << std::endl;
+  //std::cout << "Edep setEnergy_Nudetector_crosscheck: " << fedep_nudetector_crosscheck << std::endl;
   fHistoManager->fill();
 }
 

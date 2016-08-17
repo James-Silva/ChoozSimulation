@@ -28,6 +28,11 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
 
   fTypeCmd_radius = new G4UIcmdWithADoubleAndUnit("/choozsim/generator/setsourceradius",this);
   fTypeCmd_radius->SetGuidance("Set source radius (sets both gamma and neutron generator radius)");
+  fTypeCmd_radius->SetDefaultValue(100*CLHEP::mm);
+
+  fTypeCmd_height = new G4UIcmdWithADoubleAndUnit("/choozsim/generator/setsourceheight",this);
+  fTypeCmd_height->SetGuidance("Set source height (cylinder) (sets both gamma and neutron generator radius)");
+  fTypeCmd_height->SetDefaultValue(100*CLHEP::mm);
 
   fTypeCmd_spectrum = new G4UIcmdWithAString("/choozsim/generator/setneutronsourcespectrum",this);
   fTypeCmd_spectrum->SetGuidance("Set source file for generating neutron spectrum");
@@ -71,6 +76,11 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
   {
     fGeneratorAction->setSourceRadius(fTypeCmd_radius->GetNewDoubleValue(newValue));
   }
+  if(command == fTypeCmd_height)
+  {
+    fGeneratorAction->setSourceHeight(fTypeCmd_height->GetNewDoubleValue(newValue));
+  }
+
   if(command == fTypeCmd_spectrum)
   {
     fGeneratorAction->SetSpectralData(newValue);

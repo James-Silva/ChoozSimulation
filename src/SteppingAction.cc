@@ -26,14 +26,14 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   G4double d_stepenergy = aStep->GetTotalEnergyDeposit()/keV;
   //aStep->GetTotalEnergyDeposit()/keV
  
-  if(volume->GetName() == "Veto" && d_stepenergy > 0 && name == "neutron")
+  if(volume->GetName() == "Veto" && d_stepenergy > 0)
   {
     //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
     //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
     //std::cout << "in if statement" << std::endl;
     fEventAction->accumulateEdep_Veto(d_stepenergy);
   }
-  if(volume->GetName() == "NuDetector" && d_stepenergy > 0  && name == "neutron")
+  if(volume->GetName() == "NuDetector" && d_stepenergy > 0)
   {
     //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
     //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
