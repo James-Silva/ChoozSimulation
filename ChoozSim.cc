@@ -16,9 +16,9 @@
 int main(int argc,char** argv)
 {
   // check for correct # of arguments
-  if(argc != 3 && argc != 4)
+  if(argc != 2 && argc != 3)
   {
-    std::cerr << "Usage: ShieldingSim [macro name] [output file label] [vis (optional)]" << std::endl;
+    std::cerr << "Usage: ShieldingSim [macro name] [vis (optional)]" << std::endl;
     return 0;
   }
 
@@ -38,7 +38,7 @@ int main(int argc,char** argv)
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
   // set the run ID
-  runManager->SetRunIDCounter(atoi(argv[2]));
+  //runManager->SetRunIDCounter(atoi(argv[2]));
 
   // enable visualizer if selected
   G4VisManager* visManager;
@@ -47,7 +47,7 @@ int main(int argc,char** argv)
   visManager->Initialize();
   G4String fileName;
   fileName = argv[1];
-  if(argc == 4 && std::string(argv[3]) == "vis")
+  if(argc == 3 && std::string(argv[2]) == "vis")
   {
 
     ui = new G4UIExecutive(argc, argv);
@@ -55,7 +55,7 @@ int main(int argc,char** argv)
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+fileName);    
   }
-  if(argc == 3)
+  if(argc == 2)
   {
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+fileName);    
@@ -64,7 +64,7 @@ int main(int argc,char** argv)
   //G4String command = "/control/execute ";
   //UImanager->ApplyCommand(command+fileName);
   // Job termination
-  if(argc == 4 && std::string(argv[3]) == "vis")
+  if(argc == 3 && std::string(argv[2]) == "vis")
   {
     delete ui;
     delete visManager;
