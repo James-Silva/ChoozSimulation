@@ -196,7 +196,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
   } 
   else if (d_picksurface <= d_probtop+d_probside && d_picksurface >= d_probtop)
   {
-    std::cout << "Side picked" << std::endl;
+    //std::cout << "Side picked" << std::endl;
     neutronSourcePos = GenerateSideWallEvent(neutronradius,neutronheight);
   }
   else 
