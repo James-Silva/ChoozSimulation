@@ -86,7 +86,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   {  
     randomenergy = h_Spectrum.GetRandom();
     //cout << "Random Energy selected: " << randomenergy << endl;
-    buildNeutronSource(1000*randomenergy); //Input energy in MeV
+    buildNeutronSource(randomenergy); //Input energy in MeV
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } 

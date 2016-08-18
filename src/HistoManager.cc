@@ -146,7 +146,7 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
                                           anEvent->GetPrimaryVertex()->GetZ0());  
   primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
   primaryEnergy = primaryEnergy/keV;
-  //std::cout << "Primary Energy (keV): " << primaryEnergy << std::endl;
+  std::cout << "Primary Energy (keV): " << primaryEnergy << std::endl;
   for(G4int i_hitcounter = 0; i_hitcounter < nhits; i_hitcounter++)
   {
     s_currentvol = (*theHits)[i_hitcounter]->GetVolume();

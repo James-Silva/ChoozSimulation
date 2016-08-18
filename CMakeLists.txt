@@ -11,6 +11,7 @@ project(ChoozSim)
 option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
 if(WITH_GEANT4_UIVIS)
   find_package(Geant4 REQUIRED ui_all vis_all)
+  message(STATUS "Geant4 UI VIS packages found")
 else()
   find_package(Geant4 REQUIRED)
 endif()
@@ -26,7 +27,7 @@ include(${Geant4_USE_FILE})
 # Find ROOT (optional package)
 #
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
-find_package(ROOT QUIET)
+find_package(ROOT)
 if(ROOT_FOUND)
   message(STATUS "ROOT found.")
   add_definitions(-DG4ANALYSIS_USE_ROOT)
@@ -53,7 +54,7 @@ target_link_libraries(ChoozSim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-target_link_libraries(ChoozSim "$ENV{ROOTSYS}/lib/libPhysics.so" "$ENV{ROOTSYS}/lib/libRIO.so" "$ENV{ROOTSYS}/lib/libMathCore.so" "$ENV{ROOTSYS}/lib/libTree.so" "$ENV{ROOTSYS}/lib/libCore.so" "$ENV{ROOTSYS}/lib/libMathMore.so" "$ENV{ROOTSYS}/lib/libHist.so" "$ENV{CRYHOME}/lib/libCRY.a" "$ENV{CRYHOME}/../libEvt.so" ${Geant4_LIBRARIES})
+target_link_libraries(ChoozSim "$ENV{ROOTSYS}/lib/libPhysics.so" "$ENV{ROOTSYS}/lib/libRIO.so" "$ENV{ROOTSYS}/lib/libMathCore.so" "$ENV{ROOTSYS}/lib/libTree.so" "$ENV{ROOTSYS}/lib/libCore.so" "$ENV{ROOTSYS}/lib/libMathMore.so" "$ENV{ROOTSYS}/lib/libHist.so" ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
@@ -74,7 +75,7 @@ foreach(_script ${ChoozSim_SCRIPTS})
 endforeach()
 
 
-SET(CMAKE_MODULE_PATH /usr/local/geant4.10.00.p02/cmake/Modules/)
+SET(CMAKE_MODULE_PATH /home/soft/base/src/geant4.10.02.p01/cmake/Modules/)
 
 
 
