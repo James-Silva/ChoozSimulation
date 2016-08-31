@@ -52,10 +52,11 @@ DetectorConstruction::~DetectorConstruction()
 G4VPhysicalVolume*  DetectorConstruction::Construct()
 {
   InitializeWorld();
-  ConstructPit();
-  ConstructOuterDetectors();
+  //ConstructADR();
+  //ConstructPit();
+  //ConstructOuterDetectors();
   //AddConcreteWalls();
-  phystest = ConstructNuDetector();
+  phystest = ConstructDetectors();
   
   return phystest;
 }
@@ -70,6 +71,7 @@ void DetectorConstruction::DefineMaterials()
   fMaterialAir = man->FindOrBuildMaterial("G4_AIR");
   fMaterialPoly = man->FindOrBuildMaterial("G4_POLYETHYLENE");
   fMaterialConcrete = man->FindOrBuildMaterial("G4_CONCRETE");
+  fMaterialWater = man->FindOrBuildMaterial("G4_WATER");
   fMaterialLead = man->FindOrBuildMaterial("G4_Pb");
   fMaterialOs = man->FindOrBuildMaterial("G4_Os");
   fMaterialAl = man->FindOrBuildMaterial("G4_Al");
@@ -171,7 +173,7 @@ void DetectorConstruction::DefineMaterials()
 
 void DetectorConstruction::InitializeWorld()
 {
-  fWorldSize  = 15.*m;
+  fWorldSize  = 20.*m;
   fSolidWorld = new G4Box("fSolidWorld", fWorldSize/2., fWorldSize/2., fWorldSize/2.);
   fLogicWorld = new G4LogicalVolume(fSolidWorld, fMaterialGalactic, "world");
   fLogicWorld->SetVisAttributes(G4VisAttributes::GetInvisible());
@@ -181,7 +183,7 @@ void DetectorConstruction::InitializeWorld()
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()
 {
-  DetectorSize = 1.5*cm;
+  DetectorSize = 5.0*cm;
   
   std::vector<std::string> CyrstalLabels = {"Crystal_1", "Crystal_2","Crystal_3", "Crystal_4","Crystal_5"};
   std::vector<G4double> Cyrstalpos_x = {0.*cm, -6.*cm, 6.*cm, 6.*cm, -6.*cm};
@@ -193,7 +195,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()
   G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
   G4ThreeVector vec_offset(0*mm,0*mm,0.5*cm+DetectorSize/2.0);
   G4SDManager* SDmanager = G4SDManager::GetSDMpointer();
-  for(size_t jCrys = 0; jCrys < Cyrstalpos_x.size(); jCrys++)
+  for(size_t jCrys = 0; jCrys < 1; jCrys++)
   {
     v_CrystalBoxes.push_back(new G4Box(CyrstalLabels[jCrys],DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0));
     v_CrystalBoxesLog.push_back(new G4LogicalVolume(v_CrystalBoxes[jCrys], fMaterialOs,CyrstalLabels[jCrys]));
@@ -234,53 +236,22 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector()
 
 void DetectorConstruction::ConstructOuterDetectors()
 {
-  // Gamma Catcher
   zeroradius = 0.*cm;
   startAngle = 0.*deg;
   spanningAngleFull = 360.*deg;
   G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 1158.0*mm, 1229.0*mm, startAngle, spanningAngleFull);
-  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 1711.0*mm, 1787.0-15.0*mm,startAngle, spanningAngleFull);
-  this->GCTubeSolid = new G4SubtractionSolid("Gammacatcher",TempTube_outer,TempTube_inner);
-  this->GCTubeLog = new G4LogicalVolume(GCTubeSolid, fMaterialGammaCatcher, "GammaCatcher");
-  this->GCTubePhys = new G4PVPlacement(0,vec_zero, GCTubeLog, "GammaCatcher",fLogicWorld, false,0);
-  G4VisAttributes visGCTube(G4Colour(1.0,1.0,0.0));
-  visGCTube.SetForceWireframe(true);
-  visGCTube.SetForceAuxEdgeVisible(true);
-  GCTubeLog->SetVisAttributes(visGCTube);
+  G4ThreeVector vec_offset(0*mm,0*mm,+500*mm);
   TempTube_inner=0;
   TempTube_outer=0;
-  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 1711.0*mm, 1787.0*mm, startAngle, spanningAngleFull);
-  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 2761.0*mm, 2837.0-3.0*mm,startAngle, spanningAngleFull);
-  this->BufferTubeSolid = new G4SubtractionSolid("Buffer",TempTube_outer,TempTube_inner);
-  this->BufferTubeLog = new G4LogicalVolume(BufferTubeSolid, mineraloil, "Buffer");
-  this->BufferTubePhys = new G4PVPlacement(0,vec_zero, BufferTubeLog, "Buffer",fLogicWorld, false,0);
-  G4VisAttributes visBufferTube(G4Colour(1.0,0.269,0.0));
-  visBufferTube.SetForceWireframe(true);
-  visBufferTube.SetForceAuxEdgeVisible(true);
-  BufferTubeLog->SetVisAttributes(visBufferTube);
-  TempTube_inner=0;
-  TempTube_outer=0;
-  TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 2761.0*mm, 2837.0*mm, startAngle, spanningAngleFull);
-  TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 3305.0*mm, 3320.0-10*mm,startAngle, spanningAngleFull);
-  VetoTubeSolid = new G4SubtractionSolid("Veto",TempTube_outer,TempTube_inner);
-  VetoTubeLog = new G4LogicalVolume(VetoTubeSolid, mineraloil, "Veto");
-  VetoTubePhys = new G4PVPlacement(0,vec_zero, VetoTubeLog, "Veto",fLogicWorld, false,0);
-  G4VisAttributes visVetoTube(G4Colour(0.0,0.0,1.0));
-  visVetoTube.SetForceWireframe(true);
-  visVetoTube.SetForceAuxEdgeVisible(true);
-  VetoTubeLog->SetVisAttributes(visVetoTube);
-  TempTube_inner=0;
-  TempTube_outer=0;
-  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 3305.0*mm, 3500.0-170.0*mm, startAngle, spanningAngleFull);
-  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 3475.0*mm, 3500.0*mm,startAngle, spanningAngleFull);
-  this->SteelTubeSolid = new G4SubtractionSolid("Shielding",TempTube_outer,TempTube_inner);
-  this->SteelTubeLog = new G4LogicalVolume(SteelTubeSolid, fMaterialSteel, "Shielding");
-  this->SteelTubePhys = new G4PVPlacement(0,vec_zero, SteelTubeLog, "Shielding",fLogicWorld, false,0);
-  G4VisAttributes visSteelTube(G4Colour(0.375,0.375,0.375));
-  visSteelTube.SetForceWireframe(true);
-  visSteelTube.SetForceAuxEdgeVisible(true);
-  SteelTubeLog->SetVisAttributes(visSteelTube);
+  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 500.0*mm, 3500.0*mm,startAngle, spanningAngleFull);
+  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 1500.0*mm, 4000.0*mm,startAngle, spanningAngleFull);
+  this->WaterTubeSolid = new G4SubtractionSolid("WaterShielding",TempTube_outer,TempTube_inner,0,vec_offset);
+  this->WaterTubeLog = new G4LogicalVolume(WaterTubeSolid, fMaterialWater, "WaterShielding");
+  this->WaterTubePhys = new G4PVPlacement(0,-vec_offset, WaterTubeLog, "WaterShielding",fLogicWorld, false,0);
+  G4VisAttributes visWaterTube(G4Colour(0,0,1));
+  visWaterTube.SetForceWireframe(true);
+  visWaterTube.SetForceAuxEdgeVisible(true);
+  WaterTubeLog->SetVisAttributes(visWaterTube); 
 
 
 
@@ -462,15 +433,15 @@ void DetectorConstruction::ConstructPit()
     G4cout << "World volume does not exist!!" << G4endl;
     return;
   }  
-  G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+  G4ThreeVector vec_offset(0*mm,0*mm,1500*mm);
   zeroradius = 0.*cm;
   startAngle = 0.*deg;
   spanningAngleFull = 360.*deg;
-  G4Box *solidRock = new G4Box("Rock",5.*m,5.*m,5.*m);
-  G4Tubs *PitTube = new G4Tubs("Pittube", zeroradius, 3475*mm, 7000*mm/2.0, startAngle, spanningAngleFull);
-  this->PitSolid = new G4SubtractionSolid("ChoozPit",solidRock,PitTube);
+  G4Box *solidRock = new G4Box("Rock",6.*m,6.*m,5.*m);
+  G4Tubs *PitTube = new G4Tubs("Pittube", zeroradius, 4475*mm, 9000*mm/2.0, startAngle, spanningAngleFull);
+  this->PitSolid = new G4SubtractionSolid("ChoozPit",solidRock,PitTube,0,vec_offset);
   this->PitLog = new G4LogicalVolume(PitSolid, fMaterialChoozRock, "logicalRock");
-  this->PitPhys =  new G4PVPlacement(0, vec_zero, PitLog, "PVRock", fLogicWorld, false, 0);
+  this->PitPhys =  new G4PVPlacement(0, -vec_offset, PitLog, "PVRock", fLogicWorld, false, 0);
 
   G4VisAttributes visRock(G4Colour(0.398,0.199,0.));
   visRock.SetForceWireframe(true);
@@ -638,21 +609,21 @@ void DetectorConstruction::SetCrystalMaterial(G4String Material)
     crystalmaterial = Material;
     if (Material == "Os")
     {
-      for (int i=0;i<5;i++)
+      for (int i=0;i<1;i++)
       {  
         v_CrystalBoxesLog[i]->SetMaterial(fMaterialOs);
       }  
     }
     if (Material == "Zn")
     {
-      for (int i=0;i<5;i++)
+      for (int i=0;i<1;i++)
       {  
         v_CrystalBoxesLog[i]->SetMaterial(fMaterialZn);
       }
     }  
     if (Material == "Zr")
     {
-      for (int i=0;i<5;i++)
+      for (int i=0;i<1;i++)
       {  
         v_CrystalBoxesLog[i]->SetMaterial(fMaterialZr);
       }
@@ -662,7 +633,7 @@ void DetectorConstruction::SetCrystalMaterial(G4String Material)
   {
     std::cerr << "ERROR in SetCrystalMaterial source type must be Os or Zn setting to Os!" << std::endl;
     crystalmaterial = "Os";
-    for (int i=0;i<5;i++)
+    for (int i=0;i<1;i++)
     {  
       v_CrystalBoxesLog[i]->SetMaterial(fMaterialOs);
     }     

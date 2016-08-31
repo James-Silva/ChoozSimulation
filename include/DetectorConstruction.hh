@@ -161,6 +161,10 @@ class DetectorConstruction : public G4VUserDetectorConstruction
             G4LogicalVolume*        SteelTubeLog;
             G4VPhysicalVolume*      SteelTubePhys;
 
+            G4SubtractionSolid*     WaterTubeSolid;
+            G4LogicalVolume*        WaterTubeLog;
+            G4VPhysicalVolume*      WaterTubePhys;
+
             std::vector<G4Tubs*>	fSolidPolyShielding;
 			std::vector<G4LogicalVolume*>	fLogicPolyShielding;
 			std::vector<G4VPhysicalVolume*>	fPhysiPolyShielding;
@@ -223,6 +227,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
         G4Material*         fMaterialZr;
         G4Material*         fMaterialGd;
         G4Material*			fMaterialScintillator;
+        G4Material*         fMaterialWater;
         G4Material*			fMaterialConcrete;
         G4Material*         fMaterialQuartz;
         G4Material*         fMaterialCorundum;

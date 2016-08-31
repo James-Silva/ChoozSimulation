@@ -137,15 +137,15 @@ void PrimaryGeneratorAction::setGammaPosition()
   G4ThreeVector gammaSourcePos(0.,0.,0.);
   if (d_picksurface < d_probtop)
   {
-    gammaSourcePos = GenerateTopEvent(gammaradius,gammaheight/2.0);
+    gammaSourcePos = GenerateTopEvent(gammaradius,(gammaheight/2.0)+sourceoffsetz);
   } 
   else if (d_picksurface <= d_probtop+d_probside && d_picksurface >= d_probtop)
   {
-    gammaSourcePos = GenerateSideWallEvent(gammaradius,gammaheight);
+    gammaSourcePos = GenerateSideWallEvent(gammaradius,gammaheight+sourceoffsetz);
   }
   else 
   {
-    gammaSourcePos = GenerateTopEvent(gammaradius,-gammaheight/2.0);
+    gammaSourcePos = GenerateTopEvent(gammaradius,-(gammaheight/2.0)+sourceoffsetz);
   }  
   G4ThreeVector gammaMomentum = gammaSourcePos;
   //gammaSourcePos=test_vec;
@@ -182,36 +182,33 @@ void PrimaryGeneratorAction::setNeutronPosition()
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
   //G4double d_shieldingheight = 7000.0*mm;
+  G4double d_shellthickness = 50.0*mm; 
   G4double d_surfacesides = 2. * TMath::Pi() * neutronheight * neutronradius;
   G4double d_surfacetop = TMath::Pi() * neutronradius * neutronradius;
-  G4double d_totalsurface = 2.*d_surfacetop + d_surfacesides;
-  G4double d_probtop = d_surfacetop/d_totalsurface;
+  G4double d_totalsurface = d_surfacetop + d_surfacesides;
   G4double d_probside = d_surfacesides/d_totalsurface;
   G4double d_picksurface = G4UniformRand();
+  G4double d_randomaddition = 2*(G4UniformRand()-0.5)*(0.5*d_shellthickness);
   G4ThreeVector neutronSourcePos(0.,0.,0.);
-  if (d_picksurface < d_probtop)
-  {
-    //std::cout << "Top picked" << std::endl;
-    neutronSourcePos = GenerateTopEvent(neutronradius,neutronheight/2.0);
-  } 
-  else if (d_picksurface <= d_probtop+d_probside && d_picksurface >= d_probtop)
+  //std::cout<<"offset: " << sourceoffsetz/mm << endl;
+  if (d_picksurface <= d_probside)
   {
     //std::cout << "Side picked" << std::endl;
-    neutronSourcePos = GenerateSideWallEvent(neutronradius,neutronheight);
+    neutronSourcePos = GenerateSideWallEvent(neutronradius+d_randomaddition,neutronheight+sourceoffsetz);
   }
   else 
   {
     //std::cout << "Bottom picked" << std::endl;
-    neutronSourcePos = GenerateTopEvent(neutronradius,-neutronheight/2.0);
+    neutronSourcePos = GenerateTopEvent(neutronradius,-(neutronheight/2.0)+sourceoffsetz+d_randomaddition);
   }  
 
   //std::cout << "Neutron Source Pos: " << neutronSourcePos << std::endl; 
-  G4ThreeVector neutronMomentum = neutronSourcePos;
+  //G4ThreeVector neutronMomentum = neutronSourcePos;
   
-  neutronMomentum.setMag(1.);
-  neutronMomentum *= -1.;
+  //neutronMomentum.setMag(1.);
+  //neutronMomentum *= -1.;
 
-  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
+  //fParticleGun->SetParticleMomentumDirection(neutronMomentum);
   fParticleGun->SetParticlePosition(neutronSourcePos);
 }
 
@@ -247,6 +244,10 @@ void PrimaryGeneratorAction::setSourceHeight(G4double height)
 {
     neutronheight = height;
     gammaheight = height;
+}
+void PrimaryGeneratorAction::setSourceHeightOffset(G4double offset)
+{
+  sourceoffsetz = offset;
 }
 
 void PrimaryGeneratorAction::setNewNeutronSpectrumSource()

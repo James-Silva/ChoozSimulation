@@ -27,6 +27,7 @@ class PrimaryGeneratorMessenger: public G4UImessenger
     G4UIcmdWithADoubleAndUnit*	fTypeCmd_gamma;  
     G4UIcmdWithADoubleAndUnit*	fTypeCmd_radius;
     G4UIcmdWithADoubleAndUnit*  fTypeCmd_height;  
+    G4UIcmdWithADoubleAndUnit*  fTypeCmd_heightoffset;  
     G4UIcmdWithAString*	        fTypeCmd_spectrum; 
     G4UIcmdWithABool*	        fTypeCmd_spectrum_bool;
     G4UIcmdWithABool*           fTypeCmd_spectrumxlog_bool;

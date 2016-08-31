@@ -40,6 +40,7 @@ public:
     void setNewGammaSource(G4double energy);
 	void setSourceRadius(G4double radius);
 	void setSourceHeight(G4double radius);
+	void setSourceHeightOffset(G4double offset);
 	void SetSpectralData(G4String filename);
 	void setNewNeutronSpectrumSource();
 	void setNewNeutronSpectrumSource_LogX();
@@ -55,6 +56,7 @@ private:
     std::vector<double> 			vec_SpectralEnergies;
 	std::vector<double> 			vec_SpectralVals;
 	G4double                        neutronradius;
+	G4double                        sourceoffsetz;
 	G4double                        gammaradius;
 	G4double                        neutronheight;
 	G4double                        gammaheight;

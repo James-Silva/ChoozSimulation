@@ -17,14 +17,14 @@
 HistoManagerMessenger::HistoManagerMessenger(HistoManager* man)
 :manager(man)
 {
-	treeDirectory = new G4UIdirectory("/choozsim/tree/", this);
+	treeDirectory = new G4UIdirectory("/ricochetchoozsim/tree/", this);
  	treeDirectory->SetGuidance("Commands for setting the tree output.");
 
-	outputPathCmd = new G4UIcmdWithAString("/choozsim/tree/setOutputFilePath", this);
+	outputPathCmd = new G4UIcmdWithAString("/ricochetchoozsim/tree/setOutputFilePath", this);
 	outputPathCmd->SetGuidance("Set path for output ROOT file.");
 	outputPathCmd->SetDefaultValue("");
 
-	outputNameCmd = new G4UIcmdWithAString("/choozsim/tree/setOutputFileName", this);
+	outputNameCmd = new G4UIcmdWithAString("/ricochetchoozsim/tree/setOutputFileName", this);
 	outputNameCmd->SetGuidance("Set name for output ROOT file.");
 	outputNameCmd->SetDefaultValue("");
 }
