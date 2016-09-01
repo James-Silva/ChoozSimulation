@@ -60,7 +60,7 @@ void EventAction::accumulateEdep_Veto(G4double dEdep)
   fedep_veto += dEdep;
 }
 
-void EventAction::accumulateEdep_Nudetector(G4double dEdep)
+void EventAction::accumulateEdep_detector(G4double dEdep)
 {
   fedep_nudetector_crosscheck += dEdep;
 }

@@ -46,13 +46,13 @@ class HistoManager
 
     double primaryEnergy;
     double primaryX0,primaryY0,primaryZ0;
-    double GdCaptureX0,GdCaptureY0,GdCaptureZ0;
+    double NeutronRecoilX0,NeutronRecoilY0,NeutronRecoilZ0;
     int primaryPDGID;
     int i_Gdflag;
 
 
-    double edep_nudetector;
-    double edep_nudetector_crosscheck;
+    double edep_detector;
+    double edep_detector_crosscheck;
     double edep_veto;
 };
 

@@ -57,13 +57,13 @@ void HistoManager::book(const G4Run* aRun)
   primarytree->Branch("PrimaryZ0", &primaryZ0);
 
   eventtree = new TTree("eventtree", "eventtree");
-  eventtree->Branch("NuDetector", &edep_nudetector);
+  eventtree->Branch("NuDetector", &edep_detector);
   eventtree->Branch("int_Gdflag", &i_Gdflag);
-  eventtree->Branch("InteractionX0", &GdCaptureX0);
-  eventtree->Branch("InteractionY0", &GdCaptureY0);
-  eventtree->Branch("InteractionZ0", &GdCaptureZ0);
+  eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
+  eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
+  eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
   othervolumestree = new TTree("othervolumetree", "eventtree");
-  othervolumestree->Branch("NuDetector_crosscheck", &edep_nudetector_crosscheck);
+  othervolumestree->Branch("NuDetector_crosscheck", &edep_detector_crosscheck);
   othervolumestree->Branch("Vetodetector", &edep_veto);
 
   G4cout << "\n----> Histogram file is opened in " << fileName << G4endl;
@@ -96,7 +96,7 @@ void HistoManager::setPrimaryPDGID(int id)
 
 void HistoManager::setEnergy_Nudetector(double energy)
 {
-  edep_nudetector_crosscheck = energy;
+  edep_detector_crosscheck = energy;
 }
 
 void HistoManager::setEnergy_Veto(double energy)
@@ -128,10 +128,10 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   G4int i_PDGID;
   bool b_gdflag = false;
   bool b_ncapflag = false;
-  edep_nudetector = 0.;
-  GdCaptureX0  = -99999;
-  GdCaptureY0  = -99999;
-  GdCaptureZ0  = -99999;
+  edep_detector = 0.;
+  NeutronRecoilX0  = -99999;
+  NeutronRecoilY0  = -99999;
+  NeutronRecoilZ0  = -99999;
   i_Gdflag = 0;
 
   if (!anEvent || !theHits)
@@ -156,18 +156,20 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
     {
        b_gdflag = true;
        std::cout << "Gd Detected" <<  std::endl;
-       GdCaptureX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
-       GdCaptureY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
-       GdCaptureZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
-       std::cout << "Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
     }  
-    if (s_currentvol == "NuDetector")
+    if (s_currentvol == "Crystal_1")
     {  
-      edep_nudetector += (*theHits)[i_hitcounter]->GetEdep();
-      if (s_currentprocess == "nCapture")
+      edep_detector += (*theHits)[i_hitcounter]->GetEdep();
+      if (s_currentprocess == "hadElastic")
       {
         b_ncapflag = true;
-        std::cout << "Neutron Capture Detected" <<  std::endl;
+        NeutronRecoilX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
+        NeutronRecoilY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
+        NeutronRecoilZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
+        std::cout << "Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
+
+
+        std::cout << "Neutron Recoil Detected" <<  std::endl;
       }  
     }  
 
@@ -176,7 +178,7 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   {
     i_Gdflag = 1;
   }  
-  edep_nudetector = edep_nudetector/keV;
+  edep_detector = edep_detector/keV;
   //std::cout << "Primary Energy: " << primaryEnergy << " keV"  <<  std::endl;
   //std::cout << "Total: " << edep_nudetector << " keV"  << std::endl;
 

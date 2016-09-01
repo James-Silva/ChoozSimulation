@@ -20,7 +20,7 @@ public:
   virtual void    EndOfEventAction(const G4Event*);
 
   void accumulateEdep_Veto(G4double dEdep);
-  void accumulateEdep_Nudetector(G4double dEdep);
+  void accumulateEdep_detector(G4double dEdep);
 
 private:
    RunAction*       fRunAct;

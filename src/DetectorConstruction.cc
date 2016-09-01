@@ -52,7 +52,7 @@ DetectorConstruction::~DetectorConstruction()
 G4VPhysicalVolume*  DetectorConstruction::Construct()
 {
   InitializeWorld();
-  //ConstructADR();
+  ConstructADR();
   //ConstructPit();
   //ConstructOuterDetectors();
   //AddConcreteWalls();
@@ -243,8 +243,8 @@ void DetectorConstruction::ConstructOuterDetectors()
   G4ThreeVector vec_offset(0*mm,0*mm,+500*mm);
   TempTube_inner=0;
   TempTube_outer=0;
-  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 500.0*mm, 3500.0*mm,startAngle, spanningAngleFull);
-  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 1500.0*mm, 4000.0*mm,startAngle, spanningAngleFull);
+  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 3475.0*mm, 3500.0*mm,startAngle, spanningAngleFull);
+  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4475.0*mm, 4000.0*mm,startAngle, spanningAngleFull);
   this->WaterTubeSolid = new G4SubtractionSolid("WaterShielding",TempTube_outer,TempTube_inner,0,vec_offset);
   this->WaterTubeLog = new G4LogicalVolume(WaterTubeSolid, fMaterialWater, "WaterShielding");
   this->WaterTubePhys = new G4PVPlacement(0,-vec_offset, WaterTubeLog, "WaterShielding",fLogicWorld, false,0);
