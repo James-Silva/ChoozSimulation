@@ -53,8 +53,8 @@ G4VPhysicalVolume*  DetectorConstruction::Construct()
 {
   InitializeWorld();
   ConstructADR();
-  //ConstructPit();
-  //ConstructOuterDetectors();
+  ConstructPit();
+  ConstructOuterDetectors();
   //AddConcreteWalls();
   phystest = ConstructDetectors();
   
