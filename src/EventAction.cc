@@ -8,7 +8,7 @@
 
 EventAction::EventAction(RunAction* run, HistoManager* histo)
 :G4UserEventAction(),
- fRunAct(run),fHistoManager(histo), fedep_veto(0.),fedep_nudetector(0.),
+ fRunAct(run),fHistoManager(histo), fedep_veto(0.),fedep_detector(0.),
  fPrintModulo(0)
 {
  fPrintModulo = 1000;
@@ -26,7 +26,7 @@ void EventAction::BeginOfEventAction(const G4Event* evt)
     G4cout << "\n---> Begin of event: " << evtNb << G4endl;
 
   // reset event accumulators
-  fedep_nudetector_crosscheck =0;
+  fedep_detector_crosscheck =0;
   fedep_veto =0;
   G4SDManager* SDmanager = G4SDManager::GetSDMpointer();
   CrystalHCID = SDmanager->GetCollectionID("CrystalHitsCollection");
@@ -47,7 +47,7 @@ void EventAction::EndOfEventAction(const G4Event* anEvent)
       fHistoManager->FillTree(anEvent, thisHC);
     }
   }
-  fHistoManager->setEnergy_Nudetector(fedep_nudetector_crosscheck);
+  fHistoManager->setEnergy_detector(fedep_detector_crosscheck);
   fHistoManager->setEnergy_Veto(fedep_veto);
   //std::cout << "Edep Veto: " << fedep_veto << std::endl;
   //std::cout << "Edep setEnergy_Nudetector_crosscheck: " << fedep_nudetector_crosscheck << std::endl;
@@ -62,5 +62,5 @@ void EventAction::accumulateEdep_Veto(G4double dEdep)
 
 void EventAction::accumulateEdep_detector(G4double dEdep)
 {
-  fedep_nudetector_crosscheck += dEdep;
+  fedep_detector_crosscheck += dEdep;
 }

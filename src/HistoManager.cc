@@ -57,13 +57,13 @@ void HistoManager::book(const G4Run* aRun)
   primarytree->Branch("PrimaryZ0", &primaryZ0);
 
   eventtree = new TTree("eventtree", "eventtree");
-  eventtree->Branch("NuDetector", &edep_detector);
+  eventtree->Branch("Detector", &edep_detector);
   eventtree->Branch("int_Gdflag", &i_Gdflag);
   eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
   eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
   eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
   othervolumestree = new TTree("othervolumetree", "eventtree");
-  othervolumestree->Branch("NuDetector_crosscheck", &edep_detector_crosscheck);
+  othervolumestree->Branch("Detector_crosscheck", &edep_detector_crosscheck);
   othervolumestree->Branch("Vetodetector", &edep_veto);
 
   G4cout << "\n----> Histogram file is opened in " << fileName << G4endl;
@@ -94,7 +94,7 @@ void HistoManager::setPrimaryPDGID(int id)
 }
 
 
-void HistoManager::setEnergy_Nudetector(double energy)
+void HistoManager::setEnergy_detector(double energy)
 {
   edep_detector_crosscheck = energy;
 }

@@ -27,8 +27,8 @@ private:
    HistoManager*    fHistoManager;
 
    G4double         fedep_veto;
-   G4double         fedep_nudetector;
-   G4double         fedep_nudetector_crosscheck;
+   G4double         fedep_detector;
+   G4double         fedep_detector_crosscheck;
 
    G4int            fPrintModulo;
    G4int            CrystalHCID;  

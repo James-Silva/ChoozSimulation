@@ -29,7 +29,7 @@ class HistoManager
     void SetOutputName(const G4String name);
     void setPrimaryEnergy(double energy);
     void setPrimaryPDGID(int id);
-    void setEnergy_Nudetector(double energy);
+    void setEnergy_detector(double energy);
     void setEnergy_Veto(double energy);
     void fill();
     void FillTree(const G4Event* anEvent, CrystalHitsCollection* theHits);
