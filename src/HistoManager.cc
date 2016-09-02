@@ -69,7 +69,9 @@ void HistoManager::book(const G4Run* aRun)
   othervolumestree->Branch("watershield_lastX0", &watershield_lastX0);
   othervolumestree->Branch("watershield_lastY0", &watershield_lastY0);
   othervolumestree->Branch("watershield_lastZ0", &watershield_lastZ0);
-  
+  othervolumestree->Branch("crystal_firstX0", &crystal_firstX0);
+  othervolumestree->Branch("crystal_firstY0", &crystal_firstY0);
+  othervolumestree->Branch("crystal_firstZ0", &crystal_firstZ0); 
 
   G4cout << "\n----> Histogram file is opened in " << fileName << G4endl;
 }
