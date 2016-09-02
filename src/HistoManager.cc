@@ -119,14 +119,26 @@ void HistoManager::storeleavepoint_watershield(G4ThreeVector vec_position_waters
    vec_preposition_watershielding = vec_position_watershielding;
 }
 
+void HistoManager::storeentrypoint_crystal(G4ThreeVector vec_position)
+{
+   vec_postposition_crystal = vec_position;
+}
+
 void HistoManager::fill()
 {
   watershield_lastX0 = -99999;
   watershield_lastY0 = -99999;
   watershield_lastZ0 = -99999;
+  crystal_firstX0 = -999999;
+  crystal_firstY0 = -999999;
+  crystal_firstZ0 = -999999;
   watershield_lastX0 = vec_preposition_watershielding.getX();
   watershield_lastY0 = vec_preposition_watershielding.getY();
   watershield_lastZ0 = vec_preposition_watershielding.getZ();
+  crystal_firstX0 = vec_postposition_crystal.getX();
+  crystal_firstY0 = vec_postposition_crystal.getY();
+  crystal_firstZ0 = vec_postposition_crystal.getZ();
+
   othervolumestree->Fill();
 }
 
@@ -187,7 +199,7 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
         NeutronRecoilX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
         NeutronRecoilY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
         NeutronRecoilZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
-        std::cout << "Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
+        std::cout << "Hit Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
 
 
         std::cout << "Neutron Recoil Detected" <<  std::endl;

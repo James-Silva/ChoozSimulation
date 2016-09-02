@@ -33,6 +33,7 @@ class HistoManager
     void setEnergy_Veto(double energy);
     void setEnergy_Poly(double energy);
     void storeleavepoint_watershield(G4ThreeVector vec_position_watershielding);
+    void storeentrypoint_crystal(G4ThreeVector vec_position);
     void fill();
     void FillTree(const G4Event* anEvent, CrystalHitsCollection* theHits);
 
@@ -49,6 +50,7 @@ class HistoManager
     double primaryEnergy;
     double primaryX0,primaryY0,primaryZ0;
     double watershield_lastX0,watershield_lastY0,watershield_lastZ0;
+    double crystal_firstX0,crystal_firstY0,crystal_firstZ0;
     double NeutronRecoilX0,NeutronRecoilY0,NeutronRecoilZ0;
     int primaryPDGID;
     int i_Gdflag;
@@ -59,6 +61,7 @@ class HistoManager
     double edep_veto;
     double edep_poly;
     G4ThreeVector vec_preposition_watershielding;
+    G4ThreeVector vec_postposition_crystal;
 };
 
 

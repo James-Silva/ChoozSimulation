@@ -21,19 +21,23 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 { 
   // get volume and particle name of the current step
   G4VPhysicalVolume* volume = aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-  G4VPhysicalVolume* post_volume = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
   G4String name = aStep->GetTrack()->GetDefinition()->GetParticleName();
   G4ThreeVector vec_position(0*mm,0*mm,0*mm);
-  double temp;
   // collect energy and track length step by step
   G4double d_stepenergy = aStep->GetTotalEnergyDeposit()/keV;
   //aStep->GetTotalEnergyDeposit()/keV
-  if(volume->GetName() == "WaterShielding" && post_volume->GetName() != "WaterShielding")
+  if(volume->GetName() == "Crystal_1" && aStep->GetPreStepPoint()->GetStepStatus() == fGeomBoundary)
   {
-     std::cout << "Leaving Water Shielding" << std::endl;
+    vec_position = aStep->GetPreStepPoint()->GetPosition();
+    fEventAction->storeentrypoint_crystal(vec_position);
+    std::cout << "Crystal Entry point: " << vec_position << std::endl;
+  } 
+  if(volume->GetName() == "WaterShielding" && aStep->GetPostStepPoint()->GetStepStatus() == fGeomBoundary)
+  {
+     //std::cout << "Leaving Water Shielding" << std::endl;
      vec_position = aStep->GetPreStepPoint()->GetPosition();
-     temp = (vec_position.getX())*(vec_position.getX())+(vec_position.getY())*(vec_position.getY()); 
-     std::cout << "radius: " << sqrt(temp) << std::endl;
+     //double temp = (vec_position.getX())*(vec_position.getX())+(vec_position.getY())*(vec_position.getY()); 
+     //std::cout << "radius: " << sqrt(temp) << std::endl;
      fEventAction->storeleavepoint_watershield(vec_position);
   }  
   if(volume->GetName() == "WaterShielding" && d_stepenergy > 0)

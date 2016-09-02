@@ -23,6 +23,7 @@ public:
   void accumulateEdep_detector(G4double dEdep);
   void accumulateEdep_poly(G4double dEdep);
   void storeleavepoint_watershield(G4ThreeVector vectorposition);
+  void storeentrypoint_crystal(G4ThreeVector vectorposition);
 
 private:
    RunAction*       fRunAct;
@@ -33,6 +34,7 @@ private:
    G4double         fedep_poly;
    G4double         fedep_detector_crosscheck;
    G4ThreeVector    vec_position_watershielding; 
+   G4ThreeVector    vec_position_crystal;
 
    G4int            fPrintModulo;
    G4int            CrystalHCID;  
