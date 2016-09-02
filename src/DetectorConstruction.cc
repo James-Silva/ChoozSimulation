@@ -183,7 +183,7 @@ void DetectorConstruction::InitializeWorld()
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()
 {
-  DetectorSize = 5.0*cm;
+  DetectorSize = 7.18*cm; // Size needed for 1 Kg of detector material
   
   std::vector<std::string> CyrstalLabels = {"Crystal_1", "Crystal_2","Crystal_3", "Crystal_4","Crystal_5"};
   std::vector<G4double> Cyrstalpos_x = {0.*cm, -6.*cm, 6.*cm, 6.*cm, -6.*cm};
@@ -302,9 +302,9 @@ void DetectorConstruction::ConstructPolySheilding(G4double innerR, G4double oute
   fADRheight1 = fADRheight-2*(topthickness*cm);
   this->shieldTube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield, fADRheight/2.0, startAngle, spanningAngleFull);
   this->shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, fADRheight1/2.0,startAngle, spanningAngleFull);
-  G4SubtractionSolid* fullshieldTube = new G4SubtractionSolid("Shielding Shell (Poly)",shieldTube,shield1Tube);
-  this->fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, fMaterialPoly_Borated, "Shielding Shell (Borated Poly)");
-  this->fullshieldTubePhys = new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Shielding shell (Borated Poly)",fLogicWorld, false,0);
+  G4SubtractionSolid* fullshieldTube = new G4SubtractionSolid("Borated_Poly_Shield",shieldTube,shield1Tube);
+  this->fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, fMaterialPoly_Borated, "Borated_Poly_Shield");
+  this->fullshieldTubePhys = new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Borated_Poly_Shield",fLogicWorld, false,0);
   G4VisAttributes visshieldTube(G4Colour(1.0,0.586,0.0));
   visshieldTube.SetForceWireframe(true);
   visshieldTube.SetForceAuxEdgeVisible(true);

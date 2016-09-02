@@ -182,7 +182,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
   //G4double d_shieldingheight = 7000.0*mm;
-  G4double d_shellthickness = 50.0*mm; 
+  G4double d_shellthickness = 0.0*mm; 
   G4double d_surfacesides = 2. * TMath::Pi() * neutronheight * neutronradius;
   G4double d_surfacetop = TMath::Pi() * neutronradius * neutronradius;
   G4double d_totalsurface = d_surfacetop + d_surfacesides;

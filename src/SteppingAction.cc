@@ -21,17 +21,34 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
 { 
   // get volume and particle name of the current step
   G4VPhysicalVolume* volume = aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+  G4VPhysicalVolume* post_volume = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
   G4String name = aStep->GetTrack()->GetDefinition()->GetParticleName();
+  G4ThreeVector vec_position(0*mm,0*mm,0*mm);
+  double temp;
   // collect energy and track length step by step
   G4double d_stepenergy = aStep->GetTotalEnergyDeposit()/keV;
   //aStep->GetTotalEnergyDeposit()/keV
- 
-  if(volume->GetName() == "Veto" && d_stepenergy > 0)
+  if(volume->GetName() == "WaterShielding" && post_volume->GetName() != "WaterShielding")
   {
-    //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+     std::cout << "Leaving Water Shielding" << std::endl;
+     vec_position = aStep->GetPreStepPoint()->GetPosition();
+     temp = (vec_position.getX())*(vec_position.getX())+(vec_position.getY())*(vec_position.getY()); 
+     std::cout << "radius: " << sqrt(temp) << std::endl;
+     fEventAction->storeleavepoint_watershield(vec_position);
+  }  
+  if(volume->GetName() == "WaterShielding" && d_stepenergy > 0)
+  {
+    //std::cout << "Water Shielding Event " << std::endl;
     //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
     //std::cout << "in if statement" << std::endl;
     fEventAction->accumulateEdep_Veto(d_stepenergy);
+  }
+  if(volume->GetName() == "Borated_Poly_Shield" && d_stepenergy > 0)
+  {
+    //std::cout << "Poly Shielding event " << std::endl;
+    //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
+    //std::cout << "in if statement" << std::endl;
+    fEventAction->accumulateEdep_poly(d_stepenergy);
   }
   if(volume->GetName() == "Crystal_1" && d_stepenergy > 0)
   {

@@ -34,11 +34,11 @@ void HistoManager::book(const G4Run* aRun)
   G4String runNumString = int2str.str();
   G4String fileName;
   if(outputPath == "" && outputName == "")
-    fileName = "ChoozSimulation"+runNumString+".root";
+    fileName = "RicochetChoozSimulation"+runNumString+".root";
   else if(outputPath == "")
     fileName = outputName;
   else if(outputName == "")
-    fileName = outputPath+"/ChoozSimulation"+runNumString+".root";
+    fileName = outputPath+"/RicochetChoozSimulation"+runNumString+".root";
   else
     fileName = outputPath+"/"+outputName;
   outfile = new TFile(fileName,"RECREATE");
@@ -65,6 +65,11 @@ void HistoManager::book(const G4Run* aRun)
   othervolumestree = new TTree("othervolumetree", "eventtree");
   othervolumestree->Branch("Detector_crosscheck", &edep_detector_crosscheck);
   othervolumestree->Branch("Vetodetector", &edep_veto);
+  othervolumestree->Branch("Edep_Poly", &edep_poly);
+  othervolumestree->Branch("watershield_lastX0", &watershield_lastX0);
+  othervolumestree->Branch("watershield_lastY0", &watershield_lastY0);
+  othervolumestree->Branch("watershield_lastZ0", &watershield_lastZ0);
+  
 
   G4cout << "\n----> Histogram file is opened in " << fileName << G4endl;
 }
@@ -104,9 +109,24 @@ void HistoManager::setEnergy_Veto(double energy)
   edep_veto = energy;
 }
 
+void HistoManager::setEnergy_Poly(double energy)
+{
+  edep_poly = energy;
+}
+
+void HistoManager::storeleavepoint_watershield(G4ThreeVector vec_position_watershielding)
+{
+   vec_preposition_watershielding = vec_position_watershielding;
+}
 
 void HistoManager::fill()
 {
+  watershield_lastX0 = -99999;
+  watershield_lastY0 = -99999;
+  watershield_lastZ0 = -99999;
+  watershield_lastX0 = vec_preposition_watershielding.getX();
+  watershield_lastY0 = vec_preposition_watershielding.getY();
+  watershield_lastZ0 = vec_preposition_watershielding.getZ();
   othervolumestree->Fill();
 }
 
@@ -132,6 +152,7 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   NeutronRecoilX0  = -99999;
   NeutronRecoilY0  = -99999;
   NeutronRecoilZ0  = -99999;
+
   i_Gdflag = 0;
 
   if (!anEvent || !theHits)
@@ -181,7 +202,7 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   edep_detector = edep_detector/keV;
   //std::cout << "Primary Energy: " << primaryEnergy << " keV"  <<  std::endl;
   //std::cout << "Total: " << edep_nudetector << " keV"  << std::endl;
-
+   
   if(eventtree)
     eventtree->Fill();
   if (primarytree)
