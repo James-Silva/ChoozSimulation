@@ -51,7 +51,7 @@ void EventAction::EndOfEventAction(const G4Event* anEvent)
   fHistoManager->setEnergy_Veto(fedep_veto);
   fHistoManager->setEnergy_Poly(fedep_poly);
   fHistoManager->storeleavepoint_watershield(vec_position_watershielding);
-  fHistoManager->storeentrypoint_crystal(vec_position_watershielding);
+  fHistoManager->storeentrypoint_crystal(vec_position_crystal);
   //std::cout << "Edep Veto: " << fedep_veto << std::endl;
   //std::cout << "Edep setEnergy_Nudetector_crosscheck: " << fedep_nudetector_crosscheck << std::endl;
   fHistoManager->fill();
