@@ -27,6 +27,7 @@ void EventAction::BeginOfEventAction(const G4Event* evt)
 
   // reset event accumulators
   fedep_detector_crosscheck =0;
+  fedep_veto =1;
   fedep_veto =0;
   G4SDManager* SDmanager = G4SDManager::GetSDMpointer();
   CrystalHCID = SDmanager->GetCollectionID("CrystalHitsCollection");
