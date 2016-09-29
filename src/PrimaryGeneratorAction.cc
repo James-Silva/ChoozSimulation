@@ -207,14 +207,26 @@ void PrimaryGeneratorAction::setNeutronPosition()
   }  
 
   //std::cout << "Neutron Source Pos: " << neutronSourcePos << std::endl; 
-  G4ThreeVector neutronMomentum = neutronSourcePos;
+  G4ThreeVector neutronMomentum = GenerateIsotropicVector();
   neutronMomentum.setMag(1.);
-  neutronMomentum *= -1.;
 
-  //fParticleGun->SetParticleMomentumDirection(neutronMomentum);
+  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
   fParticleGun->SetParticlePosition(neutronSourcePos);
 }
 
+
+G4ThreeVector PrimaryGeneratorAction::GenerateIsotropicVector()
+{
+  G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
+  G4double randTheta = TMath::Pi() * (G4UniformRand()-0.5);
+  G4double radius = 1;
+  G4double x = radius*TMath::Cos(randPhi)*TMath::Sin(randTheta);
+  G4double y = radius*TMath::Sin(randPhi)*TMath::Sin(randTheta);
+  G4double z = radius*TMath::Cos(randTheta);
+  G4ThreeVector Isovector(x,y,z);  
+  return Isovector;
+
+}
 
 G4ThreeVector PrimaryGeneratorAction::GenerateSideWallEvent(G4double radius,G4double height,G4double offset)
 {

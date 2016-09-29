@@ -52,6 +52,7 @@ public:
 	void setSourceThickness(G4double thickness);
 	G4ThreeVector GenerateSideWallEvent(G4double radius,G4double height,G4double offset);
     G4ThreeVector GenerateTopEvent(G4double radius,G4double height);
+    G4ThreeVector GenerateIsotropicVector();
 private:
     TH1D 							h_Spectrum;
     std::vector<double> 			vec_SpectralEnergies;
