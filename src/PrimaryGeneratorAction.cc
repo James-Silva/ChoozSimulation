@@ -182,19 +182,20 @@ void PrimaryGeneratorAction::setNeutronPosition()
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
   //G4double d_shieldingheight = 7000.0*mm;
- 
-  G4double d_volumesides = 2. * TMath::Pi() * neutronheight * neutronradius;
-  G4double d_volumetop = TMath::Pi() * neutronradius * neutronradius;
+  G4double d_innerradius = neutronradius-(0.5*sourcethickness);
+  G4double d_outerradius = neutronradius+(0.5*sourcethickness);
+  G4double d_volumesides = TMath::Pi() * (neutronheight) * (TMath::Power(d_outerradius,2)-TMath::Power(d_innerradius,2));
+  G4double d_volumetop = TMath::Pi() * TMath::Power(d_innerradius,2) * sourcethickness;
   G4double d_totalvolume = d_volumetop + d_volumesides;
   G4double d_probside = d_volumesides/d_totalvolume;
   G4double d_picksurface = G4UniformRand();
   G4double d_randomaddition = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
-  std::cout << "Source thickness:  " << sourcethickness << std::endl;
+  G4double d_randomaddition_bottom = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
+  G4double d_bottomdisk =  -0.5*neutronheight+sourceoffsetz-(0.5*sourcethickness);
   G4ThreeVector neutronSourcePos(0.,0.,0.);
   //std::cout<<"offset: " << sourceoffsetz/mm << endl;
   d_randomaddition = 0;
-  //if (d_picksurface <= d_probside)
-  if (true)
+  if (d_picksurface <= d_probside)
   {
     //std::cout << "Side picked" << std::endl;
     neutronSourcePos = GenerateSideWallEvent(neutronradius+d_randomaddition,neutronheight,sourceoffsetz-(0.5*sourcethickness));
@@ -203,7 +204,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
   else 
   {
     //std::cout << "Bottom picked" << std::endl;
-    neutronSourcePos = GenerateTopEvent(neutronradius,-(neutronheight/2.0)+sourceoffsetz+d_randomaddition);
+    neutronSourcePos = GenerateTopEvent(d_innerradius,d_bottomdisk+d_randomaddition_bottom);
   }  
 
   //std::cout << "Neutron Source Pos: " << neutronSourcePos << std::endl; 
@@ -232,8 +233,6 @@ G4ThreeVector PrimaryGeneratorAction::GenerateSideWallEvent(G4double radius,G4do
 {
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
   G4double randz =  height*(G4UniformRand()-0.5)+offset;
-  std::cout << "Max Z: " << height*(1-0.5)+offset << std::endl;
-  std::cout << "Min Z: " << height*(0-0.5)+offset << std::endl;
   //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
   G4ThreeVector SourcePos(radius * TMath::Cos(randPhi)*mm,
                           radius * TMath::Sin(randPhi)*mm,
@@ -245,6 +244,7 @@ G4ThreeVector PrimaryGeneratorAction::GenerateTopEvent(G4double radius,G4double 
 {
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
   G4double sourceradius = G4UniformRand() * radius;
+  std::cout << "Bottom r,z:  " << sourceradius << " , " << height << std::endl;
   //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
   G4ThreeVector SourcePos(sourceradius * TMath::Cos(randPhi)*mm,
                           sourceradius * TMath::Sin(randPhi)*mm,
