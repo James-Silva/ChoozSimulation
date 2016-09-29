@@ -49,7 +49,8 @@ public:
 	void SetNeutronPointSource(G4ThreeVector pos);
 	void SetGammaPointSource(G4ThreeVector pos);
 	void SetGenerator(G4String generatorType);
-	G4ThreeVector GenerateSideWallEvent(G4double radius,G4double height);
+	void setSourceThickness(G4double thickness);
+	G4ThreeVector GenerateSideWallEvent(G4double radius,G4double height,G4double offset);
     G4ThreeVector GenerateTopEvent(G4double radius,G4double height);
 private:
     TH1D 							h_Spectrum;
@@ -60,6 +61,7 @@ private:
 	G4double                        gammaradius;
 	G4double                        neutronheight;
 	G4double                        gammaheight;
+	G4double                        sourcethickness;
 	PrimaryGeneratorMessenger*		fMessenger;
 	G4ParticleGun*           		fParticleGun;  //pointer a to G4 class
 	DetectorConstruction*    		fDetector;     //pointer to the geometry

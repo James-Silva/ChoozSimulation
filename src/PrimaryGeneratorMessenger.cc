@@ -34,6 +34,11 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
   fTypeCmd_height->SetGuidance("Set source height (cylinder) (sets both gamma and neutron generator radius)");
   fTypeCmd_height->SetDefaultValue(100*CLHEP::mm);
 
+  fTypeCmd_thickness = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourcethickness",this);
+  fTypeCmd_thickness->SetGuidance("Set Source thickness (side and bottom)");
+  fTypeCmd_thickness->SetDefaultValue(100*CLHEP::mm);
+
+
   fTypeCmd_heightoffset = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourceheightoffset",this);
   fTypeCmd_heightoffset->SetGuidance("Set source height offset (cylinder) (sets both gamma and neutron generator radius)");
   fTypeCmd_heightoffset->SetDefaultValue(0*CLHEP::mm);  
@@ -84,6 +89,10 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
   {
     fGeneratorAction->setSourceHeight(fTypeCmd_height->GetNewDoubleValue(newValue));
   }
+  if(command == fTypeCmd_thickness)
+  {
+    fGeneratorAction->setSourceThickness(fTypeCmd_thickness->GetNewDoubleValue(newValue));
+  }  
   if(command == fTypeCmd_heightoffset)
   {
     fGeneratorAction->setSourceHeightOffset(fTypeCmd_heightoffset->GetNewDoubleValue(newValue));
