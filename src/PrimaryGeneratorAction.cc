@@ -213,6 +213,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
 
   fParticleGun->SetParticleMomentumDirection(neutronMomentum);
   fParticleGun->SetParticlePosition(neutronSourcePos);
+  //std::cout << "Zposition of init: " << neutronSourcePos.getZ() << std::endl;
 }
 
 
@@ -244,7 +245,7 @@ G4ThreeVector PrimaryGeneratorAction::GenerateTopEvent(G4double radius,G4double 
 {
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
   G4double sourceradius = G4UniformRand() * radius;
-  std::cout << "Bottom r,z:  " << sourceradius << " , " << height << std::endl;
+  //std::cout << "Bottom r,z:  " << sourceradius << " , " << height << std::endl;
   //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
   G4ThreeVector SourcePos(sourceradius * TMath::Cos(randPhi)*mm,
                           sourceradius * TMath::Sin(randPhi)*mm,
