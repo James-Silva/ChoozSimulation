@@ -49,12 +49,12 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
+
+set(CMAKE_CXX_STANDARD 14) 
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_executable(RicochetChoozSim RicochetChoozSim.cc ${sources} ${headers})
 target_link_libraries(RicochetChoozSim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
-
-
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-target_link_libraries(RicochetChoozSim "$ENV{ROOTSYS}/lib/libPhysics.so" "$ENV{ROOTSYS}/lib/libRIO.so" "$ENV{ROOTSYS}/lib/libMathCore.so" "$ENV{ROOTSYS}/lib/libTree.so" "$ENV{ROOTSYS}/lib/libCore.so" "$ENV{ROOTSYS}/lib/libMathMore.so" "$ENV{ROOTSYS}/lib/libHist.so" ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
