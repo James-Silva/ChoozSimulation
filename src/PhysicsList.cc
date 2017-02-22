@@ -19,7 +19,7 @@
 PhysicsList::PhysicsList()
 {
   G4LossTableManager::Instance();
-  defaultCutValue = 0.1*mm;
+  defaultCutValue = 0.1*CLHEP::mm;
   cutForGamma     = defaultCutValue;
   cutForElectron  = defaultCutValue;
   cutForPositron  = defaultCutValue;
