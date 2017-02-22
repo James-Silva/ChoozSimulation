@@ -15,7 +15,6 @@
 #include "G4UnitsTable.hh"
 #include "GPSPrimaryGeneratorAction.hh"
 #include <stdlib.h>
-#include "Math/Interpolator.h"
 using namespace std;
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* DC, HistoManager* histo)
@@ -310,26 +309,21 @@ void PrimaryGeneratorAction::setSourceThickness(G4double thickness)
 
 void PrimaryGeneratorAction::SetSpectralData(G4String filename)
 {
-  // check file existence
+  
+  std::map<double, double> spectrum;
+  double energy, value;
+  
+  {
     std::ifstream DataFile(filename);
-    if(!DataFile.is_open())
-      std::cout << "ERROR: Cannot open file " << filename << "!" << std::endl;
+    if(!DataFile.is_open()) std::cout << "ERROR: Cannot open file " << filename << "!" << std::endl;
+    while(DataFile >> energy >> value) spectrum[energy] = value;
 
-    // read text file
-    double energy, value;
-    while(DataFile >> energy >> value)
-  {
-    vec_SpectralEnergies.push_back(energy);
-    vec_SpectralVals.push_back(value);
-    //std::cout << value << std::endl;
   }
-  DataFile.close();
 
-  ROOT::Math::Interpolator SpectrumInterp(vec_SpectralEnergies, vec_SpectralVals, ROOT::Math::Interpolation::kLINEAR);
-  h_Spectrum = TH1D("h_Spectrum", "h_Spectrum", 1000, vec_SpectralEnergies.front(), vec_SpectralEnergies.back());
-  for(int jBin = 0; jBin < h_Spectrum.GetNbinsX(); jBin++)
-  {
-    h_Spectrum.SetBinContent(jBin+1, SpectrumInterp.Eval(h_Spectrum.GetBinCenter(jBin+1)));
+  h_Spectrum = TH1D("h_Spectrum", "h_Spectrum", 1000, std::begin(spectrum)->first, std::end(spectrum)->first);
+  for(int jBin = 0; jBin < h_Spectrum.GetNbinsX(); ++jBin){
+    
+    h_Spectrum.SetBinContent(jBin+1, interpolate(spectrum, h_Spectrum.GetBinCenter(jBin+1)));
   }
 }
 

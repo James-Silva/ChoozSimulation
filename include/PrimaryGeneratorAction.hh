@@ -75,6 +75,24 @@ private:
     bool logaxis; 
 };
 
+
+template <class T, class K>
+K interpolate(const std::map<T,K>& map, T x){
+  
+  auto itUpper = map.upper_bound(x);
+  
+  if(itUpper == map.end()) return (--itUpper)->second;
+  else if(itUpper == map.begin()) return itUpper->second;
+  else{
+    
+    auto itLower = itUpper;
+    --itLower;
+    return itLower->second + (x - itLower->first) * (itUpper->second - itLower->second) / (itUpper->first - itLower->first) ;//y1 + (x - x1) (y2 - y1) / (x2 - x1)
+    
+  }
+  
+}
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
