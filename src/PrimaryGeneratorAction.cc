@@ -188,19 +188,24 @@ void PrimaryGeneratorAction::setNeutronPosition()
   G4double totalvolume = volumetop + volumesides;
   G4double probside = volumesides/totalvolume;
   G4double picksurface = G4UniformRand();
-  G4double randomaddition = (G4UniformRand()-0.5)*sourcethickness;
-  G4double randomaddition_bottom = (G4UniformRand()-0.5)*sourcethickness;
-  G4double bottomdisk =  -0.5*neutronheight+sourceoffsetz-0.5*sourcethickness;
-  G4ThreeVector neutronSourcePos{};
-  //std::cout<<"offset: " << sourceoffsetz/mm << endl;
-  randomaddition = 0;
-  if (picksurface <= probside) neutronSourcePos = GenerateSideWallEvent(neutronradius+randomaddition,neutronheight,sourceoffsetz-(0.5*sourcethickness));
-  else neutronSourcePos = GenerateTopEvent(innerradius,bottomdisk+randomaddition_bottom);
-
-  //std::cout << "Neutron Source Pos: " << neutronSourcePos << std::endl; 
   
+  G4ThreeVector neutronSourcePos{};
+  if (picksurface <= probside){
+    
+    G4double randomaddition = (G4UniformRand()-0.5)*sourcethickness;
+    neutronSourcePos = GenerateSideWallEvent(neutronradius+randomaddition,neutronheight,sourceoffsetz-(0.5*sourcethickness));
+    
+  }
+  else{
+    
+    G4double randomaddition_bottom = (G4UniformRand()-0.5)*sourcethickness;
+    G4double bottomdisk =  -0.5*neutronheight+sourceoffsetz-0.5*sourcethickness;
+    neutronSourcePos = GenerateTopEvent(innerradius,bottomdisk+randomaddition_bottom);
+    
+  }
+
   fParticleGun->SetParticlePosition(neutronSourcePos);
-  //std::cout << "Zposition of init: " << neutronSourcePos.getZ() << std::endl;
+
 }
 
 void PrimaryGeneratorAction::setNeutronMomentum()
