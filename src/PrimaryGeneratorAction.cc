@@ -227,23 +227,16 @@ G4ThreeVector PrimaryGeneratorAction::GenerateSideWallEvent(G4double radius,G4do
 {
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
   G4double randz =  height*(G4UniformRand()-0.5)+offset;
-  //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
-  G4ThreeVector SourcePos(radius * TMath::Cos(randPhi)*mm,
-                          radius * TMath::Sin(randPhi)*mm,
-                          randz);
-  return SourcePos;
+  
+  return G4ThreeVector (radius * TMath::Cos(randPhi), radius * TMath::Sin(randPhi), randz);
 }
 
 G4ThreeVector PrimaryGeneratorAction::GenerateTopEvent(G4double radius,G4double height)
 {
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
-  G4double sourceradius = G4UniformRand() * radius;
-  //std::cout << "Bottom r,z:  " << sourceradius << " , " << height << std::endl;
-  //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
-  G4ThreeVector SourcePos(sourceradius * TMath::Cos(randPhi)*mm,
-                          sourceradius * TMath::Sin(randPhi)*mm,
-                          height);
-  return SourcePos;
+  G4double sourceradius = std::sqrt(G4UniformRand() * std::pow(radius,2));
+  
+  return G4ThreeVector(sourceradius * TMath::Cos(randPhi), sourceradius * TMath::Sin(randPhi), height);
 }
 
 void PrimaryGeneratorAction::setSourceRadius(G4double radius)
@@ -309,7 +302,7 @@ void PrimaryGeneratorAction::SetSpectralData(G4String filename)
   
   {
     std::ifstream DataFile(filename);
-    if(!DataFile.is_open()) std::cout << "ERROR: Cannot open file " << filename << "!" << std::endl;
+    if(!DataFile.is_open()) std::cout << "ERROR: Cannot open file '" << filename << "'!" << std::endl;
     while(DataFile >> energy >> value) spectrum[energy] = value;
 
   }
