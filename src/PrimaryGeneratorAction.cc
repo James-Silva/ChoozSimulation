@@ -15,7 +15,6 @@
 #include "G4UnitsTable.hh"
 #include "GPSPrimaryGeneratorAction.hh"
 #include <stdlib.h>
-using namespace std;
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* DC, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
@@ -218,14 +217,9 @@ void PrimaryGeneratorAction::setNeutronPosition()
 
 G4ThreeVector PrimaryGeneratorAction::GenerateIsotropicVector()
 {
-  G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
-  G4double randTheta = TMath::Pi() * (G4UniformRand()-0.5);
-  G4double radius = 1;
-  G4double x = radius*TMath::Cos(randPhi)*TMath::Sin(randTheta);
-  G4double y = radius*TMath::Sin(randPhi)*TMath::Sin(randTheta);
-  G4double z = radius*TMath::Cos(randTheta);
-  G4ThreeVector Isovector(x,y,z);  
-  return Isovector;
+  G4double phi = 2. * TMath::Pi() * G4UniformRand();
+  G4double cosTheta = 2 * (G4UniformRand()-0.5);
+  return G4ThreeVector(std::cos(phi)*(1-std::pow(cosTheta,2)), std::sin(phi)*(1-std::pow(cosTheta,2)), cosTheta);
 
 }
 
