@@ -36,6 +36,7 @@ public:
 	void setGammaPosition();
 	void buildNeutronSource(G4double energy);
 	void setNeutronPosition();
+	void setNeutronMomentum();
 	void setNewNeutronSource(G4double energy);
     void setNewGammaSource(G4double energy);
 	void setSourceRadius(G4double radius);

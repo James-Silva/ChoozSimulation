@@ -59,11 +59,13 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }    
   else if(sourceType == "neutron")
   {  
+    setNeutronMomentum();
     setNeutronPosition();
     fParticleGun->GeneratePrimaryVertex(anEvent);
   }  
   else if(sourceType == "neutronpoint")
-  {  
+  { 
+    setNeutronMomentum();
     setPointNeutronPosition();
     fParticleGun->GeneratePrimaryVertex(anEvent);
   }
@@ -77,6 +79,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     randomenergy = TMath::Power(10,h_Spectrum.GetRandom());
     //cout << "Random Energy (Log) selected: " << randomenergy << endl;
     buildNeutronSource(randomenergy);
+    setNeutronMomentum();
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } 
@@ -85,6 +88,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     randomenergy = h_Spectrum.GetRandom();
     //cout << "Random Energy selected: " << randomenergy << endl;
     buildNeutronSource(randomenergy); //Input energy in MeV
+    setNeutronMomentum();
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } 
@@ -112,10 +116,7 @@ void PrimaryGeneratorAction::buildGammaSource(G4double energy)
 
 void PrimaryGeneratorAction::buildNeutronSource(G4double energy)
 {
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4String particleName;
-  G4ParticleDefinition* particle
-                    = particleTable->FindParticle(particleName="neutron");
+  G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
   fParticleGun->SetParticleDefinition(particle);
   //std::cout << "Input Energy (MeV): " << energy*MeV << std::endl;
   fParticleGun->SetParticleEnergy(energy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
@@ -180,38 +181,41 @@ void PrimaryGeneratorAction::setNeutronPosition()
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
   //G4double d_shieldingheight = 7000.0*mm;
-  G4double d_innerradius = neutronradius-(0.5*sourcethickness);
-  G4double d_outerradius = neutronradius+(0.5*sourcethickness);
-  G4double d_volumesides = TMath::Pi() * (neutronheight) * (TMath::Power(d_outerradius,2)-TMath::Power(d_innerradius,2));
-  G4double d_volumetop = TMath::Pi() * TMath::Power(d_innerradius,2) * sourcethickness;
-  G4double d_totalvolume = d_volumetop + d_volumesides;
-  G4double d_probside = d_volumesides/d_totalvolume;
-  G4double d_picksurface = G4UniformRand();
-  G4double d_randomaddition = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
-  G4double d_randomaddition_bottom = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
-  G4double d_bottomdisk =  -0.5*neutronheight+sourceoffsetz-(0.5*sourcethickness);
-  G4ThreeVector neutronSourcePos(0.,0.,0.);
+  G4double innerradius = neutronradius-(0.5*sourcethickness);
+  G4double outerradius = neutronradius+(0.5*sourcethickness);
+  G4double volumesides = TMath::Pi() * neutronheight * (TMath::Power(outerradius,2)-TMath::Power(innerradius,2));
+  G4double volumetop = TMath::Pi() * TMath::Power(innerradius,2) * sourcethickness;
+  G4double totalvolume = volumetop + volumesides;
+  G4double probside = volumesides/totalvolume;
+  G4double picksurface = G4UniformRand();
+  G4double randomaddition = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
+  G4double randomaddition_bottom = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
+  G4double bottomdisk =  -0.5*neutronheight+sourceoffsetz-(0.5*sourcethickness);
+  G4ThreeVector neutronSourcePos{};
   //std::cout<<"offset: " << sourceoffsetz/mm << endl;
-  d_randomaddition = 0;
-  if (d_picksurface <= d_probside)
+  randomaddition = 0;
+  if (picksurface <= probside)
   {
     //std::cout << "Side picked" << std::endl;
-    neutronSourcePos = GenerateSideWallEvent(neutronradius+d_randomaddition,neutronheight,sourceoffsetz-(0.5*sourcethickness));
+    neutronSourcePos = GenerateSideWallEvent(neutronradius+randomaddition,neutronheight,sourceoffsetz-(0.5*sourcethickness));
     //std::cout << "Z position: " << neutronSourcePos.getZ() << std::endl;
   }
   else 
   {
     //std::cout << "Bottom picked" << std::endl;
-    neutronSourcePos = GenerateTopEvent(d_innerradius,d_bottomdisk+d_randomaddition_bottom);
+    neutronSourcePos = GenerateTopEvent(innerradius,bottomdisk+randomaddition_bottom);
   }  
 
   //std::cout << "Neutron Source Pos: " << neutronSourcePos << std::endl; 
-  G4ThreeVector neutronMomentum = GenerateIsotropicVector();
-  neutronMomentum.setMag(1.);
-
-  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
+  
   fParticleGun->SetParticlePosition(neutronSourcePos);
   //std::cout << "Zposition of init: " << neutronSourcePos.getZ() << std::endl;
+}
+
+void PrimaryGeneratorAction::setNeutronMomentum()
+{
+  G4ThreeVector neutronMomentum = GenerateIsotropicVector();
+  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
 }
 
 
