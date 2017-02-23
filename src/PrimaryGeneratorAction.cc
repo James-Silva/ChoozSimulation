@@ -219,7 +219,7 @@ G4ThreeVector PrimaryGeneratorAction::GenerateIsotropicVector()
 {
   G4double phi = 2. * TMath::Pi() * G4UniformRand();
   G4double cosTheta = 2 * (G4UniformRand()-0.5);
-  return G4ThreeVector(std::cos(phi)*(1-std::pow(cosTheta,2)), std::sin(phi)*(1-std::pow(cosTheta,2)), cosTheta);
+  return G4ThreeVector(std::cos(phi)*std::sqrt(1-std::pow(cosTheta,2)), std::sin(phi)*std::sqrt(1-std::pow(cosTheta,2)), cosTheta);
 
 }
 
