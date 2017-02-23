@@ -53,7 +53,10 @@ int main(int argc,char** argv)
     ui = new G4UIExecutive(argc, argv);
     ui->SessionStart();
     G4String command = "/control/execute ";
-    UImanager->ApplyCommand(command+fileName);    
+    UImanager->ApplyCommand(command+fileName);
+    delete ui;
+    delete visManager;
+    
   }
   if(argc == 2)
   {
@@ -64,11 +67,7 @@ int main(int argc,char** argv)
   //G4String command = "/control/execute ";
   //UImanager->ApplyCommand(command+fileName);
   // Job termination
-  if(argc == 3 && std::string(argv[2]) == "vis")
-  {
-    delete ui;
-    delete visManager;
-  }
+
   delete runManager;
   return 0;
 }
