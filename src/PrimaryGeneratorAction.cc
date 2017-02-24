@@ -78,7 +78,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   {  
     randomenergy = TMath::Power(10,h_Spectrum.GetRandom());
     //cout << "Random Energy (Log) selected: " << randomenergy << endl;
-    buildNeutronSource(randomenergy);
+    buildSource("neutron",randomenergy);
     setNeutronMomentum();
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
@@ -86,7 +86,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   else if(sourceType == "neutronspectrum")
   {  
     randomenergy = h_Spectrum.GetRandom();
-    buildNeutronSource(randomenergy); //Input energy in MeV
+    buildSource("neutron", randomenergy); //Input energy in MeV
     setNeutronMomentum();
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
@@ -102,22 +102,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 }
 
-
-void PrimaryGeneratorAction::buildGammaSource(G4double energy)
+void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double energy)
 {
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4String particleName;
-  G4ParticleDefinition* particle
-                    = particleTable->FindParticle(particleName="gamma");
-  fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleEnergy(energy*MeV);
-}
-
-void PrimaryGeneratorAction::buildNeutronSource(G4double energy)
-{
-  G4ParticleDefinition* particle = G4ParticleTable::GetParticleTable()->FindParticle("neutron");
-  fParticleGun->SetParticleDefinition(particle);
-  //std::cout << "Input Energy (MeV): " << energy*MeV << std::endl;
+  fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
   fParticleGun->SetParticleEnergy(energy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
 }
 
@@ -267,13 +254,13 @@ void PrimaryGeneratorAction::setNewNeutronSpectrumSource_LogX()
 void PrimaryGeneratorAction::setNewNeutronSource(G4double energy)
 {
   sourceType = "neutron";
-  buildNeutronSource(energy);
+  buildSource("neutron",energy);
 }
 
 void PrimaryGeneratorAction::setNewGammaSource(G4double energy)
 {
   sourceType = "gamma";
-  buildGammaSource(energy);
+  buildSource("gamma", energy);
 }
 
 void PrimaryGeneratorAction::SetNeutronPointSource(G4ThreeVector pos)

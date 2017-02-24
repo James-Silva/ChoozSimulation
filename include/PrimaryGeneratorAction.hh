@@ -32,9 +32,8 @@ public:
 	virtual ~PrimaryGeneratorAction();
 
 	virtual void GeneratePrimaries(G4Event*);
-	void buildGammaSource(G4double energy);
+	void buildSource(const G4String& particleName, G4double energy);
 	void setGammaPosition();
-	void buildNeutronSource(G4double energy);
 	void setNeutronPosition();
 	void setNeutronMomentum();
 	void setNewNeutronSource(G4double energy);
