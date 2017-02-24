@@ -86,7 +86,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   else if(sourceType == "neutronspectrum")
   {  
     randomenergy = h_Spectrum.GetRandom();
-    //cout << "Random Energy selected: " << randomenergy << endl;
     buildNeutronSource(randomenergy); //Input energy in MeV
     setNeutronMomentum();
     setNeutronPosition();  
@@ -306,11 +305,15 @@ void PrimaryGeneratorAction::SetSpectralData(G4String filename)
     while(DataFile >> energy >> value) spectrum[energy] = value;
 
   }
+  
+  if(!spectrum.empty()){
 
-  h_Spectrum = TH1D("h_Spectrum", "h_Spectrum", 1000, std::begin(spectrum)->first, std::end(spectrum)->first);
-  for(int jBin = 0; jBin < h_Spectrum.GetNbinsX(); ++jBin){
-    
-    h_Spectrum.SetBinContent(jBin+1, interpolate(spectrum, h_Spectrum.GetBinCenter(jBin+1)));
+    h_Spectrum = TH1D("h_Spectrum", "h_Spectrum", 1000, spectrum.begin()->first, spectrum.rbegin()->first);
+    for(int k = 0; k < h_Spectrum.GetNbinsX(); ++k)
+      h_Spectrum.SetBinContent(k+1, interpolate(spectrum, h_Spectrum.GetBinCenter(k+1)));
+  
   }
+  else throw std::runtime_error("The spectrum read from "+filename+"is empty!");
+
 }
 
