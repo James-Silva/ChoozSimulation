@@ -7,14 +7,11 @@
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4ThreeVector.hh"
 #include "Randomize.hh"
 #include "TMath.h"
 #include "G4UnitsTable.hh"
 #include "GPSPrimaryGeneratorAction.hh"
-#include <stdlib.h>
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* DC, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
