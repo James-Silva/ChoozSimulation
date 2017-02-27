@@ -32,7 +32,7 @@ public:
     virtual ~PrimaryGeneratorAction() = default;
 
     virtual void GeneratePrimaries(G4Event*);
-    void buildSource(const G4String& particleName, G4double energy);
+    void buildSource(const G4String& particleName, G4double kineticEnergy);
     void setGammaPosition();
     void setNeutronPosition();
     void setNeutronMomentum();
@@ -53,6 +53,7 @@ public:
     G4ThreeVector GenerateSideWallEvent(G4double radius,G4double height,G4double offset);
     G4ThreeVector GenerateTopEvent(G4double radius,G4double height);
     G4ThreeVector GenerateIsotropicVector();
+    virtual void print(std::ostream& output, double scalingUnit) const;//print in HEPEvt format if scalingUnit == CLHEP::GeV
 private:
     TH1D 			h_Spectrum;
     std::vector<double> 	vec_SpectralEnergies;
@@ -77,6 +78,7 @@ private:
     void updateBottomProbability();
 };
 
+std::ostream& operator<<(std::ostream& output, const PrimaryGeneratorAction& primaryGeneratorAction);
 
 template <class T, class K>
 K interpolate(const std::map<T,K>& map, T x){

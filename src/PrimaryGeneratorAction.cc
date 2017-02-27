@@ -85,10 +85,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 }
 
-void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double energy)
+void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double kineticEnergy)
 {
   particleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
-  particleGun->SetParticleEnergy(energy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
+  particleGun->SetParticleEnergy(kineticEnergy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
 }
 
 void PrimaryGeneratorAction::setGammaPosition()
@@ -265,3 +265,35 @@ void PrimaryGeneratorAction::SetSpectralData(const std::string& fileName)
 
 }
 
+G4ThreeVector GetParticleMomentum(const G4ParticleGun& particleGun){
+  
+  double particleMomentumAmplitude = std::sqrt(particleGun.GetParticleEnergy() * (particleGun.GetParticleEnergy() + 2 * particleGun.GetParticleDefinition()->GetPDGMass()));// sqrt(T*(T + 2m)) with T being the kinetic energy; 
+  return particleMomentumAmplitude * particleGun.GetParticleMomentumDirection();
+  
+}
+
+void PrimaryGeneratorAction::print(std::ostream& output, double printingUnit) const{
+  
+  auto particleMomentum = GetParticleMomentum(*particleGun);//When using G4ParticleGun::SetParticleEnergy Geant4 stores a 0 momentum amplitude => bypass it with own free function
+  
+  if(printingUnit > 0){
+    
+    double unitFactor = 1 / printingUnit;
+
+    output<<"1"<<" "
+      <<particleGun->GetParticleDefinition()->GetPDGEncoding()<<" 0"<<" 0"<<" "
+      <<particleMomentum.x()* unitFactor<<" "<<particleMomentum.y()* unitFactor<<" "<<particleMomentum.z()* unitFactor<<" "
+      <<particleGun->GetParticleDefinition()->GetPDGMass()* unitFactor<<" "<<"0"<<" "
+      <<particleGun->GetParticlePosition().x()<<" "<<particleGun->GetParticlePosition().y()<<" "<<particleGun->GetParticlePosition().z();
+      
+  }
+  else throw std::invalid_argument(std::to_string(printingUnit)+ "is not a valid unit conversion factor");
+  
+}
+
+std::ostream& operator<<(std::ostream& output, const PrimaryGeneratorAction& primaryGeneratorAction){
+  
+  primaryGeneratorAction.print(output, CLHEP::GeV); //HEPEvt format uses GeV by default but this program relies on MeV
+  return output;
+  
+}
