@@ -61,6 +61,7 @@ private:
 	G4double                        sourceoffsetz;
 	G4double                        sourceRadius;
 	G4double                        sourceHeight;
+	G4double 			bottomProbability; //ratio of the bottom surface to the side surface
 	G4double                        sourcethickness;
 	PrimaryGeneratorMessenger*		fMessenger;
 	G4ParticleGun*           		fParticleGun;  //pointer a to G4 class
@@ -72,6 +73,8 @@ private:
 
 	G4String sourceType; 
     bool logaxis; 
+    
+    void updateBottomProbability();
 };
 
 

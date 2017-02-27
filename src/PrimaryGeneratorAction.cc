@@ -15,8 +15,8 @@
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* DC, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
-  fMessenger(0),
-  fParticleGun(0),
+  fMessenger(nullptr),
+  fParticleGun(nullptr),
   fDetector(DC),
   fHistoManager(histo)
 {
@@ -159,8 +159,6 @@ void PrimaryGeneratorAction::setPointGammaPosition()
 
 void PrimaryGeneratorAction::setNeutronPosition()
 {	
-  double bottomProbability = sourceRadius / (sourceRadius + 2 * sourceHeight); // surface ratio reads (pi r^2) / (pi r^2 + 2 pi r h)
-  
   if (G4UniformRand() < bottomProbability) fParticleGun->SetParticlePosition(GenerateTopEvent(sourceRadius, -0.5 * sourceHeight));
   else fParticleGun->SetParticlePosition(GenerateSideWallEvent(sourceRadius,sourceHeight,sourceoffsetz));
 
@@ -200,12 +198,20 @@ G4ThreeVector PrimaryGeneratorAction::GenerateTopEvent(G4double radius,G4double 
 void PrimaryGeneratorAction::setSourceRadius(G4double sourceRadius_)
 {
     sourceRadius = sourceRadius_;
+    updateBottomProbability();
 }
 
 void PrimaryGeneratorAction::setSourceHeight(G4double sourceHeight_)
 {
     sourceHeight = sourceHeight_;
+    updateBottomProbability();
 }
+
+void PrimaryGeneratorAction::updateBottomProbability()
+{
+    bottomProbability = sourceRadius / (sourceRadius + 2 * sourceHeight); // surface ratio reads (pi r^2) / (pi r^2 + 2 pi r h)
+}
+
 void PrimaryGeneratorAction::setSourceHeightOffset(G4double offset)
 {
   sourceoffsetz = offset;
