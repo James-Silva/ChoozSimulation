@@ -59,9 +59,8 @@ private:
 	std::vector<double> 			vec_SpectralVals;
 	G4double                        neutronradius;
 	G4double                        sourceoffsetz;
-	G4double                        gammaradius;
-	G4double                        neutronheight;
-	G4double                        gammaheight;
+	G4double                        sourceRadius;
+	G4double                        sourceHeight;
 	G4double                        sourcethickness;
 	PrimaryGeneratorMessenger*		fMessenger;
 	G4ParticleGun*           		fParticleGun;  //pointer a to G4 class
