@@ -13,28 +13,16 @@
 #include "G4UnitsTable.hh"
 #include "GPSPrimaryGeneratorAction.hh"
 
-PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* DC, HistoManager* histo)
+PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorConstruction_, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
-  fMessenger(nullptr),
-  fParticleGun(nullptr),
-  fDetector(DC),
+  messenger(new PrimaryGeneratorMessenger(this)),
+  particleGun(new G4ParticleGun(1)),
+  detectorConstruction(detectorConstruction_),
   fHistoManager(histo)
 {
-  G4int n_particle = 1;
-  fParticleGun  = new G4ParticleGun(n_particle);
-
-  fMessenger = new PrimaryGeneratorMessenger(this);
-
-  // default particle kinematic
-  //setNewSource(sourceType);
+  
 }
 
-
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fMessenger;
-  delete fParticleGun;
-}
 void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
 {
   if(generatorType == "GPS")
@@ -51,24 +39,24 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   if(sourceType == "gamma")
   {  
     setGammaPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun->GeneratePrimaryVertex(anEvent);
   }    
   else if(sourceType == "neutron")
   {  
     setNeutronMomentum();
     setNeutronPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun->GeneratePrimaryVertex(anEvent);
   }  
   else if(sourceType == "neutronpoint")
   { 
     setNeutronMomentum();
     setPointNeutronPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun->GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "gammapoint")
   {  
     setPointGammaPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun->GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "neutronspectrum" && logaxis == true)
   {  
@@ -76,15 +64,15 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     buildSource("neutron",kineticEnergy);
     setNeutronMomentum();
     setNeutronPosition();  
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun->GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "neutronspectrum")
   {  
     auto kineticEnergy = h_Spectrum.GetRandom();
     buildSource("neutron", kineticEnergy); //Input energy in MeV
     setNeutronMomentum();
-    setNeutronPosition();  
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    setNeutronPosition();
+    particleGun->GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "GPS")
   {  
@@ -99,8 +87,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double energy)
 {
-  fParticleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
-  fParticleGun->SetParticleEnergy(energy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
+  particleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
+  particleGun->SetParticleEnergy(energy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
 }
 
 void PrimaryGeneratorAction::setGammaPosition()
@@ -133,8 +121,8 @@ void PrimaryGeneratorAction::setGammaPosition()
   gammaMomentum.setMag(1.);
   gammaMomentum *= -1.;
 
-  fParticleGun->SetParticleMomentumDirection(gammaMomentum);
-  fParticleGun->SetParticlePosition(gammaSourcePos);
+  particleGun->SetParticleMomentumDirection(gammaMomentum);
+  particleGun->SetParticlePosition(gammaSourcePos);
 }
 
 void PrimaryGeneratorAction::setPointNeutronPosition()
@@ -143,8 +131,8 @@ void PrimaryGeneratorAction::setPointNeutronPosition()
   neutronMomentum.setMag(1.);
   neutronMomentum *= -1.;
 
-  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
-  fParticleGun->SetParticlePosition(neutronsourcepos);  
+  particleGun->SetParticleMomentumDirection(neutronMomentum);
+  particleGun->SetParticlePosition(neutronsourcepos);  
 }
 
 void PrimaryGeneratorAction::setPointGammaPosition()
@@ -153,21 +141,21 @@ void PrimaryGeneratorAction::setPointGammaPosition()
   gammaMomentum.setMag(1.);
   gammaMomentum *= -1.;
 
-  fParticleGun->SetParticleMomentumDirection(gammaMomentum);
-  fParticleGun->SetParticlePosition(gammasourcepos);  
+  particleGun->SetParticleMomentumDirection(gammaMomentum);
+  particleGun->SetParticlePosition(gammasourcepos);  
 }
 
 void PrimaryGeneratorAction::setNeutronPosition()
 {	
-  if (G4UniformRand() < bottomProbability) fParticleGun->SetParticlePosition(GenerateTopEvent(sourceRadius, -0.5 * sourceHeight));
-  else fParticleGun->SetParticlePosition(GenerateSideWallEvent(sourceRadius,sourceHeight,sourceoffsetz));
+  if (G4UniformRand() < bottomProbability) particleGun->SetParticlePosition(GenerateTopEvent(sourceRadius, -0.5 * sourceHeight));
+  else particleGun->SetParticlePosition(GenerateSideWallEvent(sourceRadius,sourceHeight,sourceoffsetz));
 
 }
 
 void PrimaryGeneratorAction::setNeutronMomentum()
 {
   G4ThreeVector neutronMomentum = GenerateIsotropicVector();
-  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
+  particleGun->SetParticleMomentumDirection(neutronMomentum);
 }
 
 
