@@ -244,15 +244,15 @@ void PrimaryGeneratorAction::setSourceThickness(G4double thickness)
   sourcethickness = thickness;
 }
 
-void PrimaryGeneratorAction::SetSpectralData(G4String filename)
+void PrimaryGeneratorAction::SetSpectralData(const std::string& fileName)
 {
   
   std::map<double, double> spectrum;
   double energy, value;
   
   {
-    std::ifstream DataFile(filename);
-    if(!DataFile.is_open()) std::cout << "ERROR: Cannot open file '" << filename << "'!" << std::endl;
+    std::ifstream DataFile(fileName);
+    if(!DataFile.is_open()) std::cout << "ERROR: Cannot open file '" << fileName << "'!" << std::endl;
     while(DataFile >> energy >> value) spectrum[energy] = value;
 
   }
@@ -264,7 +264,7 @@ void PrimaryGeneratorAction::SetSpectralData(G4String filename)
       h_Spectrum.SetBinContent(k+1, interpolate(spectrum, h_Spectrum.GetBinCenter(k+1)));
   
   }
-  else throw std::runtime_error("The spectrum read from "+filename+"is empty!");
+  else throw std::runtime_error("The spectrum read from "+fileName+"is empty!");
 
 }
 

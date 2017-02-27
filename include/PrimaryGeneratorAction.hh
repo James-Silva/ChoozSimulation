@@ -41,7 +41,7 @@ public:
 	void setSourceRadius(G4double radius);
 	void setSourceHeight(G4double radius);
 	void setSourceHeightOffset(G4double offset);
-	void SetSpectralData(G4String filename);
+	void SetSpectralData(const std::string& fileName);
 	void setNewNeutronSpectrumSource();
 	void setNewNeutronSpectrumSource_LogX();
 	void setPointNeutronPosition();
