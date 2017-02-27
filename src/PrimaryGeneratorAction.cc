@@ -48,7 +48,6 @@ void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   // Set position differently depending on source type
-  G4double randomenergy;
   if(sourceType == "gamma")
   {  
     setGammaPosition();
@@ -73,17 +72,16 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }
   else if(sourceType == "neutronspectrum" && logaxis == true)
   {  
-    randomenergy = TMath::Power(10,h_Spectrum.GetRandom());
-    //cout << "Random Energy (Log) selected: " << randomenergy << endl;
-    buildSource("neutron",randomenergy);
+    auto kineticEnergy = TMath::Power(10,h_Spectrum.GetRandom());
+    buildSource("neutron",kineticEnergy);
     setNeutronMomentum();
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "neutronspectrum")
   {  
-    randomenergy = h_Spectrum.GetRandom();
-    buildSource("neutron", randomenergy); //Input energy in MeV
+    auto kineticEnergy = h_Spectrum.GetRandom();
+    buildSource("neutron", kineticEnergy); //Input energy in MeV
     setNeutronMomentum();
     setNeutronPosition();  
     fParticleGun->GeneratePrimaryVertex(anEvent);
