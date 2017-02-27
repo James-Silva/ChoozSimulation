@@ -159,33 +159,10 @@ void PrimaryGeneratorAction::setPointGammaPosition()
 
 void PrimaryGeneratorAction::setNeutronPosition()
 {
-  // generate particles on a cylinder around the detector, with momenta pointing
-  // radially inward
-  //G4double d_shieldingheight = 7000.0*mm;
-  G4double innerradius = neutronradius-(0.5*sourcethickness);
-  G4double outerradius = neutronradius+(0.5*sourcethickness);
-  G4double volumesides = TMath::Pi() * neutronheight * (TMath::Power(outerradius,2)-TMath::Power(innerradius,2));
-  G4double volumetop = TMath::Pi() * TMath::Power(innerradius,2) * sourcethickness;
-  G4double totalvolume = volumetop + volumesides;
-  G4double probside = volumesides/totalvolume;
-  G4double picksurface = G4UniformRand();
+  double bottomProbability = neutronradius / (neutronradius + 2 * neutronheight); // surface ratio reads (pi r^2) / (pi r^2 + 2 pi r h)
   
-  G4ThreeVector neutronSourcePos{};
-  if (picksurface <= probside){
-    
-    G4double randomaddition = (G4UniformRand()-0.5)*sourcethickness;
-    neutronSourcePos = GenerateSideWallEvent(neutronradius+randomaddition,neutronheight,sourceoffsetz-(0.5*sourcethickness));
-    
-  }
-  else{
-    
-    G4double randomaddition_bottom = (G4UniformRand()-0.5)*sourcethickness;
-    G4double bottomdisk =  -0.5*neutronheight+sourceoffsetz-0.5*sourcethickness;
-    neutronSourcePos = GenerateTopEvent(innerradius,bottomdisk+randomaddition_bottom);
-    
-  }
-
-  fParticleGun->SetParticlePosition(neutronSourcePos);
+  if (G4UniformRand() < bottomProbability) fParticleGun->SetParticlePosition(GenerateTopEvent(neutronradius, -0.5 * neutronheight));
+  else fParticleGun->SetParticlePosition(GenerateSideWallEvent(neutronradius,neutronheight,sourceoffsetz));
 
 }
 
