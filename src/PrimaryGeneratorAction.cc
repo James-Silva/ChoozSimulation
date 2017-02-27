@@ -118,7 +118,6 @@ void PrimaryGeneratorAction::setGammaPosition()
   G4ThreeVector gammaMomentum = gammaSourcePos;
   //gammaSourcePos=test_vec;
   
-  gammaMomentum.setMag(1.);
   gammaMomentum *= -1.;
 
   particleGun->SetParticleMomentumDirection(gammaMomentum);
@@ -128,7 +127,6 @@ void PrimaryGeneratorAction::setGammaPosition()
 void PrimaryGeneratorAction::setPointNeutronPosition()
 {
   G4ThreeVector neutronMomentum = neutronsourcepos;
-  neutronMomentum.setMag(1.);
   neutronMomentum *= -1.;
 
   particleGun->SetParticleMomentumDirection(neutronMomentum);
@@ -138,7 +136,6 @@ void PrimaryGeneratorAction::setPointNeutronPosition()
 void PrimaryGeneratorAction::setPointGammaPosition()
 {
   G4ThreeVector gammaMomentum = gammasourcepos;
-  gammaMomentum.setMag(1.);
   gammaMomentum *= -1.;
 
   particleGun->SetParticleMomentumDirection(gammaMomentum);
@@ -252,7 +249,7 @@ void PrimaryGeneratorAction::SetSpectralData(const std::string& fileName)
   
   {
     std::ifstream DataFile(fileName);
-    if(!DataFile.is_open()) std::cout << "ERROR: Cannot open file '" << fileName << "'!" << std::endl;
+    if(!DataFile.is_open()) std::cerr << "ERROR: Cannot open file '" << fileName << "'!" << std::endl;
     while(DataFile >> energy >> value) spectrum[energy] = value;
 
   }
