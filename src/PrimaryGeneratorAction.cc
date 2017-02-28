@@ -15,8 +15,8 @@
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorConstruction_, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
-  messenger(new PrimaryGeneratorMessenger(this)),
-  particleGun(new G4ParticleGun(1)),
+  messenger(this),
+  particleGun(1),
   detectorConstruction(detectorConstruction_),
   fHistoManager(histo)
 {
@@ -39,24 +39,24 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   if(sourceType == "gamma")
   {  
     setGammaPosition();
-    particleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }    
   else if(sourceType == "neutron")
   {  
     setNeutronMomentum();
     setNeutronPosition();
-    particleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }  
   else if(sourceType == "neutronpoint")
   { 
     setNeutronMomentum();
     setPointNeutronPosition();
-    particleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "gammapoint")
   {  
     setPointGammaPosition();
-    particleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "neutronspectrum" && logaxis == true)
   {  
@@ -64,7 +64,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     buildSource("neutron",kineticEnergy);
     setNeutronMomentum();
     setNeutronPosition();  
-    particleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "neutronspectrum")
   {  
@@ -72,7 +72,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     buildSource("neutron", kineticEnergy); //Input energy in MeV
     setNeutronMomentum();
     setNeutronPosition();
-    particleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "GPS")
   {  
@@ -87,8 +87,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double kineticEnergy)
 {
-  particleGun->SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
-  particleGun->SetParticleEnergy(kineticEnergy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
+  particleGun.SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
+  particleGun.SetParticleEnergy(kineticEnergy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
 }
 
 void PrimaryGeneratorAction::setGammaPosition()
@@ -120,8 +120,8 @@ void PrimaryGeneratorAction::setGammaPosition()
   
   gammaMomentum *= -1.;
 
-  particleGun->SetParticleMomentumDirection(gammaMomentum);
-  particleGun->SetParticlePosition(gammaSourcePos);
+  particleGun.SetParticleMomentumDirection(gammaMomentum);
+  particleGun.SetParticlePosition(gammaSourcePos);
 }
 
 void PrimaryGeneratorAction::setPointNeutronPosition()
@@ -129,8 +129,8 @@ void PrimaryGeneratorAction::setPointNeutronPosition()
   G4ThreeVector neutronMomentum = neutronsourcepos;
   neutronMomentum *= -1.;
 
-  particleGun->SetParticleMomentumDirection(neutronMomentum);
-  particleGun->SetParticlePosition(neutronsourcepos);  
+  particleGun.SetParticleMomentumDirection(neutronMomentum);
+  particleGun.SetParticlePosition(neutronsourcepos);  
 }
 
 void PrimaryGeneratorAction::setPointGammaPosition()
@@ -138,21 +138,21 @@ void PrimaryGeneratorAction::setPointGammaPosition()
   G4ThreeVector gammaMomentum = gammasourcepos;
   gammaMomentum *= -1.;
 
-  particleGun->SetParticleMomentumDirection(gammaMomentum);
-  particleGun->SetParticlePosition(gammasourcepos);  
+  particleGun.SetParticleMomentumDirection(gammaMomentum);
+  particleGun.SetParticlePosition(gammasourcepos);  
 }
 
 void PrimaryGeneratorAction::setNeutronPosition()
 {	
-  if (G4UniformRand() < bottomProbability) particleGun->SetParticlePosition(GenerateTopEvent(sourceRadius, -0.5 * sourceHeight));
-  else particleGun->SetParticlePosition(GenerateSideWallEvent(sourceRadius,sourceHeight,sourceoffsetz));
+  if (G4UniformRand() < bottomProbability) particleGun.SetParticlePosition(GenerateTopEvent(sourceRadius, -0.5 * sourceHeight));
+  else particleGun.SetParticlePosition(GenerateSideWallEvent(sourceRadius,sourceHeight,sourceoffsetz));
 
 }
 
 void PrimaryGeneratorAction::setNeutronMomentum()
 {
   G4ThreeVector neutronMomentum = GenerateIsotropicVector();
-  particleGun->SetParticleMomentumDirection(neutronMomentum);
+  particleGun.SetParticleMomentumDirection(neutronMomentum);
 }
 
 
@@ -274,17 +274,17 @@ G4ThreeVector GetParticleMomentum(const G4ParticleGun& particleGun){
 
 void PrimaryGeneratorAction::print(std::ostream& output, double printingUnit) const{
   
-  auto particleMomentum = GetParticleMomentum(*particleGun);//When using G4ParticleGun::SetParticleEnergy Geant4 stores a 0 momentum amplitude => bypass it with own free function
+  auto particleMomentum = GetParticleMomentum(particleGun);//When using G4ParticleGun::SetParticleEnergy Geant4 stores a 0 momentum amplitude => bypass it with own free function
   
   if(printingUnit > 0){
     
     double unitFactor = 1 / printingUnit;
 
     output<<"1"<<" "
-      <<particleGun->GetParticleDefinition()->GetPDGEncoding()<<" 0"<<" 0"<<" "
+      <<particleGun.GetParticleDefinition()->GetPDGEncoding()<<" 0"<<" 0"<<" "
       <<particleMomentum.x()* unitFactor<<" "<<particleMomentum.y()* unitFactor<<" "<<particleMomentum.z()* unitFactor<<" "
-      <<particleGun->GetParticleDefinition()->GetPDGMass()* unitFactor<<" "<<"0"<<" "
-      <<particleGun->GetParticlePosition().x()<<" "<<particleGun->GetParticlePosition().y()<<" "<<particleGun->GetParticlePosition().z();
+      <<particleGun.GetParticleDefinition()->GetPDGMass()* unitFactor<<" "<<"0"<<" "
+      <<particleGun.GetParticlePosition().x()<<" "<<particleGun.GetParticlePosition().y()<<" "<<particleGun.GetParticlePosition().z();
       
   }
   else throw std::invalid_argument(std::to_string(printingUnit)+ "is not a valid unit conversion factor");

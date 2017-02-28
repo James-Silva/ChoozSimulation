@@ -13,17 +13,14 @@
 #define PrimaryGeneratorAction_h 1
 
 #include "G4VUserPrimaryGeneratorAction.hh"
+#include "G4ParticleGun.hh"
+#include "globals.hh"
+#include "TH1D.h"
 #include "PrimaryGeneratorMessenger.hh"
 #include "HistoManager.hh"
-#include "globals.hh"
 
-#include "TH1D.h"
-
-class G4ParticleGun;
 class G4Event;
 class DetectorConstruction;
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
@@ -64,8 +61,8 @@ private:
     G4double                    sourceHeight;
     G4double 			bottomProbability; //ratio of the bottom surface to the side surface
     G4double                    sourcethickness;
-    std::unique_ptr<PrimaryGeneratorMessenger>		messenger;
-    std::unique_ptr<G4ParticleGun>          		particleGun;
+    PrimaryGeneratorMessenger		messenger;
+    G4ParticleGun          		particleGun;
     DetectorConstruction*    				detectorConstruction;
     HistoManager*						fHistoManager;
     G4ThreeVector                   neutronsourcepos;
