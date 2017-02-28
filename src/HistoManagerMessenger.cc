@@ -17,7 +17,7 @@
 HistoManagerMessenger::HistoManagerMessenger(HistoManager* man)
 :manager(man)
 {
-	treeDirectory = new G4UIdirectory("/ricochetchoozsim/tree/", this);
+	treeDirectory = new G4UIdirectory("/ricochetchoozsim/tree/");
  	treeDirectory->SetGuidance("Commands for setting the tree output.");
 
 	outputPathCmd = new G4UIcmdWithAString("/ricochetchoozsim/tree/setOutputFilePath", this);
