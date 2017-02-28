@@ -12,6 +12,8 @@
 #ifndef PrimaryGeneratorAction_h
 #define PrimaryGeneratorAction_h 1
 
+#include <fstream>
+
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "PrimaryGeneratorMessenger.hh"
 #include "HistoManager.hh"
@@ -73,7 +75,8 @@ private:
     G4VUserPrimaryGeneratorAction*  particleSource;    //pointer a to G4  class
 
     G4String sourceType; 
-    bool logaxis; 
+    bool logaxis;
+    std::ofstream outputFileStream;//for HEPEvt output
     
     void updateBottomProbability();
 };

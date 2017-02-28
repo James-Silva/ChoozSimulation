@@ -18,7 +18,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorCon
   messenger(new PrimaryGeneratorMessenger(this)),
   particleGun(new G4ParticleGun(1)),
   detectorConstruction(detectorConstruction_),
-  fHistoManager(histo)
+  fHistoManager(histo),
+  outputFileStream("fast_neutrons.txt")
 {
   
 }
@@ -72,6 +73,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     buildSource("neutron", kineticEnergy); //Input energy in MeV
     setNeutronMomentum();
     setNeutronPosition();
+    outputFileStream<<"1\n"<<*this<<"\n";
     particleGun->GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "GPS")
