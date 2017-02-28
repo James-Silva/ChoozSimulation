@@ -1,17 +1,12 @@
+#include "G4MTRunManager.hh"
+#include "G4UImanager.hh"
+#include "G4VisExecutive.hh"
+#include "G4UIExecutive.hh"
+#include "Randomize.hh"
+
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
 #include "ActionInitialization.hh"
-
-#include "G4RunManager.hh"
-#include "G4UImanager.hh"
-
-#include "Randomize.hh"
-#include "time.h"
-
-#include <cstdlib>
-
-#include "G4VisExecutive.hh"
-#include "G4UIExecutive.hh"
 
 int main(int argc,char** argv)
 {
@@ -23,51 +18,37 @@ int main(int argc,char** argv)
   }
 
   // Construct the default run manager
-  G4RunManager * runManager = new G4RunManager;
+  G4RunManager runManager;
 
   // Set mandatory initialization classes
   DetectorConstruction* detector = new DetectorConstruction;
-  runManager->SetUserInitialization(detector);
-  runManager->SetUserInitialization(new PhysicsList);
-  runManager->SetUserInitialization(new ActionInitialization(detector));
+  runManager.SetUserInitialization(detector);
+  runManager.SetUserInitialization(new PhysicsList);
+  runManager.SetUserInitialization(new ActionInitialization(detector));
 
   // Initialize G4 kernel
-  runManager->Initialize();
+  runManager.Initialize();
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
   // set the run ID
-  //runManager->SetRunIDCounter(atoi(argv[2]));
+  //runManager.SetRunIDCounter(atoi(argv[2]));
 
-  // enable visualizer if selected
-  G4VisManager* visManager;
-  G4UIExecutive* ui;
-  visManager = new G4VisExecutive;
-  visManager->Initialize();
-  G4String fileName;
-  fileName = argv[1];
+  G4String fileName{argv[1]};
   if(argc == 3 && std::string(argv[2]) == "vis")
   {
-
-    ui = new G4UIExecutive(argc, argv);
+      // enable visualizer if selected
+    G4VisManager* visManager = new G4VisExecutive;
+    visManager->Initialize();
+    G4UIExecutive* ui = new G4UIExecutive(argc, argv);
     ui->SessionStart();
-    G4String command = "/control/execute ";
-    UImanager->ApplyCommand(command+fileName);
+    
+    UImanager->ApplyCommand("/control/execute "+fileName);
     delete ui;
     delete visManager;
-    
   }
-  if(argc == 2)
-  {
-    G4String command = "/control/execute ";
-    UImanager->ApplyCommand(command+fileName);    
-  }
-  // actually execute the command
-  //G4String command = "/control/execute ";
-  //UImanager->ApplyCommand(command+fileName);
-  // Job termination
+  if(argc == 2) UImanager->ApplyCommand("/control/execute "+fileName);    
 
-  delete runManager;
   return 0;
 }
