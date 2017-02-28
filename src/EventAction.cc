@@ -11,7 +11,6 @@ EventAction::EventAction(RunAction* run, HistoManager* histo)
  fRunAct(run),fHistoManager(histo), fedep_veto(0.),fedep_detector(0.),
  fPrintModulo(0)
 {
- fPrintModulo = 1000;
 }
 
 
