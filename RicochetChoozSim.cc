@@ -13,7 +13,7 @@ int main(int argc,char** argv)
   // check for correct # of arguments
   if(argc != 2 && argc != 3)
   {
-    std::cerr << "Usage: ShieldingSim [macro name] [vis (optional)]" << std::endl;
+    std::cerr << "Usage: RicochetChoozSim [macro name] [vis (optional)]" << std::endl;
     return 0;
   }
 
