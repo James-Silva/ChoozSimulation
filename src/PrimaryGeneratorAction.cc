@@ -7,39 +7,23 @@
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4ThreeVector.hh"
 #include "Randomize.hh"
 #include "TMath.h"
 #include "G4UnitsTable.hh"
 #include "GPSPrimaryGeneratorAction.hh"
-#include <stdlib.h>
-#include "Math/Interpolator.h"
-using namespace std;
 
-PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* DC, HistoManager* histo)
+PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorConstruction_, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
-  fMessenger(0),
-  fParticleGun(0),
-  fDetector(DC),
-  fHistoManager(histo)
+  messenger(this),
+  particleGun(1),
+  detectorConstruction(detectorConstruction_),
+  fHistoManager(histo),
+  outputFileStream("fast_neutrons.txt")
 {
-  G4int n_particle = 1;
-  fParticleGun  = new G4ParticleGun(n_particle);
-
-  fMessenger = new PrimaryGeneratorMessenger(this);
-
-  // default particle kinematic
-  //setNewSource(sourceType);
+  
 }
 
-
-PrimaryGeneratorAction::~PrimaryGeneratorAction()
-{
-  delete fMessenger;
-  delete fParticleGun;
-}
 void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
 {
   if(generatorType == "GPS")
@@ -53,42 +37,44 @@ void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   // Set position differently depending on source type
-  G4double randomenergy;
   if(sourceType == "gamma")
   {  
     setGammaPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }    
   else if(sourceType == "neutron")
   {  
+    setNeutronMomentum();
     setNeutronPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }  
   else if(sourceType == "neutronpoint")
-  {  
+  { 
+    setNeutronMomentum();
     setPointNeutronPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "gammapoint")
   {  
     setPointGammaPosition();
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "neutronspectrum" && logaxis == true)
   {  
-    randomenergy = TMath::Power(10,h_Spectrum.GetRandom());
-    //cout << "Random Energy (Log) selected: " << randomenergy << endl;
-    buildNeutronSource(randomenergy);
+    auto kineticEnergy = TMath::Power(10,h_Spectrum.GetRandom());
+    buildSource("neutron",kineticEnergy);
+    setNeutronMomentum();
     setNeutronPosition();  
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    particleGun.GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "neutronspectrum")
   {  
-    randomenergy = h_Spectrum.GetRandom();
-    //cout << "Random Energy selected: " << randomenergy << endl;
-    buildNeutronSource(randomenergy); //Input energy in MeV
-    setNeutronPosition();  
-    fParticleGun->GeneratePrimaryVertex(anEvent);
+    auto kineticEnergy = h_Spectrum.GetRandom();
+    buildSource("neutron", kineticEnergy); //Input energy in MeV
+    setNeutronMomentum();
+    setNeutronPosition();
+    outputFileStream<<"1\n"<<*this<<"\n";
+    particleGun.GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "GPS")
   {  
@@ -101,26 +87,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 }
 
-
-void PrimaryGeneratorAction::buildGammaSource(G4double energy)
+void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double kineticEnergy)
 {
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4String particleName;
-  G4ParticleDefinition* particle
-                    = particleTable->FindParticle(particleName="gamma");
-  fParticleGun->SetParticleDefinition(particle);
-  fParticleGun->SetParticleEnergy(energy*MeV);
-}
-
-void PrimaryGeneratorAction::buildNeutronSource(G4double energy)
-{
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4String particleName;
-  G4ParticleDefinition* particle
-                    = particleTable->FindParticle(particleName="neutron");
-  fParticleGun->SetParticleDefinition(particle);
-  //std::cout << "Input Energy (MeV): " << energy*MeV << std::endl;
-  fParticleGun->SetParticleEnergy(energy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
+  particleGun.SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
+  particleGun.SetParticleEnergy(kineticEnergy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
 }
 
 void PrimaryGeneratorAction::setGammaPosition()
@@ -128,8 +98,8 @@ void PrimaryGeneratorAction::setGammaPosition()
   // generate particles on a cylinder around the detector, with momenta pointing
   // radially inward
   //G4double d_shieldingheight = 7000.0*mm;
-  G4double d_surfacesides = 2. * TMath::Pi() * gammaheight * gammaradius;
-  G4double d_surfacetop = TMath::Pi() * gammaradius * gammaradius;
+  G4double d_surfacesides = 2. * TMath::Pi() * sourceHeight * sourceRadius;
+  G4double d_surfacetop = TMath::Pi() * sourceRadius * sourceRadius;
   G4double d_totalsurface = 2.*d_surfacetop + d_surfacesides;
   G4double d_probtop = d_surfacetop/d_totalsurface;
   G4double d_probside = d_surfacesides/d_totalsurface;
@@ -137,96 +107,61 @@ void PrimaryGeneratorAction::setGammaPosition()
   G4ThreeVector gammaSourcePos(0.,0.,0.);
   if (d_picksurface < d_probtop)
   {
-    gammaSourcePos = GenerateTopEvent(gammaradius,(gammaheight/2.0)+sourceoffsetz);
+    gammaSourcePos = GenerateTopEvent(sourceRadius,(sourceHeight/2.0)+sourceoffsetz);
   } 
   else if (d_picksurface <= d_probtop+d_probside && d_picksurface >= d_probtop)
   {
-    gammaSourcePos = GenerateSideWallEvent(gammaradius,gammaheight,sourceoffsetz);
+    gammaSourcePos = GenerateSideWallEvent(sourceRadius,sourceHeight,sourceoffsetz);
   }
   else 
   {
-    gammaSourcePos = GenerateTopEvent(gammaradius,-(gammaheight/2.0)+sourceoffsetz);
+    gammaSourcePos = GenerateTopEvent(sourceRadius,-(sourceHeight/2.0)+sourceoffsetz);
   }  
   G4ThreeVector gammaMomentum = gammaSourcePos;
   //gammaSourcePos=test_vec;
   
-  gammaMomentum.setMag(1.);
   gammaMomentum *= -1.;
 
-  fParticleGun->SetParticleMomentumDirection(gammaMomentum);
-  fParticleGun->SetParticlePosition(gammaSourcePos);
+  particleGun.SetParticleMomentumDirection(gammaMomentum);
+  particleGun.SetParticlePosition(gammaSourcePos);
 }
 
 void PrimaryGeneratorAction::setPointNeutronPosition()
 {
   G4ThreeVector neutronMomentum = neutronsourcepos;
-  neutronMomentum.setMag(1.);
   neutronMomentum *= -1.;
 
-  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
-  fParticleGun->SetParticlePosition(neutronsourcepos);  
+  particleGun.SetParticleMomentumDirection(neutronMomentum);
+  particleGun.SetParticlePosition(neutronsourcepos);  
 }
 
 void PrimaryGeneratorAction::setPointGammaPosition()
 {
   G4ThreeVector gammaMomentum = gammasourcepos;
-  gammaMomentum.setMag(1.);
   gammaMomentum *= -1.;
 
-  fParticleGun->SetParticleMomentumDirection(gammaMomentum);
-  fParticleGun->SetParticlePosition(gammasourcepos);  
+  particleGun.SetParticleMomentumDirection(gammaMomentum);
+  particleGun.SetParticlePosition(gammasourcepos);  
 }
 
 void PrimaryGeneratorAction::setNeutronPosition()
+{	
+  if (G4UniformRand() < bottomProbability) particleGun.SetParticlePosition(GenerateTopEvent(sourceRadius, -0.5 * sourceHeight));
+  else particleGun.SetParticlePosition(GenerateSideWallEvent(sourceRadius,sourceHeight,sourceoffsetz));
+}
+
+void PrimaryGeneratorAction::setNeutronMomentum()
 {
-  // generate particles on a cylinder around the detector, with momenta pointing
-  // radially inward
-  //G4double d_shieldingheight = 7000.0*mm;
-  G4double d_innerradius = neutronradius-(0.5*sourcethickness);
-  G4double d_outerradius = neutronradius+(0.5*sourcethickness);
-  G4double d_volumesides = TMath::Pi() * (neutronheight) * (TMath::Power(d_outerradius,2)-TMath::Power(d_innerradius,2));
-  G4double d_volumetop = TMath::Pi() * TMath::Power(d_innerradius,2) * sourcethickness;
-  G4double d_totalvolume = d_volumetop + d_volumesides;
-  G4double d_probside = d_volumesides/d_totalvolume;
-  G4double d_picksurface = G4UniformRand();
-  G4double d_randomaddition = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
-  G4double d_randomaddition_bottom = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
-  G4double d_bottomdisk =  -0.5*neutronheight+sourceoffsetz-(0.5*sourcethickness);
-  G4ThreeVector neutronSourcePos(0.,0.,0.);
-  //std::cout<<"volume: " << d_totalvolume/mm3 << endl;
-  d_randomaddition = 0;
-  if (d_picksurface <= d_probside)
-  {
-    //std::cout << "Side picked" << std::endl;
-    neutronSourcePos = GenerateSideWallEvent(neutronradius+d_randomaddition,neutronheight,sourceoffsetz-(0.5*sourcethickness));
-    //std::cout << "Z position: " << neutronSourcePos.getZ() << std::endl;
-  }
-  else 
-  {
-    //std::cout << "Bottom picked" << std::endl;
-    neutronSourcePos = GenerateTopEvent(d_innerradius,d_bottomdisk+d_randomaddition_bottom);
-  }  
-
-  //std::cout << "Neutron Source Pos: " << neutronSourcePos << std::endl; 
   G4ThreeVector neutronMomentum = GenerateIsotropicVector();
-  neutronMomentum.setMag(1.);
-
-  fParticleGun->SetParticleMomentumDirection(neutronMomentum);
-  fParticleGun->SetParticlePosition(neutronSourcePos);
-  //std::cout << "Zposition of init: " << neutronSourcePos.getZ() << std::endl;
+  particleGun.SetParticleMomentumDirection(neutronMomentum);
 }
 
 
 G4ThreeVector PrimaryGeneratorAction::GenerateIsotropicVector()
 {
-  G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
-  G4double randTheta = TMath::Pi() * (G4UniformRand()-0.5);
-  G4double radius = 1;
-  G4double x = radius*TMath::Cos(randPhi)*TMath::Sin(randTheta);
-  G4double y = radius*TMath::Sin(randPhi)*TMath::Sin(randTheta);
-  G4double z = radius*TMath::Cos(randTheta);
-  G4ThreeVector Isovector(x,y,z);  
-  return Isovector;
+  G4double phi = 2. * TMath::Pi() * G4UniformRand();
+  G4double cosTheta = 2 * (G4UniformRand()-0.5);
+  return G4ThreeVector(std::cos(phi)*std::sqrt(1-std::pow(cosTheta,2)), std::sin(phi)*std::sqrt(1-std::pow(cosTheta,2)), cosTheta);
 
 }
 
@@ -234,36 +169,35 @@ G4ThreeVector PrimaryGeneratorAction::GenerateSideWallEvent(G4double radius,G4do
 {
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
   G4double randz =  height*(G4UniformRand()-0.5)+offset;
-  //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
-  G4ThreeVector SourcePos(radius * TMath::Cos(randPhi)*mm,
-                          radius * TMath::Sin(randPhi)*mm,
-                          randz);
-  return SourcePos;
+  
+  return G4ThreeVector (radius * TMath::Cos(randPhi), radius * TMath::Sin(randPhi), randz);
 }
 
 G4ThreeVector PrimaryGeneratorAction::GenerateTopEvent(G4double radius,G4double height)
 {
   G4double randPhi = 2. * TMath::Pi() * G4UniformRand();
-  G4double sourceradius = G4UniformRand() * radius;
-  //std::cout << "Bottom r,z:  " << sourceradius << " , " << height << std::endl;
-  //G4ThreeVector test_vec(9*cm,9*cm,0*cm);
-  G4ThreeVector SourcePos(sourceradius * TMath::Cos(randPhi)*mm,
-                          sourceradius * TMath::Sin(randPhi)*mm,
-                          height);
-  return SourcePos;
+  radius = std::sqrt(G4UniformRand() * std::pow(radius,2));
+  
+  return G4ThreeVector(radius * TMath::Cos(randPhi), radius * TMath::Sin(randPhi), height);
 }
 
-void PrimaryGeneratorAction::setSourceRadius(G4double radius)
+void PrimaryGeneratorAction::setSourceRadius(G4double sourceRadius_)
 {
-    neutronradius = radius;
-    gammaradius = radius;
+    sourceRadius = sourceRadius_;
+    updateBottomProbability();
 }
 
-void PrimaryGeneratorAction::setSourceHeight(G4double height)
+void PrimaryGeneratorAction::setSourceHeight(G4double sourceHeight_)
 {
-    neutronheight = height;
-    gammaheight = height;
+    sourceHeight = sourceHeight_;
+    updateBottomProbability();
 }
+
+void PrimaryGeneratorAction::updateBottomProbability()
+{
+    bottomProbability = sourceRadius / (sourceRadius + 2 * sourceHeight); // surface ratio reads (pi r^2) / (pi r^2 + 2 pi r h)
+}
+
 void PrimaryGeneratorAction::setSourceHeightOffset(G4double offset)
 {
   sourceoffsetz = offset;
@@ -282,13 +216,13 @@ void PrimaryGeneratorAction::setNewNeutronSpectrumSource_LogX()
 void PrimaryGeneratorAction::setNewNeutronSource(G4double energy)
 {
   sourceType = "neutron";
-  buildNeutronSource(energy);
+  buildSource("neutron",energy);
 }
 
 void PrimaryGeneratorAction::setNewGammaSource(G4double energy)
 {
   sourceType = "gamma";
-  buildGammaSource(energy);
+  buildSource("gamma", energy);
 }
 
 void PrimaryGeneratorAction::SetNeutronPointSource(G4ThreeVector pos)
@@ -308,28 +242,59 @@ void PrimaryGeneratorAction::setSourceThickness(G4double thickness)
   sourcethickness = thickness;
 }
 
-void PrimaryGeneratorAction::SetSpectralData(G4String filename)
+void PrimaryGeneratorAction::SetSpectralData(const std::string& fileName)
 {
-  // check file existence
-    std::ifstream DataFile(filename);
-    if(!DataFile.is_open())
-      std::cout << "ERROR: Cannot open file " << filename << "!" << std::endl;
-
-    // read text file
-    double energy, value;
-    while(DataFile >> energy >> value)
+  
+  std::map<double, double> spectrum;
+  double energy, value;
+  
   {
-    vec_SpectralEnergies.push_back(energy);
-    vec_SpectralVals.push_back(value);
-    //std::cout << value << std::endl;
-  }
-  DataFile.close();
+    std::ifstream DataFile(fileName);
+    if(!DataFile.is_open()) std::cerr << "ERROR: Cannot open file '" << fileName << "'!" << std::endl;
+    while(DataFile >> energy >> value) spectrum[energy] = value;
 
-  ROOT::Math::Interpolator SpectrumInterp(vec_SpectralEnergies, vec_SpectralVals, ROOT::Math::Interpolation::kLINEAR);
-  h_Spectrum = TH1D("h_Spectrum", "h_Spectrum", 1000, vec_SpectralEnergies.front(), vec_SpectralEnergies.back());
-  for(int jBin = 0; jBin < h_Spectrum.GetNbinsX(); jBin++)
-  {
-    h_Spectrum.SetBinContent(jBin+1, SpectrumInterp.Eval(h_Spectrum.GetBinCenter(jBin+1)));
   }
+  
+  if(!spectrum.empty()){
+
+    h_Spectrum = TH1D("h_Spectrum", "h_Spectrum", 1000, spectrum.begin()->first, spectrum.rbegin()->first);
+    for(int k = 0; k < h_Spectrum.GetNbinsX(); ++k)
+      h_Spectrum.SetBinContent(k+1, interpolate(spectrum, h_Spectrum.GetBinCenter(k+1)));
+  
+  }
+  else throw std::runtime_error("The spectrum read from "+fileName+"is empty!");
+
 }
 
+G4ThreeVector GetParticleMomentum(const G4ParticleGun& particleGun){
+  
+  double particleMomentumAmplitude = std::sqrt(particleGun.GetParticleEnergy() * (particleGun.GetParticleEnergy() + 2 * particleGun.GetParticleDefinition()->GetPDGMass()));// sqrt(T*(T + 2m)) with T being the kinetic energy; 
+  return particleMomentumAmplitude * particleGun.GetParticleMomentumDirection();
+  
+}
+
+void PrimaryGeneratorAction::print(std::ostream& output, double printingUnit) const{
+  
+  auto particleMomentum = GetParticleMomentum(particleGun);//When using G4ParticleGun::SetParticleEnergy Geant4 stores a 0 momentum amplitude => bypass it with own free function
+  
+  if(printingUnit > 0){
+    
+    double unitFactor = 1 / printingUnit;
+
+    output<<"1"<<" "
+      <<particleGun.GetParticleDefinition()->GetPDGEncoding()<<" 0"<<" 0"<<" "
+      <<particleMomentum.x()* unitFactor<<" "<<particleMomentum.y()* unitFactor<<" "<<particleMomentum.z()* unitFactor<<" "
+      <<particleGun.GetParticleDefinition()->GetPDGMass()* unitFactor<<" "<<"0"<<" "
+      <<particleGun.GetParticlePosition().x()<<" "<<particleGun.GetParticlePosition().y()<<" "<<particleGun.GetParticlePosition().z();
+      
+  }
+  else throw std::invalid_argument(std::to_string(printingUnit)+ "is not a valid unit conversion factor");
+  
+}
+
+std::ostream& operator<<(std::ostream& output, const PrimaryGeneratorAction& primaryGeneratorAction){
+  
+  primaryGeneratorAction.print(output, CLHEP::GeV); //HEPEvt format uses GeV by default but this program relies on MeV
+  return output;
+  
+}

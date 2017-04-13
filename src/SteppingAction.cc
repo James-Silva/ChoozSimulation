@@ -30,7 +30,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   {
     vec_position = aStep->GetPreStepPoint()->GetPosition();
     fEventAction->storeentrypoint_crystal(vec_position);
-    std::cout << "Crystal Entry point: " << vec_position << std::endl;
+//     std::cout << "Crystal Entry point: " << vec_position << std::endl;
   } 
   if(volume->GetName() == "WaterShielding" && aStep->GetPostStepPoint()->GetStepStatus() == fGeomBoundary)
   {

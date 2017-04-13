@@ -203,10 +203,10 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
         NeutronRecoilX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
         NeutronRecoilY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
         NeutronRecoilZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
-        std::cout << "Hit Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
+//         std::cout << "Hit Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
 
 
-        std::cout << "Neutron Recoil Detected" <<  std::endl;
+//         std::cout << "Neutron Recoil Detected" <<  std::endl;
       }  
     }  
 

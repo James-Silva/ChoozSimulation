@@ -27,11 +27,11 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
   fTypeCmd_gamma->SetGuidance("Set type of particle generator and set energy");
 
   fTypeCmd_radius = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourceradius",this);
-  fTypeCmd_radius->SetGuidance("Set source radius (sets both gamma and neutron generator radius)");
+  fTypeCmd_radius->SetGuidance("Set source radius (cylinder)");
   fTypeCmd_radius->SetDefaultValue(100*CLHEP::mm);
 
   fTypeCmd_height = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourceheight",this);
-  fTypeCmd_height->SetGuidance("Set source height (cylinder) (sets both gamma and neutron generator radius)");
+  fTypeCmd_height->SetGuidance("Set source height (cylinder)");
   fTypeCmd_height->SetDefaultValue(100*CLHEP::mm);
 
   fTypeCmd_thickness = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourcethickness",this);
@@ -40,7 +40,7 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
 
 
   fTypeCmd_heightoffset = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourceheightoffset",this);
-  fTypeCmd_heightoffset->SetGuidance("Set source height offset (cylinder) (sets both gamma and neutron generator radius)");
+  fTypeCmd_heightoffset->SetGuidance("Set source height offset (cylinder) (sets both gamma and neutron generator offset)");
   fTypeCmd_heightoffset->SetDefaultValue(0*CLHEP::mm);  
 
   fTypeCmd_spectrum = new G4UIcmdWithAString("/ricochetchoozsim/generator/setneutronsourcespectrum",this);

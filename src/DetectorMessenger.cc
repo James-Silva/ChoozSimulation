@@ -13,9 +13,9 @@ using namespace std;
 DetectorMessenger::DetectorMessenger( DetectorConstruction* Det)
 : G4UImessenger(), fDetector(Det)
 {
-  fDetDir = new G4UIdirectory("/ricochetchoozsim/detector/", this);
+  fDetDir = new G4UIdirectory("/ricochetchoozsim/detector/");
   fDetDir->SetGuidance("detector control");
-  fshieldDir = new G4UIdirectory("/ricochetchoozsim/shielding/", this);
+  fshieldDir = new G4UIdirectory("/ricochetchoozsim/shielding/");
   fshieldDir->SetGuidance("shielding control");
   shieldingCmdPb = new G4UIcmdWith3VectorAndUnit("/ricochetchoozsim/shielding/setPbshielding", this);
   shieldingCmdPb->SetGuidance("Determine inner and outer shielding (syntax: inner radius outer radius top thickness cm)");

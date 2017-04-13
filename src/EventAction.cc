@@ -9,9 +9,8 @@
 EventAction::EventAction(RunAction* run, HistoManager* histo)
 :G4UserEventAction(),
  fRunAct(run),fHistoManager(histo), fedep_veto(0.),fedep_detector(0.),
- fPrintModulo(0)
+ fPrintModulo(1e5)
 {
- fPrintModulo = 1000;
 }
 
 
