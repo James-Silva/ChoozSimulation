@@ -193,7 +193,7 @@ void PrimaryGeneratorAction::setNeutronPosition()
   G4double d_randomaddition_bottom = 2*(G4UniformRand()-0.5)*(0.5*sourcethickness);
   G4double d_bottomdisk =  -0.5*neutronheight+sourceoffsetz-(0.5*sourcethickness);
   G4ThreeVector neutronSourcePos(0.,0.,0.);
-  //std::cout<<"offset: " << sourceoffsetz/mm << endl;
+  //std::cout<<"volume: " << d_totalvolume/mm3 << endl;
   d_randomaddition = 0;
   if (d_picksurface <= d_probside)
   {

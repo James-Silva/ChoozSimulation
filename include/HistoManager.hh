@@ -46,7 +46,7 @@ class HistoManager
     
     G4String      outputPath;
     G4String      outputName;    
-
+    G4String      s_NeutronProcess;
     double primaryEnergy;
     double primaryX0,primaryY0,primaryZ0;
     double watershield_lastX0,watershield_lastY0,watershield_lastZ0;
