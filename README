@@ -1,8 +1,10 @@
 This is a simple geant4 simulation of shielding around a Ge detector. To build, perform the following steps:
 
-cd to the directory enclosing shieldingsim
-mkdir shieldingsim_build
-cd shieldingsim_build
-cmake -DGeant4_DIR=path_to_geant4_installation/lib(64)/Geant4-versionNum ../shieldingsim
-make -j N shieldingsim							 # N is number of cores
+cd to the directory enclosing RicochetChoozSimulation
+mkdir RicochetChoozSimulation_build
+cd RicochetChoozSimulation_build
+cmake -DGeant4_DIR=path_to_geant4_installation/lib(64)/Geant4-versionNum ../RicochetChoozSimulation
+(on hopper this path is cmake -DGeant4_Dir=/home/soft/base/src/geant4.10.02.p01/cmake/Modules ../RicochetChoozSimulation)
+make -j N RicochetChoozSimulation							 # N is number of cores
 make install
+
