@@ -438,15 +438,27 @@ void DetectorConstruction::ConstructPit()
   startAngle = 0.*deg;
   spanningAngleFull = 360.*deg;
   G4Box *solidRock = new G4Box("Rock",6.*m,6.*m,5.*m);
-  G4Tubs *PitTube = new G4Tubs("Pittube", zeroradius, 4475*mm, 9000*mm/2.0, startAngle, spanningAngleFull);
+  G4Tubs *PitTube = new G4Tubs("Pittube", zeroradius, 4350*mm, 9000*mm/2.0, startAngle, spanningAngleFull);
+  G4Tubs *ConcreteTube = new G4Tubs("Concretetube", zeroradius, 4250*mm, 9000*mm/2.0, startAngle, spanningAngleFull);
   this->PitSolid = new G4SubtractionSolid("ChoozPit",solidRock,PitTube,0,vec_offset);
   this->PitLog = new G4LogicalVolume(PitSolid, fMaterialChoozRock, "logicalRock");
   this->PitPhys =  new G4PVPlacement(0, -vec_offset, PitLog, "PVRock", fLogicWorld, false, 0);
 
+  this->PitJacketSolid = new G4SubtractionSolid("ChoozPit_ConcreteJacket",PitTube,ConcreteTube,0,vec_offset);
+  this->PitJacketLog = new G4LogicalVolume(PitJacketSolid, fMaterialConcrete, "logicalConcrete");
+  this->PitJacketPhys =  new G4PVPlacement(0, -vec_offset, PitJacketLog, "ConcreteJacket", fLogicWorld, false, 0);
+
+  cout << "!!!!!!TESTFLAG" << endl;
   G4VisAttributes visRock(G4Colour(0.398,0.199,0.));
   visRock.SetForceWireframe(true);
   PitLog->SetVisAttributes(visRock);
+  G4VisAttributes visJacket(G4Colour(0.625,0.625,0.625));
+  visJacket.SetForceWireframe(true);
+  PitJacketLog->SetVisAttributes(visJacket);
+
 }
+
+
 
 void DetectorConstruction::AddConcreteFloor()
 {

@@ -142,7 +142,11 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 
             G4SubtractionSolid*     PitSolid;
             G4LogicalVolume*        PitLog;
-            G4VPhysicalVolume*      PitPhys;       
+            G4VPhysicalVolume*      PitPhys; 
+
+            G4SubtractionSolid*     PitJacketSolid;
+            G4LogicalVolume*        PitJacketLog;
+            G4VPhysicalVolume*      PitJacketPhys;        
 
             G4SubtractionSolid*     GCTubeSolid;
             G4LogicalVolume*        GCTubeLog;
