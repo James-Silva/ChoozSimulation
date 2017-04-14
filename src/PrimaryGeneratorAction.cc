@@ -73,7 +73,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     buildSource("neutron", kineticEnergy); //Input energy in MeV
     setNeutronMomentum();
     setNeutronPosition();
-    outputFileStream<<"1\n"<<*this<<"\n";
+    //outputFileStream<<"1\n"<<*this<<"\n";
     particleGun.GeneratePrimaryVertex(anEvent);
   } 
   else if(sourceType == "GPS")
@@ -276,7 +276,7 @@ G4ThreeVector GetParticleMomentum(const G4ParticleGun& particleGun){
 void PrimaryGeneratorAction::print(std::ostream& output, double printingUnit) const{
   
   auto particleMomentum = GetParticleMomentum(particleGun);//When using G4ParticleGun::SetParticleEnergy Geant4 stores a 0 momentum amplitude => bypass it with own free function
-  
+  G4ThreeVector test;
   if(printingUnit > 0){
     
     double unitFactor = 1 / printingUnit;
@@ -284,8 +284,8 @@ void PrimaryGeneratorAction::print(std::ostream& output, double printingUnit) co
     output<<"1"<<" "
       <<particleGun.GetParticleDefinition()->GetPDGEncoding()<<" 0"<<" 0"<<" "
       <<particleMomentum.x()* unitFactor<<" "<<particleMomentum.y()* unitFactor<<" "<<particleMomentum.z()* unitFactor<<" "
-      <<particleGun.GetParticleDefinition()->GetPDGMass()* unitFactor<<" "<<"0"<<" "
-      <<particleGun.GetParticlePosition().x()<<" "<<particleGun.GetParticlePosition().y()<<" "<<particleGun.GetParticlePosition().z();
+      <<particleGun.GetParticleDefinition()->GetPDGMass()* unitFactor<<" "<<"0"<<" ";
+   // test = particleGun.GetParticlePosition();
       
   }
   else throw std::invalid_argument(std::to_string(printingUnit)+ "is not a valid unit conversion factor");

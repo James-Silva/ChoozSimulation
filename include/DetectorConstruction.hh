@@ -94,6 +94,10 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 			G4LogicalVolume* 		fLogicDetector;
 			G4VPhysicalVolume*		fPhysiDetector;
 
+            G4Tubs*                 TestTube;
+            G4LogicalVolume*        TestTubeLog;
+            G4VPhysicalVolume*      TestTubePhys;
+
 			G4Tubs* 				plateTube;
 			G4LogicalVolume* 		plateLog;
 			G4VPhysicalVolume*		platePhys;

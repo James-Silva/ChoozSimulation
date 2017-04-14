@@ -240,11 +240,15 @@ void DetectorConstruction::ConstructOuterDetectors()
   startAngle = 0.*deg;
   spanningAngleFull = 360.*deg;
   G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-  G4ThreeVector vec_offset(0*mm,0*mm,+500*mm);
+  G4ThreeVector vec_offset(0*mm,0*mm,+1000*mm);
+  G4ThreeVector vec_offset2(0*mm,0*mm,+4250*mm);
   TempTube_inner=0;
   TempTube_outer=0;
-  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 3475.0*mm, 3500.0*mm,startAngle, spanningAngleFull);
-  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4475.0*mm, 4000.0*mm,startAngle, spanningAngleFull);
+  this->TestTube = new G4Tubs("TestTube", zeroradius, 4250.0*mm,10*mm,startAngle, spanningAngleFull);
+  this->TestTubeLog = new G4LogicalVolume(TestTube, fMaterialConcrete, "Testtube");
+  this->TestTubePhys = new G4PVPlacement(0,vec_offset2, TestTubeLog, "Test Tube",fLogicWorld, false,0);
+  this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 1000.0*mm, 3050.0*mm,startAngle, spanningAngleFull);
+  this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4250.0*mm, 4050.0*mm,startAngle, spanningAngleFull);
   this->WaterTubeSolid = new G4SubtractionSolid("WaterShielding",TempTube_outer,TempTube_inner,0,vec_offset);
   this->WaterTubeLog = new G4LogicalVolume(WaterTubeSolid, fMaterialWater, "WaterShielding");
   this->WaterTubePhys = new G4PVPlacement(0,-vec_offset, WaterTubeLog, "WaterShielding",fLogicWorld, false,0);
@@ -253,7 +257,10 @@ void DetectorConstruction::ConstructOuterDetectors()
   visWaterTube.SetForceAuxEdgeVisible(true);
   WaterTubeLog->SetVisAttributes(visWaterTube); 
 
-
+  G4VisAttributes visTestTube(G4Colour(1,0,1));
+  visTestTube.SetForceWireframe(true);
+  visTestTube.SetForceAuxEdgeVisible(true);
+  WaterTubeLog->SetVisAttributes(visWaterTube); 
 
 }
 
@@ -433,22 +440,22 @@ void DetectorConstruction::ConstructPit()
     G4cout << "World volume does not exist!!" << G4endl;
     return;
   }  
-  G4ThreeVector vec_offset(0*mm,0*mm,1500*mm);
+  G4ThreeVector vec_offset(0*mm,0*mm,750*mm);
+  G4ThreeVector concrete_offset(0*mm,0*mm,100*mm);
   zeroradius = 0.*cm;
   startAngle = 0.*deg;
   spanningAngleFull = 360.*deg;
   G4Box *solidRock = new G4Box("Rock",6.*m,6.*m,5.*m);
-  G4Tubs *PitTube = new G4Tubs("Pittube", zeroradius, 4350*mm, 9000*mm/2.0, startAngle, spanningAngleFull);
-  G4Tubs *ConcreteTube = new G4Tubs("Concretetube", zeroradius, 4250*mm, 9000*mm/2.0, startAngle, spanningAngleFull);
+  G4Tubs *PitTube = new G4Tubs("Pittube", zeroradius, 4350*mm, 8500*mm/2.0, startAngle, spanningAngleFull);
+  G4Tubs *Jacket2Tube = new G4Tubs("JacketShell21", zeroradius, 4250*mm, 8400*mm/2.0,startAngle, spanningAngleFull);
+  G4Tubs *Jacket21Tube = new G4Tubs("JacketShell21", zeroradius, 4350*mm, 8500*mm/2.0,startAngle, spanningAngleFull);
   this->PitSolid = new G4SubtractionSolid("ChoozPit",solidRock,PitTube,0,vec_offset);
   this->PitLog = new G4LogicalVolume(PitSolid, fMaterialChoozRock, "logicalRock");
   this->PitPhys =  new G4PVPlacement(0, -vec_offset, PitLog, "PVRock", fLogicWorld, false, 0);
-
-  this->PitJacketSolid = new G4SubtractionSolid("ChoozPit_ConcreteJacket",PitTube,ConcreteTube,0,vec_offset);
+  this->PitJacketSolid = new G4SubtractionSolid("ChoozPit_ConcreteJacket",Jacket21Tube,Jacket2Tube,0,concrete_offset);
   this->PitJacketLog = new G4LogicalVolume(PitJacketSolid, fMaterialConcrete, "logicalConcrete");
-  this->PitJacketPhys =  new G4PVPlacement(0, -vec_offset, PitJacketLog, "ConcreteJacket", fLogicWorld, false, 0);
+  this->PitJacketPhys =  new G4PVPlacement(0,G4ThreeVector(0), PitJacketLog, "ConcreteJacket", fLogicWorld, false, 0);
 
-  cout << "!!!!!!TESTFLAG" << endl;
   G4VisAttributes visRock(G4Colour(0.398,0.199,0.));
   visRock.SetForceWireframe(true);
   PitLog->SetVisAttributes(visRock);
