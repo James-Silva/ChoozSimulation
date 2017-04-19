@@ -12,6 +12,7 @@
 #include "TMath.h"
 #include "G4UnitsTable.hh"
 #include "GPSPrimaryGeneratorAction.hh"
+#include "TRandom3.h"
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorConstruction_, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
@@ -21,7 +22,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorCon
   fHistoManager(histo),
   outputFileStream("fast_neutrons.txt")
 {
-  
+  gRandom->SetSeed(0);
 }
 
 void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
