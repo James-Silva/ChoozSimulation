@@ -64,6 +64,7 @@ target_link_libraries(RicochetChoozSim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 set(RicochetChoozSim_SCRIPTS
     run.mac
     vis.mac
+    fast_neutron_spectrum.txt
   )
 
 foreach(_script ${RicohetChoozSim_SCRIPTS})

@@ -40,8 +40,6 @@ fADRheightaboveground(100*cm),fvec_roomoffset(-750*mm,-1525*mm,-(floorThickness/
   fDetectorMessenger = new DetectorMessenger(this);
   // construct the geometry
   Construct();
-  //ConstructDetectors();
-
 	// create commands for interactive definition of the calorimeter
 
 }
@@ -55,7 +53,6 @@ G4VPhysicalVolume*  DetectorConstruction::Construct()
   ConstructADR();
   ConstructPit();
   ConstructOuterDetectors();
-  //AddConcreteWalls();
   phystest = ConstructDetectors();
   
   return phystest;
@@ -217,12 +214,6 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector()
 {
   // arbitrarily assuming 4-inch iZIP here [AJA]
   // Taking out 4-inch iZIP for now [AFL - March 2016]
-  //fSolidDetector = new G4Tubs("fSolidDetector", 0.*cm, 5.08*cm, 2.54*cm, 0*deg, 360*deg);
-  //fLogicDetector = new G4LogicalVolume(fSolidDetector, fMaterialGe, "detector"); // in the future make detector material configurable between Si/Ge
-  //fVisAttDetector = new G4VisAttributes(G4Colour(1.0, 0.0, 0.0));
-  //fVisAttDetector->SetForceSolid(true);
-  //fLogicDetector->SetVisAttributes(fVisAttDetector);
-  //fPhysiDetector = new G4PVPlacement(noRotation, G4ThreeVector(), fLogicDetector, "detector", fLogicWorld, false, 0);
   G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
   this->crystalBox_single = new G4Box("Single Crystal",DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0);
   this->crystalLog_single = new G4LogicalVolume(crystalBox_single,fMaterialZn, "Single Crystal");
@@ -239,12 +230,8 @@ void DetectorConstruction::ConstructOuterDetectors()
   zeroradius = 0.*cm;
   startAngle = 0.*deg;
   spanningAngleFull = 360.*deg;
-  G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+  G4ThreeVector vec_zero(0*mm,0*mm,50*mm); // Offset include to have top of water shield line up with top of pit
   G4ThreeVector vec_offset(0*mm,0*mm,+1000*mm);
-  //G4ThreeVector vec_offset2(0*mm,0*mm,+4250*mm);
-  //this->TestTube = new G4Tubs("TestTube", zeroradius, 4250.0*mm,10*mm,startAngle, spanningAngleFull);
-  //this->TestTubeLog = new G4LogicalVolume(TestTube, fMaterialConcrete, "Testtube");
-  //this->TestTubePhys = new G4PVPlacement(0,vec_offset2, TestTubeLog, "Test Tube",fLogicWorld, false,0);
   this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 1000.0*mm, 3200.0*mm,startAngle, spanningAngleFull);
   this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4250.0*mm, 4200*mm,startAngle, spanningAngleFull);
   this->WaterTubeSolid = new G4SubtractionSolid("WaterShielding",TempTube_outer,TempTube_inner,0,vec_offset);
@@ -254,12 +241,6 @@ void DetectorConstruction::ConstructOuterDetectors()
   visWaterTube.SetForceWireframe(true);
   visWaterTube.SetForceAuxEdgeVisible(true);
   WaterTubeLog->SetVisAttributes(visWaterTube); 
-
-  G4VisAttributes visTestTube(G4Colour(1,0,1));
-  visTestTube.SetForceWireframe(true);
-  visTestTube.SetForceAuxEdgeVisible(true);
-  WaterTubeLog->SetVisAttributes(visWaterTube); 
-
 }
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()
@@ -276,7 +257,6 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()
 
   TargetDetectorBox = new G4Tubs("NuDetector",0*m,1150*mm,1221*mm,startAngle, spanningAngleFull);
   TargetDetectorLog = new G4LogicalVolume(TargetDetectorBox, fMaterialNuTarget,"NuDetector");
-  //G4ThreeVector crys_pos(Cyrstalpos_x[0],Cyrstalpos_y[0],Cyrstalpos_z[0]);
   TargetDetectorPhys = new G4PVPlacement(0,vec_zero,TargetDetectorLog,"NuDetector",fLogicWorld,false,0);
   TargetDetectorLog->SetVisAttributes(visDetector);
   CrystalSensitiveDetector *NuDetector = new CrystalSensitiveDetector("NuDetector");
@@ -290,12 +270,6 @@ void DetectorConstruction::ConstructPolySheilding(G4double innerR, G4double oute
   // detector shielding is arbitrarily assuemd to be two concentric cylinders of
   // polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
   // Taking out this version of shielding while I work on the ATR geometry [AFL]
-
-  /*for(int jLayer = 0; jLayer < PbInnerRad.size(); jLayer++)
-  {
-    fSolidLeadShielding.push_back(new G4Tubs(PbLabels[jLayer], PbInnerRad[jLayer], PbOuterRad[jLayer], PbInnerShieldHeight, 0*deg, 360*deg));
-    fLogicLeadShielding.push_back(new G4LogicalVolume(fSolidLeadShielding[jLayer], fMaterialLead, ""));
-  }*/
   // Lead Tube
   zeroradius = 0.*cm;
   startAngle = 0.*deg;
@@ -322,12 +296,6 @@ void DetectorConstruction::ConstructPbSheilding(G4double innerR, G4double outerR
   // detector shielding is arbitrarily assuemd to be two concentric cylinders of
   // polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
   // Taking out this version of shielding while I work on the ATR geometry [AFL]
-
-  /*for(int jLayer = 0; jLayer < PbInnerRad.size(); jLayer++)
-  {
-    fSolidLeadShielding.push_back(new G4Tubs(PbLabels[jLayer], PbInnerRad[jLayer], PbOuterRad[jLayer], PbInnerShieldHeight, 0*deg, 360*deg));
-    fLogicLeadShielding.push_back(new G4LogicalVolume(fSolidLeadShielding[jLayer], fMaterialLead, ""));
-  }*/
   // Lead Tube
   zeroradius = 0.*cm;
   startAngle = 0.*deg;
@@ -473,7 +441,6 @@ void DetectorConstruction::AddConcreteFloor()
     G4cout << "World volume does not exist!!" << G4endl;
     return;
   }
-  //G4ThreeVector fvec_roomoffset(-354*mm,-1525*mm,-(floorThickness/2.)-1.25*fADRheight);
   G4ThreeVector vec_heightaboveground(0.,0.,-fADRheightaboveground);
   solidFloor = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
   logFloor = new G4LogicalVolume(solidFloor, fMaterialConcrete, "logicalFloor");
@@ -517,12 +484,6 @@ void DetectorConstruction::AddCoffinWalls()
 
 void DetectorConstruction::AddConcreteWalls()
 {
-   //G4double floorWidthX = 2210*mm;
-   //G4double floorWidthZ = 3810*mm;
-   //G4double floorThickness = 0.5*m;
-   //G4double wallsHeight = 2.5*m;
-
-
   if(!fPhysiWorld)
   {
     G4cout << "ERROR in DetectorConstruction::AddConcreteWalls" << G4endl;
@@ -548,52 +509,25 @@ void DetectorConstruction::AddConcreteWalls()
   // transformation variables to help build the walls using a subtraction solid
   G4ThreeVector voidTranslation(0.0, 0.0,-floorThickness);
 
-  //solidWallsOuterBox = new G4Box("solidWallsOuterBox", floorWidthX, wallsHeight, floorWidthZ);
-  //solidWallsInnerVoid = new G4Box("solidWallsInnerVoid", floorWidthX-2.0*floorThickness,
-  //                wallsHeight-floorThickness, floorWidthZ-2.0*floorThickness);
-  //solidWalls = new G4SubtractionSolid("solidWalls", solidWallsOuterBox, solidWallsInnerVoid, nullRotation, voidTranslation);
-  //logWalls = new G4LogicalVolume(solidWalls, concrete, "logicalWalls");
-  //physFloor = new G4PVPlacement(0, posWalls+fvec_roomoffset, logWalls, "PVWalls", fLogicWorld, false, 0);
-
-
-  //testbox = new G4Box("Test Box",42*cm,38*cm,79*cm);
-    //testbox_logvolume = new G4LogicalVolume(testbox,Steel,"Test Box");
-
-
   inbetweenwall = new G4Box("Inbetweenwall",381*mm,229*mm,wallsHeight/2.0);
-    inbetweenwall_logvolume = new G4LogicalVolume(inbetweenwall,fMaterialConcrete,"inbetweenwall_logvolume");
+  inbetweenwall_logvolume = new G4LogicalVolume(inbetweenwall,fMaterialConcrete,"inbetweenwall_logvolume");
   inbetweenwall_B = new G4Box("Inbetweenwall_B",1123*mm,229*mm,wallsHeight/2.0);
-    inbetweenwall_logvolume_B = new G4LogicalVolume(inbetweenwall_B,fMaterialConcrete,"inbetweenwall_logvolume_B");
-    inbetweenwall_C = new G4Box("Inbetweenwall_C",457*mm,457*mm,wallsHeight/2.0);
-    inbetweenwall_logvolume_C = new G4LogicalVolume(inbetweenwall_C,fMaterialConcrete,"inbetweenwall_logvolume_C");
+  inbetweenwall_logvolume_B = new G4LogicalVolume(inbetweenwall_B,fMaterialConcrete,"inbetweenwall_logvolume_B");
+  inbetweenwall_C = new G4Box("Inbetweenwall_C",457*mm,457*mm,wallsHeight/2.0);
+  inbetweenwall_logvolume_C = new G4LogicalVolume(inbetweenwall_C,fMaterialConcrete,"inbetweenwall_logvolume_C");
   inbetweenwall_D = new G4Box("Inbetweenwall_D",229*mm,457*mm,wallsHeight/2.0);
-    inbetweenwall_logvolume_D = new G4LogicalVolume(inbetweenwall_D,fMaterialConcrete,"inbetweenwall_logvolume_D");
+  inbetweenwall_logvolume_D = new G4LogicalVolume(inbetweenwall_D,fMaterialConcrete,"inbetweenwall_logvolume_D");
   inbetweenwall_E = new G4Box("Inbetweenwall_E",267*mm,3125*mm,wallsHeight/2.0);
-    inbetweenwall_logvolume_E = new G4LogicalVolume(inbetweenwall_E,Chrysotile,"inbetweenwall_logvolume_E");
-    solidceiling = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
+  inbetweenwall_logvolume_E = new G4LogicalVolume(inbetweenwall_E,Chrysotile,"inbetweenwall_logvolume_E");
+  solidceiling = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
   logceiling = new G4LogicalVolume(solidceiling, fMaterialConcrete, "logicalCeiling");
-
-    //pwinbetweenwall_logvolume_E = new G4LogicalVolume(inbetweenwall_E,fMaterialConcrete,"inbetweenwall_logvolume_E");
-
-  //G4ThreeVector posinbetweenwall(-150.0*cm-(floorWidthX/4.0),offset,(1.0/6.0)*floorWidthZ);
-    //inbetweenwall2 = new G4Box("Inbetweenwall2",182.88*cm,wallsHeight,floorThickness);
-    //inbetweenwall_logvolume2 = new G4LogicalVolume(inbetweenwall,fMaterialConcrete,"inbetweenwall_logvolume2");
-  //G4ThreeVector posinbetweenwall2(+150.0*cm+(floorWidthX/4.0),offset,(1.0/6.0)*floorWidthZ);
-
-  //physinbetweenwall = new G4PVPlacement(0,posinbetweenwall+fvec_roomoffset,inbetweenwall_logvolume,"PVinbetweenWall",fLogicWorld,false,0);
+ 
   physceiling = new G4PVPlacement(0, posCeiling+fvec_roomoffset, logceiling,"PVCeiling", fLogicWorld, false, 0);
   physinbetweenwall = new G4PVPlacement(0,vec_wallA,inbetweenwall_logvolume,"PVinbetweenWall",fLogicWorld,false,0);
   physinbetweenwall_B = new G4PVPlacement(0,vec_wallB,inbetweenwall_logvolume_B,"PVinbetweenWall",fLogicWorld,false,0);
   physinbetweenwall_C = new G4PVPlacement(0,vec_wallC,inbetweenwall_logvolume_C,"PVinbetweenWall",fLogicWorld,false,0);
   physinbetweenwall_D = new G4PVPlacement(0,vec_wallD,inbetweenwall_logvolume_D,"PVinbetweenWall",fLogicWorld,false,0);
   physinbetweenwall_E = new G4PVPlacement(0,vec_wallE,inbetweenwall_logvolume_E,"PVinbetweenWall",fLogicWorld,false,0);
-  //phystestbox = new G4PVPlacement(0,vec_testbox,testbox_logvolume,"PVinbetweenWall",fLogicWorld,false,0);
-  //physinbetweenwall = new G4PVPlacement(0,posinbetweenwall2+fvec_roomoffset,inbetweenwall_logvolume2,"PVinbetweenWall",fLogicWorld,false,0);
-  // Set the visualizer properties
-
-  //G4VisAttributes visWalls(G4Colour(1.,0.,0.));
-  //visWalls.SetForceWireframe(true);
-  //logWalls->SetVisAttributes(visWalls);
 
   G4VisAttributes visbetweenwall(G4Colour(0.,1.,0.));
   visbetweenwall.SetForceWireframe(true);
@@ -610,12 +544,9 @@ void DetectorConstruction::AddConcreteWalls()
   G4VisAttributes visbetweenwall_E(G4Colour(0.,0.,1.));
   visbetweenwall_E.SetForceWireframe(true);
   inbetweenwall_logvolume_E->SetVisAttributes(visbetweenwall_E);
-
-    G4VisAttributes visceiling(G4Colour(1.,0.,0.));
-    visceiling.SetForceWireframe(true);
-    logceiling->SetVisAttributes(visceiling);
-
-
+  G4VisAttributes visceiling(G4Colour(1.,0.,0.));
+  visceiling.SetForceWireframe(true);
+  logceiling->SetVisAttributes(visceiling);
 }
 
 
@@ -656,7 +587,4 @@ void DetectorConstruction::SetCrystalMaterial(G4String Material)
     }     
   }
   G4RunManager::GetRunManager()->GeometryHasBeenModified();
-  
-  
-
 }

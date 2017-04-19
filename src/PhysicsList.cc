@@ -24,7 +24,27 @@ PhysicsList::PhysicsList()
   cutForElectron  = defaultCutValue;
   cutForPositron  = defaultCutValue;
 
-  this->RegisterPhysics(new G4DecayPhysics());
+
+  // EM physics
+  this->RegisterPhysics(new G4EmStandardPhysics());
+
+  // Synchrotron radiation and GN physics
+  this->RegisterPhysics(new G4EmExtraPhysics(1));
+
+  // Decay physics and all particles
+  this->RegisterPhysics(new G4DecayPhysics(1));
+
+  // Ion physics
+  this->RegisterPhysics(new G4IonPhysics(1));
+
+  // Hadron elastic scattering
+  this->RegisterPhysics(new G4HadronElasticPhysicsHP(1));
+
+  // Hadron physics
+  this->RegisterPhysics(new G4HadronPhysicsQGSP_BERT_HP(1));
+
+  // Stopping physics
+  this->RegisterPhysics(new G4StoppingPhysics(1));
 
 }
 
