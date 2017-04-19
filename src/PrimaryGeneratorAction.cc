@@ -19,8 +19,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorCon
   messenger(this),
   particleGun(1),
   detectorConstruction(detectorConstruction_),
-  fHistoManager(histo),
-  outputFileStream("fast_neutrons.txt")
+  fHistoManager(histo)
 {
   gRandom->SetSeed(0);
 }

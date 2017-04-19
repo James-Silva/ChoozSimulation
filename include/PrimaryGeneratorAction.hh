@@ -73,7 +73,6 @@ private:
 
     G4String sourceType; 
     bool logaxis;
-    std::ofstream outputFileStream;//for HEPEvt output
     
     void updateBottomProbability();
 };
