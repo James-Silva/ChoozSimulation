@@ -27,10 +27,10 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   G4double d_stepenergy = aStep->GetTotalEnergyDeposit()/keV;
   //aStep->GetTotalEnergyDeposit()/keV
   if(volume->GetName() == "Crystal_1" && aStep->GetPreStepPoint()->GetStepStatus() == fGeomBoundary)
-  {
+  { 
     vec_position = aStep->GetPreStepPoint()->GetPosition();
     fEventAction->storeentrypoint_crystal(vec_position);
-//     std::cout << "Crystal Entry point: " << vec_position << std::endl;
+    //std::cout << "Crystal Entry point: " << vec_position << std::endl;
   } 
   if(volume->GetName() == "WaterShielding" && aStep->GetPostStepPoint()->GetStepStatus() == fGeomBoundary)
   {
@@ -56,8 +56,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   }
   if(volume->GetName() == "Crystal_1" && d_stepenergy > 0)
   {
-    //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
-    //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
+    std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+    std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
     //std::cout << "in if statement" << std::endl;
     fEventAction->accumulateEdep_detector(d_stepenergy);
   }
