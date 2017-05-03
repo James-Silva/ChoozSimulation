@@ -22,7 +22,7 @@ function main(){
             echo "Folder \"$cmake_directory\" does not exist!"
         fi
     else
-        echo "Usage: ./replace_CMS_paths.sh \"CMakeFiles folder\" \"Project name\""
+        echo "Usage: $0 \"CMakeFiles folder\" \"Project name\""
     fi
 
 }
