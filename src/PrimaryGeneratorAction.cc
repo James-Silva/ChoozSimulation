@@ -250,7 +250,7 @@ void PrimaryGeneratorAction::SetSpectralData(const std::string& fileName)
   
   {
     std::ifstream DataFile(fileName);
-    if(!DataFile.is_open()) std::cerr << "ERROR: Cannot open file '" << fileName << "'!" << std::endl;
+    if(!DataFile.is_open()) throw std::runtime_error("Could not open '"+fileName+"'!");
     while(DataFile >> energy >> value) spectrum[energy] = value;
 
   }
@@ -262,7 +262,7 @@ void PrimaryGeneratorAction::SetSpectralData(const std::string& fileName)
       h_Spectrum.SetBinContent(k+1, interpolate(spectrum, h_Spectrum.GetBinCenter(k+1)));
   
   }
-  else throw std::runtime_error("The spectrum read from "+fileName+"is empty!");
+  else throw std::runtime_error("The spectrum read from '"+fileName+"' is empty!");
 
 }
 
