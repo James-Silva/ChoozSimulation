@@ -22,7 +22,6 @@ endif()
 #
 include(${Geant4_USE_FILE})
 
-
 #----------------------------------------------------------------------------
 # Find ROOT (optional package)
 #
@@ -74,11 +73,6 @@ foreach(_script ${RicohetChoozSim_SCRIPTS})
     COPYONLY
     )
 endforeach()
-
-
-SET(CMAKE_MODULE_PATH /home/soft/base/src/geant4.10.02.p01/cmake/Modules/)
-
-
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
