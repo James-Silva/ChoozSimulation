@@ -44,7 +44,6 @@ include_directories(${PROJECT_SOURCE_DIR}/include
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 
-
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
@@ -55,6 +54,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(RicochetChoozSim RicochetChoozSim.cc ${sources} ${headers})
 target_link_libraries(RicochetChoozSim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
+#----------------------------------------------------------------------------
+# For use with the Geant4 builds provided by CMS on CVMFS
+#
+
+option(USE_CMS_CVMFS "Rely on the CMS CVMFS Geant4 set up" OFF)
+if(USE_CMS_CVMFS)
+    set(dummy ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cms_cvfms.success)
+    add_custom_command (
+        OUTPUT  ${dummy} 
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/replace_CMS_paths.sh ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cmake.check_cache 
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/replace_CMS_paths.sh ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY} ${PROJECT_NAME}
+        COMMAND touch ${dummy}
+    )
+    add_custom_target(
+       ReplaceCMSPaths
+       DEPENDS ${dummy} 
+       )
+    add_dependencies(${PROJECT_NAME} ReplaceCMSPaths)
+endif(USE_CMS_CVMFS)
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
 # build AnaEx01. This is so that we can run the executable directly because it
