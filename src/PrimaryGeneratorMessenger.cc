@@ -115,7 +115,7 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
   }  
   if(command == fTypeCmd_gammapoint_vec)
   { 
-      fGeneratorAction->SetGammaPointSource(fTypeCmd_neutronpoint_vec->GetNew3VectorValue(newValue));  
+      fGeneratorAction->SetGammaPointSource(fTypeCmd_gammapoint_vec->GetNew3VectorValue(newValue));  
   }    
   if(command == fTypeCmd_gps)
   { 

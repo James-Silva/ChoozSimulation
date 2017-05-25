@@ -180,7 +180,7 @@ void DetectorConstruction::InitializeWorld()
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()
 {
-  DetectorSize = 7.18*cm; // Size needed for 1 Kg of detector material
+  DetectorSize = 5.2*cm; // Size needed for 1 Kg of detector material
   
   std::vector<std::string> CyrstalLabels = {"Crystal_1", "Crystal_2","Crystal_3", "Crystal_4","Crystal_5"};
   std::vector<G4double> Cyrstalpos_x = {0.*cm, -6.*cm, 6.*cm, 6.*cm, -6.*cm};
