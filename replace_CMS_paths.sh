@@ -18,6 +18,7 @@ function main(){
         if [ -d $cmake_directory ]; then
             replace "$outdated" "$cms_cvmfs" "$cmake_directory/*.make"
             replace "$outdated" "$cms_cvmfs" "$cmake_directory/link.txt"
+            replace "$outdated" "$cms_cvmfs" "$cmake_directory/../../*.cmake"
         else
             echo "Folder \"$cmake_directory\" does not exist!"
         fi
