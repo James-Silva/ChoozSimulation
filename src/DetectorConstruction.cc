@@ -52,7 +52,7 @@ G4VPhysicalVolume*  DetectorConstruction::Construct()
   ConstructPit();
   ConstructOuterDetectors();
   phystest = ConstructDetectors();
-  
+
   return phystest;
 }
 
@@ -74,8 +74,8 @@ void DetectorConstruction::DefineMaterials()
   fMaterialCu = man->FindOrBuildMaterial("G4_Cu");
   fMaterialPb = man->FindOrBuildMaterial("G4_Pb");
   fMaterialZn = man->FindOrBuildMaterial("G4_Zn");
-  fMaterialZr = man->FindOrBuildMaterial("G4_Zr");  
-  fMaterialGd = man->FindOrBuildMaterial("G4_Gd"); 
+  fMaterialZr = man->FindOrBuildMaterial("G4_Zr");
+  fMaterialGd = man->FindOrBuildMaterial("G4_Gd");
 
   elH = man->FindOrBuildElement("H");
   elO = man->FindOrBuildElement("O");
@@ -86,37 +86,37 @@ void DetectorConstruction::DefineMaterials()
   elK = man->FindOrBuildElement("K");
   elB = man->FindOrBuildElement("B");
   elC = man->FindOrBuildElement("C");
-  
+
 
   fMaterialScintillator = new G4Material("Scintillator",1.032*g/cm3,2);
   fMaterialScintillator->AddElement(elC,9);
   fMaterialScintillator->AddElement(elH,10);
-  
+
   Chrysotile = new G4Material("Chrysotile",2.53*g/cm3,4);
   Chrysotile->AddElement(elMg,3);
   Chrysotile->AddElement(elSi,2);
   Chrysotile->AddElement(elO,9);
-  Chrysotile->AddElement(elH,4);  
+  Chrysotile->AddElement(elH,4);
   fMaterialPoly_Borated = new G4Material("BoratedPoly",1.07*g/cm3,2);
   fMaterialPoly_Borated->AddMaterial(fMaterialPoly,95.0*perCent);
   fMaterialPoly_Borated->AddElement(elB,5.0*perCent);
-  
+
   fMaterialQuartz = new G4Material("Quartz",2.81*g/cm3,2);
   fMaterialQuartz->AddElement(elSi,1);
   fMaterialQuartz->AddElement(elO,2);
-  
+
   fMaterialCorundum = new G4Material("Corundum",2.81*g/cm3,2);
   fMaterialCorundum->AddElement(elAl,2);
   fMaterialCorundum->AddElement(elO,3);
-  
+
   fMaterialIronOxide = new G4Material("IronOxide",2.81*g/cm3,2);
   fMaterialIronOxide->AddElement(elFe,1);
   fMaterialIronOxide->AddElement(elO,1);
-  
+
   fMaterialMgOxide = new G4Material("MgOxide",2.81*g/cm3,2);
   fMaterialMgOxide->AddElement(elMg,1);
   fMaterialMgOxide->AddElement(elO,1);
-  
+
   fMaterialKOxide = new G4Material("KOxide",2.81*g/cm3,2);
   fMaterialKOxide->AddElement(elK,2);
   fMaterialKOxide->AddElement(elO,1);
@@ -127,18 +127,18 @@ void DetectorConstruction::DefineMaterials()
   fMaterialChoozRock->AddMaterial(fMaterialIronOxide,17.0*perCent);
   fMaterialChoozRock->AddMaterial(fMaterialMgOxide,4.0*perCent);
   fMaterialChoozRock->AddMaterial(fMaterialKOxide,2.0*perCent);
-  
+
   mineraloil = new G4Material("MineralOil",0.86*g/cm3,2);
   mineraloil->AddElement(elC,25);
-  mineraloil->AddElement(elH,43);  
+  mineraloil->AddElement(elH,43);
 
   fMaterialSteel = new G4Material("Steel",7.9*g/cm3,2);
   fMaterialSteel->AddElement(elFe,98.0*perCent);
-  fMaterialSteel->AddElement(elC,2.0*perCent);  
+  fMaterialSteel->AddElement(elC,2.0*perCent);
 
   fMaterialDodecane = new G4Material("Dodecane",0.75*g/cm3,2);
   fMaterialDodecane->AddElement(elC,12);
-  fMaterialDodecane->AddElement(elH,24);  
+  fMaterialDodecane->AddElement(elH,24);
 
   fMaterialPXE = new G4Material("PXE",0.988*g/cm3,2);
   fMaterialPXE->AddElement(elC,16);
@@ -148,18 +148,18 @@ void DetectorConstruction::DefineMaterials()
   fMaterialPPO->AddElement(elC,3);
   fMaterialPPO->AddElement(elH,6);
   fMaterialPPO->AddElement(elO,1);
-  
+
   fMaterialNuTarget = new G4Material("NuTargetLiquid",804.59*kg/m3,4);
   fMaterialNuTarget->AddMaterial(fMaterialDodecane,74.5*perCent);
   fMaterialNuTarget->AddMaterial(fMaterialPXE,24.6*perCent);
   fMaterialNuTarget->AddMaterial(fMaterialPPO,0.8*perCent);
   fMaterialNuTarget->AddMaterial(fMaterialGd,0.1*perCent);
 
-  fMaterialGammaCatcher = new G4Material("GammaCatcherLiquid",800.6*kg/m3,3); 
+  fMaterialGammaCatcher = new G4Material("GammaCatcherLiquid",800.6*kg/m3,3);
   fMaterialGammaCatcher->AddMaterial(fMaterialDodecane,74.94*perCent);
   fMaterialGammaCatcher->AddMaterial(fMaterialPXE,24.68*perCent);
   fMaterialGammaCatcher->AddMaterial(fMaterialPPO,0.38*perCent);
-  
+
 }
 
 
@@ -173,13 +173,13 @@ void DetectorConstruction::InitializeWorld()
   fLogicWorld = new G4LogicalVolume(fSolidWorld, fMaterialGalactic, "world");
   fLogicWorld->SetVisAttributes(G4VisAttributes::GetInvisible());
   fPhysiWorld = new G4PVPlacement(0, G4ThreeVector(), fLogicWorld, "world", 0, false, 0);
-}  
+}
 
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()
 {
   DetectorSize = 5.2*cm; // Size needed for 1 Kg of detector material
-  
+
   std::vector<std::string> CyrstalLabels = {"Crystal_1", "Crystal_2","Crystal_3", "Crystal_4","Crystal_5"};
   std::vector<G4double> Cyrstalpos_x = {0.*cm, -6.*cm, 6.*cm, 6.*cm, -6.*cm};
   std::vector<G4double> Cyrstalpos_y = {0.*cm, 6.*cm, 6.*cm, -6.*cm, -6.*cm};
@@ -198,14 +198,14 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()
     v_CrystalBoxesPhys.push_back(new G4PVPlacement(0,crys_pos+vec_offset,v_CrystalBoxesLog[jCrys],CyrstalLabels[jCrys],fLogicWorld,false,0));
     v_CrystalBoxesLog[jCrys]->SetVisAttributes(visDetector);
     if (jCrys==0)
-    {  
+    {
       CrystalSensitiveDetector *Crystal1_SD = new CrystalSensitiveDetector("Crystal_1SD");
       SDmanager->AddNewDetector(Crystal1_SD);
       v_CrystalBoxesLog[jCrys]->SetSensitiveDetector(Crystal1_SD);
-    }  
-  
+    }
+
   }
-  return fPhysiWorld; 
+  return fPhysiWorld;
 }
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector()
@@ -219,8 +219,8 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector()
   G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
   visDetector.SetForceWireframe(true);
   visDetector.SetForceAuxEdgeVisible(true);
-  crystalLog_single->SetVisAttributes(visDetector); 
-  return fPhysiWorld;  
+  crystalLog_single->SetVisAttributes(visDetector);
+  return fPhysiWorld;
 }
 
 void DetectorConstruction::ConstructOuterDetectors()
@@ -238,13 +238,13 @@ void DetectorConstruction::ConstructOuterDetectors()
   G4VisAttributes visWaterTube(G4Colour(0,0,1));
   visWaterTube.SetForceWireframe(true);
   visWaterTube.SetForceAuxEdgeVisible(true);
-  WaterTubeLog->SetVisAttributes(visWaterTube); 
+  WaterTubeLog->SetVisAttributes(visWaterTube);
 }
-
+//
 G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()
 {
   startAngle = 0.*deg;
-  spanningAngleFull = 360.*deg; 
+  spanningAngleFull = 360.*deg;
 
   G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
   visDetector.SetForceWireframe(true);
@@ -260,11 +260,11 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()
   CrystalSensitiveDetector *NuDetector = new CrystalSensitiveDetector("NuDetector");
   SDmanager->AddNewDetector(NuDetector);
   TargetDetectorLog->SetSensitiveDetector(NuDetector);
-  return fPhysiWorld;  
+  return fPhysiWorld;
 }
 
 void DetectorConstruction::ConstructPolySheilding(G4double innerR, G4double outerR,G4double topthickness)
-{  
+{
   // detector shielding is arbitrarily assuemd to be two concentric cylinders of
   // polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
   // Taking out this version of shielding while I work on the ATR geometry [AFL]
@@ -290,7 +290,7 @@ void DetectorConstruction::ConstructPolySheilding(G4double innerR, G4double oute
 
 
 void DetectorConstruction::ConstructPbSheilding(G4double innerR, G4double outerR,G4double topthickness)
-{  
+{
   // detector shielding is arbitrarily assuemd to be two concentric cylinders of
   // polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
   // Taking out this version of shielding while I work on the ATR geometry [AFL]
@@ -403,7 +403,7 @@ void DetectorConstruction::ConstructPit()
     G4cout << "ERROR in DetectorConstruction::ConstructPit" << G4endl;
     G4cout << "World volume does not exist!!" << G4endl;
     return;
-  }  
+  }
   G4ThreeVector vec_offset(0*mm,0*mm,750*mm);
   G4ThreeVector concrete_offset(0*mm,0*mm,100*mm);
   zeroradius = 0.*cm;
@@ -519,7 +519,7 @@ void DetectorConstruction::AddConcreteWalls()
   inbetweenwall_logvolume_E = new G4LogicalVolume(inbetweenwall_E,Chrysotile,"inbetweenwall_logvolume_E");
   solidceiling = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
   logceiling = new G4LogicalVolume(solidceiling, fMaterialConcrete, "logicalCeiling");
- 
+
   physceiling = new G4PVPlacement(0, posCeiling+fvec_roomoffset, logceiling,"PVCeiling", fLogicWorld, false, 0);
   physinbetweenwall = new G4PVPlacement(0,vec_wallA,inbetweenwall_logvolume,"PVinbetweenWall",fLogicWorld,false,0);
   physinbetweenwall_B = new G4PVPlacement(0,vec_wallB,inbetweenwall_logvolume_B,"PVinbetweenWall",fLogicWorld,false,0);
@@ -556,33 +556,33 @@ void DetectorConstruction::SetCrystalMaterial(G4String Material)
     if (Material == "Os")
     {
       for (int i=0;i<1;i++)
-      {  
+      {
         v_CrystalBoxesLog[i]->SetMaterial(fMaterialOs);
-      }  
+      }
     }
     if (Material == "Zn")
     {
       for (int i=0;i<1;i++)
-      {  
+      {
         v_CrystalBoxesLog[i]->SetMaterial(fMaterialZn);
       }
-    }  
+    }
     if (Material == "Zr")
     {
       for (int i=0;i<1;i++)
-      {  
+      {
         v_CrystalBoxesLog[i]->SetMaterial(fMaterialZr);
       }
-    }   
+    }
   }
   else
   {
     std::cerr << "ERROR in SetCrystalMaterial source type must be Os or Zn setting to Os!" << std::endl;
     crystalmaterial = "Os";
     for (int i=0;i<1;i++)
-    {  
+    {
       v_CrystalBoxesLog[i]->SetMaterial(fMaterialOs);
-    }     
+    }
   }
   G4RunManager::GetRunManager()->GeometryHasBeenModified();
 }
