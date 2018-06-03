@@ -26,16 +26,16 @@ class DetectorConstruction : public G4VUserDetectorConstruction
     	void ConstructADR();
     	void ConstructPit();
         void ConstructOuterDetectors();
-        void InitializeWorld();	
-    	void ConstructPbSheilding(G4double innerR, G4double outerR,G4double topthickness);	
-		void ConstructPolySheilding(G4double innerR, G4double outerR,G4double topthickness);	
+        void InitializeWorld();
+    	void ConstructPbSheilding(G4double innerR, G4double outerR,G4double topthickness);
+		void ConstructPolySheilding(G4double innerR, G4double outerR,G4double topthickness);
 		virtual G4VPhysicalVolume* Construct();
 		void AddConcreteFloor();
         void AddCoffinWalls();
         void AddConcreteWalls();
         void SetCrystalMaterial(G4String Material);
 
-  	
+
     private:
             G4String                crystalmaterial;
   		    G4double                zeroradius;
@@ -73,9 +73,9 @@ class DetectorConstruction : public G4VUserDetectorConstruction
             G4double                fADRheightaboveground;
             G4ThreeVector           fvec_roomoffset;
 
-            G4double                pos_z;	
+            G4double                pos_z;
             G4double                pos_x;
-            G4double                pos_y;		
+            G4double                pos_y;
 
 
 			G4double				fWorldSize;
@@ -109,13 +109,13 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 			G4Tubs*                 shell1Tube;
 			G4Tubs*                 shell11Tube;
 			G4LogicalVolume* 		shellinnerAlTubeLog;
-			G4VPhysicalVolume*		shellinnerAlTubePhys;		
+			G4VPhysicalVolume*		shellinnerAlTubePhys;
 
 			G4Tubs*                 shell2Tube;
 			G4Tubs*                 shell21Tube;
 			G4LogicalVolume* 		shellouterAlTubeLog;
 			G4VPhysicalVolume*		shellouterAlTubePhys;
-			
+
 
    		    G4Tubs*                 tungTube;
 			G4Tubs*                 tung1Tube;
@@ -126,7 +126,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 			G4Tubs*                 scin1Tube;
 			G4LogicalVolume* 		fullscinTubeLog;
 			G4VPhysicalVolume*		fullscinTubePhys;
-   		    
+
    		    G4Tubs*                 shieldTube;
 			G4Tubs*                 shield1Tube;
 			G4LogicalVolume* 		fullshieldTubeLog;
@@ -135,18 +135,18 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 			G4Box*                  solidFloor;
             G4LogicalVolume* 		logFloor;
             G4VPhysicalVolume*		physFloor;
-            
+
             G4SubtractionSolid*     solidWalls;
             G4LogicalVolume*        logWalls;
             G4VPhysicalVolume*      physWalls;
 
             G4SubtractionSolid*     PitSolid;
             G4LogicalVolume*        PitLog;
-            G4VPhysicalVolume*      PitPhys; 
+            G4VPhysicalVolume*      PitPhys;
 
             G4SubtractionSolid*     PitJacketSolid;
             G4LogicalVolume*        PitJacketLog;
-            G4VPhysicalVolume*      PitJacketPhys;        
+            G4VPhysicalVolume*      PitJacketPhys;
 
             G4SubtractionSolid*     GCTubeSolid;
             G4LogicalVolume*        GCTubeLog;
@@ -156,7 +156,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
             G4SubtractionSolid*     BufferTubeSolid;
             G4LogicalVolume*        BufferTubeLog;
             G4VPhysicalVolume*      BufferTubePhys;
-			
+
             G4SubtractionSolid*     VetoTubeSolid;
             G4LogicalVolume*        VetoTubeLog;
             G4VPhysicalVolume*      VetoTubePhys;
@@ -168,6 +168,10 @@ class DetectorConstruction : public G4VUserDetectorConstruction
             G4SubtractionSolid*     WaterTubeSolid;
             G4LogicalVolume*        WaterTubeLog;
             G4VPhysicalVolume*      WaterTubePhys;
+
+						G4SubtractionSolid*     AirTubeSolid;
+            G4LogicalVolume*        AirTubeLog;
+            G4VPhysicalVolume*      AirTubePhys;
 
             std::vector<G4Tubs*>	fSolidPolyShielding;
 			std::vector<G4LogicalVolume*>	fLogicPolyShielding;
@@ -188,18 +192,18 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 			std::vector<G4Box*>	v_CrystalBoxes;
 			std::vector<G4LogicalVolume*>	v_CrystalBoxesLog;
 			std::vector<G4VPhysicalVolume*>	v_CrystalBoxesPhys;
-            
+
             G4Box*             solidWallsOuterBox;
             G4Box*             solidWallsInnerVoid;
             G4Box*             coffinfloor;
-            
+
             G4Box* solidceiling;
             G4LogicalVolume* logceiling;
-            G4VPhysicalVolume* physceiling;        
+            G4VPhysicalVolume* physceiling;
 
             G4Box*             inbetweenwall;
             G4LogicalVolume*   inbetweenwall_logvolume;
-            G4VPhysicalVolume* physinbetweenwall;            
+            G4VPhysicalVolume* physinbetweenwall;
             G4Box*             inbetweenwall_B;
             G4LogicalVolume*   inbetweenwall_logvolume_B;
             G4VPhysicalVolume* physinbetweenwall_B;
@@ -211,7 +215,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
             G4VPhysicalVolume* physinbetweenwall_D;
             G4Box*             inbetweenwall_E;
             G4LogicalVolume*   inbetweenwall_logvolume_E;
-            G4VPhysicalVolume* physinbetweenwall_E;            
+            G4VPhysicalVolume* physinbetweenwall_E;
 
 
 	  	// Material properties
@@ -227,7 +231,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
         G4Material*			fMaterialW;
         G4Material*			fMaterialCu;
         G4Material*			fMaterialPb;
-        G4Material*			fMaterialZn;        
+        G4Material*			fMaterialZn;
         G4Material*         fMaterialZr;
         G4Material*         fMaterialGd;
         G4Material*			fMaterialScintillator;
@@ -241,7 +245,7 @@ class DetectorConstruction : public G4VUserDetectorConstruction
         G4Material*         fMaterialChoozRock;
         G4Material*         Chrysotile;
         G4Material*         mineraloil;
-        G4Material*         fMaterialSteel; 
+        G4Material*         fMaterialSteel;
         G4Material*         fMaterialDodecane;
         G4Material*         fMaterialPXE;
         G4Material*         fMaterialPPO;

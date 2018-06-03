@@ -232,13 +232,17 @@ void DetectorConstruction::ConstructOuterDetectors()
   G4ThreeVector vec_offset(0*mm,0*mm,+1000*mm);
   this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 1000.0*mm, 3200.0*mm,startAngle, spanningAngleFull);
   this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4250.0*mm, 4200*mm,startAngle, spanningAngleFull);
-  this->WaterTubeSolid = new G4SubtractionSolid("WaterShielding",TempTube_outer,TempTube_inner,0,vec_offset);
-  this->WaterTubeLog = new G4LogicalVolume(WaterTubeSolid, fMaterialWater, "WaterShielding");
-  this->WaterTubePhys = new G4PVPlacement(0,vec_zero, WaterTubeLog, "WaterShielding",fLogicWorld, false,0);
-  G4VisAttributes visWaterTube(G4Colour(0,0,1));
-  visWaterTube.SetForceWireframe(true);
-  visWaterTube.SetForceAuxEdgeVisible(true);
-  WaterTubeLog->SetVisAttributes(visWaterTube);
+  //this->WaterTubeSolid = new G4SubtractionSolid("WaterShielding",TempTube_outer,TempTube_inner,0,vec_offset);
+  //this->WaterTubeLog = new G4LogicalVolume(WaterTubeSolid, fMaterialWater, "WaterShielding");
+  //this->WaterTubePhys = new G4PVPlacement(0,vec_zero, WaterTubeLog, "WaterShielding",fLogicWorld, false,0);
+	//Surround Detector with water instead of air
+	this->AirTubeSolid = new G4SubtractionSolid("AirShielding",TempTube_outer,TempTube_inner,0,vec_offset);
+	this->AirTubeLog = new G4LogicalVolume(AirTubeSolid, fMaterialAir, "AirShielding");
+	this->AirTubePhys = new G4PVPlacement(0,vec_zero, AirTubeLog, "AirShielding",fLogicWorld, false,0);
+  G4VisAttributes visAirTube(G4Colour(0,0,1));
+  visAirTube.SetForceWireframe(true);
+  visAirTube.SetForceAuxEdgeVisible(true);
+  AirTubeLog->SetVisAttributes(visAirTube);
 }
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()
