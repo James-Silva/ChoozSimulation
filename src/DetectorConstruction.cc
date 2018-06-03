@@ -240,7 +240,7 @@ void DetectorConstruction::ConstructOuterDetectors()
   visWaterTube.SetForceAuxEdgeVisible(true);
   WaterTubeLog->SetVisAttributes(visWaterTube);
 }
-//
+
 G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()
 {
   startAngle = 0.*deg;
