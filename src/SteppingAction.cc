@@ -18,7 +18,7 @@ SteppingAction::~SteppingAction()
 
 
 void SteppingAction::UserSteppingAction(const G4Step* aStep)
-{ 
+{
   // get volume and particle name of the current step
   G4VPhysicalVolume* volume = aStep->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
   G4String name = aStep->GetTrack()->GetDefinition()->GetParticleName();
@@ -27,19 +27,19 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   G4double d_stepenergy = aStep->GetTotalEnergyDeposit()/keV;
   //aStep->GetTotalEnergyDeposit()/keV
   if(volume->GetName() == "Crystal_1" && aStep->GetPreStepPoint()->GetStepStatus() == fGeomBoundary)
-  { 
+  {
     vec_position = aStep->GetPreStepPoint()->GetPosition();
     fEventAction->storeentrypoint_crystal(vec_position);
     //std::cout << "Crystal Entry point: " << vec_position << std::endl;
-  } 
+  }
   if(volume->GetName() == "WaterShielding" && aStep->GetPostStepPoint()->GetStepStatus() == fGeomBoundary)
   {
      //std::cout << "Leaving Water Shielding" << std::endl;
      vec_position = aStep->GetPreStepPoint()->GetPosition();
-     //double temp = (vec_position.getX())*(vec_position.getX())+(vec_position.getY())*(vec_position.getY()); 
+     //double temp = (vec_position.getX())*(vec_position.getX())+(vec_position.getY())*(vec_position.getY());
      //std::cout << "radius: " << sqrt(temp) << std::endl;
      fEventAction->storeleavepoint_watershield(vec_position);
-  }  
+  }
   if(volume->GetName() == "WaterShielding" && d_stepenergy > 0)
   {
     //std::cout << "Water Shielding Event " << std::endl;
@@ -56,8 +56,8 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   }
   if(volume->GetName() == "Crystal_1" && d_stepenergy > 0)
   {
-    std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
-    std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
+    //std::cout << name << " Hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+    //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
     //std::cout << "in if statement" << std::endl;
     fEventAction->accumulateEdep_detector(d_stepenergy);
   }
