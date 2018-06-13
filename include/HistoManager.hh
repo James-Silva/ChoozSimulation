@@ -42,10 +42,10 @@ class HistoManager
     TFile* outfile;
     TTree* eventtree;
     TTree* othervolumestree;
-    TTree* primarytree;
-    
+    // TTree* primarytree;
+
     G4String      outputPath;
-    G4String      outputName;    
+    G4String      outputName;
     G4String      s_NeutronProcess;
     double primaryEnergy;
     double primaryX0,primaryY0,primaryZ0;

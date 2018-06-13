@@ -50,29 +50,29 @@ void HistoManager::book(const G4Run* aRun)
     return;
   }
 
-  primarytree = new TTree("primarytree", "primarytree");
-  primarytree->Branch("energy", &primaryEnergy);
-  primarytree->Branch("PrimaryX0", &primaryX0);
-  primarytree->Branch("PrimaryY0", &primaryY0);
-  primarytree->Branch("PrimaryZ0", &primaryZ0);
+  // primarytree = new TTree("primarytree", "primarytree");
+  // primarytree->Branch("energy", &primaryEnergy);
+  // primarytree->Branch("PrimaryX0", &primaryX0);
+  // primarytree->Branch("PrimaryY0", &primaryY0);
+  // primarytree->Branch("PrimaryZ0", &primaryZ0);
 
   eventtree = new TTree("eventtree", "eventtree");
   eventtree->Branch("Detector", &edep_detector);
-  eventtree->Branch("int_Gdflag", &i_Gdflag);
-  eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
-  eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
-  eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
+  // eventtree->Branch("int_Gdflag", &i_Gdflag);
+  // eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
+  // eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
+  // eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
   //eventtree->Branch("NeutronInteractionProcess", s_NeutronProcess,"string/C",1024);
-  othervolumestree = new TTree("othervolumetree", "eventtree");
-  othervolumestree->Branch("Detector_crosscheck", &edep_detector_crosscheck);
-  othervolumestree->Branch("Vetodetector", &edep_veto);
-  othervolumestree->Branch("Edep_Poly", &edep_poly);
-  othervolumestree->Branch("watershield_lastX0", &watershield_lastX0);
-  othervolumestree->Branch("watershield_lastY0", &watershield_lastY0);
-  othervolumestree->Branch("watershield_lastZ0", &watershield_lastZ0);
-  othervolumestree->Branch("crystal_firstX0", &crystal_firstX0);
-  othervolumestree->Branch("crystal_firstY0", &crystal_firstY0);
-  othervolumestree->Branch("crystal_firstZ0", &crystal_firstZ0);
+  // othervolumestree = new TTree("othervolumetree", "eventtree");
+  // othervolumestree->Branch("Detector_crosscheck", &edep_detector_crosscheck);
+  // othervolumestree->Branch("Vetodetector", &edep_veto);
+  // othervolumestree->Branch("Edep_Poly", &edep_poly);
+  // othervolumestree->Branch("watershield_lastX0", &watershield_lastX0);
+  // othervolumestree->Branch("watershield_lastY0", &watershield_lastY0);
+  // othervolumestree->Branch("watershield_lastZ0", &watershield_lastZ0);
+  // othervolumestree->Branch("crystal_firstX0", &crystal_firstX0);
+  // othervolumestree->Branch("crystal_firstY0", &crystal_firstY0);
+  // othervolumestree->Branch("crystal_firstZ0", &crystal_firstZ0);
 
   G4cout << "\n----> Histogram file is opened in " << fileName << G4endl;
 }
@@ -129,20 +129,20 @@ void HistoManager::storeentrypoint_crystal(G4ThreeVector vec_position)
 
 void HistoManager::fill()
 {
-  watershield_lastX0 = -99999;
-  watershield_lastY0 = -99999;
-  watershield_lastZ0 = -99999;
-  crystal_firstX0 = -999999;
-  crystal_firstY0 = -999999;
-  crystal_firstZ0 = -999999;
-  watershield_lastX0 = vec_preposition_watershielding.getX();
-  watershield_lastY0 = vec_preposition_watershielding.getY();
-  watershield_lastZ0 = vec_preposition_watershielding.getZ();
-  crystal_firstX0 = vec_postposition_crystal.getX();
-  crystal_firstY0 = vec_postposition_crystal.getY();
-  crystal_firstZ0 = vec_postposition_crystal.getZ();
-
-  othervolumestree->Fill();
+  // watershield_lastX0 = -99999;
+  // watershield_lastY0 = -99999;
+  // watershield_lastZ0 = -99999;
+  // crystal_firstX0 = -999999;
+  // crystal_firstY0 = -999999;
+  // crystal_firstZ0 = -999999;
+  // watershield_lastX0 = vec_preposition_watershielding.getX();
+  // watershield_lastY0 = vec_preposition_watershielding.getY();
+  // watershield_lastZ0 = vec_preposition_watershielding.getZ();
+  // crystal_firstX0 = vec_postposition_crystal.getX();
+  // crystal_firstY0 = vec_postposition_crystal.getY();
+  // crystal_firstZ0 = vec_postposition_crystal.getZ();
+  //
+  // othervolumestree->Fill();
 }
 
 void HistoManager::SetOutputPath(const G4String path)
@@ -164,9 +164,9 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   bool b_gdflag = false;
   bool b_ncapflag = false;
   edep_detector = 0.;
-  NeutronRecoilX0  = -99999;
-  NeutronRecoilY0  = -99999;
-  NeutronRecoilZ0  = -99999;
+  // NeutronRecoilX0  = -99999;
+  // NeutronRecoilY0  = -99999;
+  // NeutronRecoilZ0  = -99999;
 
   i_Gdflag = 0;
 
@@ -174,14 +174,14 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
     return;
 
   G4int nhits = theHits->entries();
-  primaryX0 = anEvent->GetPrimaryVertex()->GetX0();
-  primaryY0 = anEvent->GetPrimaryVertex()->GetY0();
-  primaryZ0 = anEvent->GetPrimaryVertex()->GetZ0();
-  G4ThreeVector primaryR0 = G4ThreeVector(anEvent->GetPrimaryVertex()->GetX0(),
-                                          anEvent->GetPrimaryVertex()->GetY0(),
-                                          anEvent->GetPrimaryVertex()->GetZ0());
-  primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
-  primaryEnergy = primaryEnergy/keV;
+  // primaryX0 = anEvent->GetPrimaryVertex()->GetX0();
+  // primaryY0 = anEvent->GetPrimaryVertex()->GetY0();
+  // primaryZ0 = anEvent->GetPrimaryVertex()->GetZ0();
+  // G4ThreeVector primaryR0 = G4ThreeVector(anEvent->GetPrimaryVertex()->GetX0(),
+  //                                         anEvent->GetPrimaryVertex()->GetY0(),
+  //                                         anEvent->GetPrimaryVertex()->GetZ0());
+  // primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
+  // primaryEnergy = primaryEnergy/keV;
   //std::cout << "Primary Energy (keV): " << primaryEnergy << std::endl;
   for(G4int i_hitcounter = 0; i_hitcounter < nhits; i_hitcounter++)
   {
@@ -197,13 +197,12 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
     if (s_currentvol == "Crystal_1")
     {
       edep_detector += (*theHits)[i_hitcounter]->GetEdep();
-      PDGID = i_PDGID
       if (s_currentprocess == "hadElastic")
       {
-        b_ncapflag = true;
-        NeutronRecoilX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
-        NeutronRecoilY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
-        NeutronRecoilZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
+        // b_ncapflag = true;
+        // NeutronRecoilX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
+        // NeutronRecoilY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
+        // NeutronRecoilZ0 = (*theHits)[i_hitcounter]->GetPosition0().getZ();
         //std::cout << "Hit Position: " << (*theHits)[i_hitcounter]->GetPosition0() << std::endl;
         // std::cout << "PDGID " << i_PDGID << " Recoil Detected" << std::endl;
         // std::cout << "ParentID: " << (*theHits)[i_hitcounter]->GetParentID() << std::endl;
@@ -223,6 +222,6 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
 
   if(eventtree)
     eventtree->Fill();
-  if (primarytree)
-    primarytree->Fill();
+  // if (primarytree)
+  //   primarytree->Fill();
 }
