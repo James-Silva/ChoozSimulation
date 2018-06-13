@@ -38,8 +38,6 @@ fADRheightaboveground(100*cm),fvec_roomoffset(-750*mm,-1525*mm,-(floorThickness/
 	// materials
 	DefineMaterials();
   fDetectorMessenger = new DetectorMessenger(this);
-  // construct the geometry
-  Construct();
 	// create commands for interactive definition of the calorimeter
 
 }
