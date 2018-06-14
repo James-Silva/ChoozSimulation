@@ -1,7 +1,0 @@
-/home/james/Chooz/build/CMakeFiles/install/strip.dir
-/home/james/Chooz/build/CMakeFiles/edit_cache.dir
-/home/james/Chooz/build/CMakeFiles/RicochetChoozSim.dir
-/home/james/Chooz/build/CMakeFiles/install.dir
-/home/james/Chooz/build/CMakeFiles/rebuild_cache.dir
-/home/james/Chooz/build/CMakeFiles/list_install_components.dir
-/home/james/Chooz/build/CMakeFiles/install/local.dir

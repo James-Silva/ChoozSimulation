@@ -1,0 +1,11 @@
+Universe = vanilla
+Executable = ./RicochetChoozSim
+
+Arguments = /home/silvaj/fast_neutrons_10_000_000/build/macros/joe_10Mev-50GeV_macros/run_joe10MeV_$(process).mac
+
+Log = CondorLogs/condorrun1-run$(process).log
+Output =  CondorLogs/condorrun1-run$(process).out
+Error =  CondorLogs/condorrun1-run$(process).error
+
+getenv = True
+Queue 20

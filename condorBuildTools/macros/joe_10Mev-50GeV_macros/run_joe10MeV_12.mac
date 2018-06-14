@@ -1,0 +1,10 @@
+/control/verbose 0
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+/ricochetchoozsim/tree/setOutputFileName ChoozWithAirJoe10MeV_12.root
+/ricochetchoozsim/generator/SetNeutronSource true
+/ricochetchoozsim/generator/setsourceradius 4.25 m
+/ricochetchoozsim/generator/setsourceheight 8.4 m
+/ricochetchoozsim/generator/setneutronsourcespectrum /home/silvaj/fast_neutrons_10_000_000/build/input_spectra/fast_neutron_spectrum_Joe-32GeV-10MeVthreshold.txt
+/run/beamOn 500000
