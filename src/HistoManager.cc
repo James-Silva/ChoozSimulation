@@ -57,11 +57,12 @@ void HistoManager::book(const G4Run* aRun)
   // primarytree->Branch("PrimaryZ0", &primaryZ0);
 
   eventtree = new TTree("eventtree", "eventtree");
-  eventtree->Branch("Detector", &edep_detector);
+  eventtree->Branch("Edep_Detector", &edep_detector);
+  eventtree->Branch("energy", &primaryEnergy);
   // eventtree->Branch("int_Gdflag", &i_Gdflag);
-  // eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
-  // eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
-  // eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
+  eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
+  eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
+  eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
   //eventtree->Branch("NeutronInteractionProcess", s_NeutronProcess,"string/C",1024);
   // othervolumestree = new TTree("othervolumetree", "eventtree");
   // othervolumestree->Branch("Detector_crosscheck", &edep_detector_crosscheck);
@@ -180,8 +181,8 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   // G4ThreeVector primaryR0 = G4ThreeVector(anEvent->GetPrimaryVertex()->GetX0(),
   //                                         anEvent->GetPrimaryVertex()->GetY0(),
   //                                         anEvent->GetPrimaryVertex()->GetZ0());
-  // primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
-  // primaryEnergy = primaryEnergy/keV;
+  primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
+  primaryEnergy = primaryEnergy/keV;
   //std::cout << "Primary Energy (keV): " << primaryEnergy << std::endl;
   for(G4int i_hitcounter = 0; i_hitcounter < nhits; i_hitcounter++)
   {
