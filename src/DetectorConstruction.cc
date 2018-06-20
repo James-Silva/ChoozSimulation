@@ -115,6 +115,174 @@ void DetectorConstruction::ConstructOuterDetectors()
 	AirTubeLog->SetVisAttributes(visAirTube);
 }
 
+void DetectorConstruction::AddGioveShielding()
+{
+
+	const double thickness = 50*mm;
+	const double MuonVetoWidth = 1000*mm;
+	const double MuonVetoHeight = 950*mm;
+
+	std::cout << "   ***** Chose GIOVE-like shielding configuration *****\n";
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//Layer 1 - Polyethylene
+	muonShielding = new G4Box("muonShielding",
+														MuonVetoWidth/2.,
+													  MuonVetoWidth/2.,
+													  MuonVetoHeight/2.);
+	muonShielding_lv = new G4LogicalVolume(muonShielding,
+																				 G4Material::GetMaterial("G4_POLYETHYLENE"),
+																				 "muonShielding");
+	muonShielding_pv = new G4PVPlacement(0,
+																			{0,0,0},
+																			muonShielding_lv,
+																			"muonShielding",
+																			fLogicWorld,
+																			false,
+																			0);
+	G4VisAttributes visMuShielding(G4Colour(1.,0.,0.));
+	visMuShielding.SetForceWireframe(true);
+	muonShielding_lv->SetVisAttributes(visMuShielding);
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//Layer 2 - Lead
+	pbShielding1 = new G4Box("Pb_shielding1",
+													 MuonVetoWidth/2. - 1*thickness,
+													 MuonVetoWidth/2. - 1*thickness,
+													 MuonVetoWidth/2. - 1*thickness);
+  pbShielding1_lv = new G4LogicalVolume(pbShielding1,
+																				G4Material::GetMaterial("G4_Pb"),
+																				"Pb_shielding1");
+	pbShielding1_pv = new G4PVPlacement(0,
+																		  {0,0,0},
+																			pbShielding1_lv,
+																			"Pb_shielding1",
+																			fLogicWorld,
+																			false,
+																			0);
+	G4VisAttributes visPbShielding1(G4Colour(1.,0.,0.));
+	visPbShielding1.SetForceWireframe(true);
+	pbShielding1_lv->SetVisAttributes(visPbShielding1);
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//Layer 3 - 10% Borated Polyethylene
+	pe_b_Shielding1 = new G4Box("PE_B_shielding1",
+															 MuonVetoWidth/2. - 2*thickness,
+															 MuonVetoWidth/2. - 2*thickness,
+															 MuonVetoWidth/2. - 2*thickness);
+
+  G4Material* poly_Borated_10p = new G4Material("BoratedPoly_10p",1.07*g/cm3,2);
+ 	poly_Borated_10p->AddMaterial(G4Material::GetMaterial("G4_POLYETHYLENE"), 95.0*perCent);
+ 	poly_Borated_10p->AddElement(G4Element::GetElement("B"), 5.0*perCent);
+
+  pe_b_Shielding1_lv = new G4LogicalVolume(pe_b_Shielding1,
+																					 poly_Borated_10p,
+																					 "PE_B_shielding1");
+	pe_b_Shielding1_pv = new G4PVPlacement(0,
+																			  {0,0,0},
+																				pe_b_Shielding1_lv,
+																				"PE_B_shielding1",
+																				fLogicWorld,
+																				false,
+																				0);
+	G4VisAttributes visPE_B_Shielding1(G4Colour(1.,0.,0.));
+	visPE_B_Shielding1.SetForceWireframe(true);
+	pe_b_Shielding1_lv->SetVisAttributes(visPE_B_Shielding1);
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//Layer 4 - Lead
+	pbShielding2 = new G4Box("Pb_shielding2",
+													 MuonVetoWidth/2. - 3*thickness,
+													 MuonVetoWidth/2. - 3*thickness,
+													 MuonVetoWidth/2. - 3*thickness);
+  pbShielding2_lv = new G4LogicalVolume(pbShielding2,
+																				G4Material::GetMaterial("G4_Pb"),
+																				"Pb_shielding2");
+	pbShielding2_pv = new G4PVPlacement(0,
+																		  {0,0,0},
+																			pbShielding2_lv,
+																			"Pb_shielding2",
+																			fLogicWorld,
+																			false,
+																			0);
+	G4VisAttributes visPbShielding2(G4Colour(1.,0.,0.));
+	visPbShielding2.SetForceWireframe(true);
+	pbShielding2_lv->SetVisAttributes(visPbShielding2);
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//Layer 5 - 3% Borated Polyethylene
+	pe_b_Shielding2 = new G4Box("PE_B_shielding2",
+															 MuonVetoWidth/2. - 4*thickness,
+															 MuonVetoWidth/2. - 4*thickness,
+															 MuonVetoWidth/2. - 4*thickness);
+
+  G4Material* poly_Borated_3p = new G4Material("BoratedPoly_3p",1.07*g/cm3,2);
+ 	poly_Borated_3p->AddMaterial(G4Material::GetMaterial("G4_POLYETHYLENE"), 95.0*perCent);
+ 	poly_Borated_3p->AddElement(G4Element::GetElement("B"), 5.0*perCent);
+
+  pe_b_Shielding2_lv = new G4LogicalVolume(pe_b_Shielding2,
+																					 poly_Borated_3p,
+																					 "PE_B_shielding3");
+	pe_b_Shielding2_pv = new G4PVPlacement(0,
+																			  {0,0,0},
+																				pe_b_Shielding2_lv,
+																				"PE_B_shielding2",
+																				fLogicWorld,
+																				false,
+																				0);
+	G4VisAttributes visPE_B_Shielding2(G4Colour(1.,0.,0.));
+	visPE_B_Shielding2.SetForceWireframe(true);
+	pe_b_Shielding2_lv->SetVisAttributes(visPE_B_Shielding2);
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//Layer 6 - Lead
+	pbShielding3 = new G4Box("Pb_shielding3",
+													 MuonVetoWidth/2. - 6*thickness,
+													 MuonVetoWidth/2. - 6*thickness,
+													 MuonVetoWidth/2. - 6*thickness);
+	pbShielding3_lv = new G4LogicalVolume(pbShielding3,
+																				G4Material::GetMaterial("G4_Pb"),
+																				"Pb_shielding3");
+	pbShielding3_pv = new G4PVPlacement(0,
+																			{0,0,0},
+																			pbShielding3_lv,
+																			"Pb_shielding3",
+																			fLogicWorld,
+																			false,
+																			0);
+	G4VisAttributes visPbShielding3(G4Colour(1.,0.,0.));
+	visPbShielding3.SetForceWireframe(true);
+	pbShielding3_lv->SetVisAttributes(visPbShielding3);
+
+	//////////////////////////////////////////////////////////////////////////////
+
+	//Shield interior
+	shieldInterior = new G4Box("shieldInterior",
+													 MuonVetoWidth/2. - 7*thickness,
+													 MuonVetoWidth/2. - 7*thickness,
+													 MuonVetoWidth/2. - 7*thickness);
+	shieldInterior_lv = new G4LogicalVolume(shieldInterior,
+																				G4Material::GetMaterial("G4_Pb"),
+																				"shieldInterior");
+	shieldInterior_pv = new G4PVPlacement(0,
+																			{0,0,0},
+																			shieldInterior_lv,
+																			"shieldInterior",
+																			fLogicWorld,
+																			false,
+																			0);
+	G4VisAttributes visshieldInterior(G4Colour(1.,0.,0.));
+	visshieldInterior.SetForceWireframe(true);
+	shieldInterior_lv->SetVisAttributes(visshieldInterior);
+
+}
+
 void DetectorConstruction::ConstructADR()
 {
 	// copper plate
@@ -289,7 +457,6 @@ void DetectorConstruction::ConstructPolySheilding(G4double innerR, G4double oute
   visshieldTube.SetForceAuxEdgeVisible(true);
   fullshieldTubeLog->SetVisAttributes(visshieldTube);
 }
-
 
 void DetectorConstruction::ConstructPbSheilding(G4double innerR, G4double outerR,G4double topthickness)
 {
