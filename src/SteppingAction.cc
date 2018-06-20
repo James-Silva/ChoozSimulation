@@ -56,7 +56,7 @@ void SteppingAction::UserSteppingAction(const G4Step* aStep)
   }
   if(volume->GetName() == "Crystal_1" && d_stepenergy > 0)
   {
-    //std::cout << name << " Hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
+    std::cout << name << " Hit!!!!!!!!!!!!!!!!!!!!!!!!!!!!! " << std::endl;
     //std::cout << "Energy: " << aStep->GetTotalEnergyDeposit()/keV << std::endl;
     //std::cout << "in if statement" << std::endl;
     fEventAction->accumulateEdep_detector(d_stepenergy);
