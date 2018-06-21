@@ -133,7 +133,7 @@ void DetectorConstruction::AddGioveShielding()
 													  MuonVetoWidth/2.,
 													  MuonVetoHeight/2.);
 	muonShielding_lv = new G4LogicalVolume(muonShielding,
-																				 G4Material::GetMaterial("G4_POLYETHYLENE"),
+																				 fPol,
 																				 "muonShielding");
 	muonShielding_pv = new G4PVPlacement(0,
 																			{0,0,0},
@@ -154,7 +154,7 @@ void DetectorConstruction::AddGioveShielding()
 													 MuonVetoWidth/2. - 1*thickness,
 													 MuonVetoWidth/2. - 1*thickness);
   pbShielding1_lv = new G4LogicalVolume(pbShielding1,
-																				G4Material::GetMaterial("G4_Pb"),
+																				fMaterialPb,
 																				"Pb_shielding1");
 	pbShielding1_pv = new G4PVPlacement(0,
 																		  {0,0,0},
@@ -175,12 +175,8 @@ void DetectorConstruction::AddGioveShielding()
 															 MuonVetoWidth/2. - 2*thickness,
 															 MuonVetoWidth/2. - 2*thickness);
 
-  G4Material* poly_Borated_10p = new G4Material("BoratedPoly_10p",1.07*g/cm3,2);
- 	poly_Borated_10p->AddMaterial(G4Material::GetMaterial("G4_POLYETHYLENE"), 95.0*perCent);
- 	poly_Borated_10p->AddElement(G4Element::GetElement("B"), 5.0*perCent);
-
   pe_b_Shielding1_lv = new G4LogicalVolume(pe_b_Shielding1,
-																					 poly_Borated_10p,
+																					 fPolBor10pc,
 																					 "PE_B_shielding1");
 	pe_b_Shielding1_pv = new G4PVPlacement(0,
 																			  {0,0,0},
@@ -201,7 +197,7 @@ void DetectorConstruction::AddGioveShielding()
 													 MuonVetoWidth/2. - 3*thickness,
 													 MuonVetoWidth/2. - 3*thickness);
   pbShielding2_lv = new G4LogicalVolume(pbShielding2,
-																				G4Material::GetMaterial("G4_Pb"),
+																				fMaterialPb,
 																				"Pb_shielding2");
 	pbShielding2_pv = new G4PVPlacement(0,
 																		  {0,0,0},
@@ -222,13 +218,9 @@ void DetectorConstruction::AddGioveShielding()
 															 MuonVetoWidth/2. - 4*thickness,
 															 MuonVetoWidth/2. - 4*thickness);
 
-  G4Material* poly_Borated_3p = new G4Material("BoratedPoly_3p",1.07*g/cm3,2);
- 	poly_Borated_3p->AddMaterial(G4Material::GetMaterial("G4_POLYETHYLENE"), 95.0*perCent);
- 	poly_Borated_3p->AddElement(G4Element::GetElement("B"), 5.0*perCent);
-
   pe_b_Shielding2_lv = new G4LogicalVolume(pe_b_Shielding2,
-																					 poly_Borated_3p,
-																					 "PE_B_shielding3");
+																					 fPolBor3pc,
+																					 "PE_B_shielding2");
 	pe_b_Shielding2_pv = new G4PVPlacement(0,
 																			  {0,0,0},
 																				pe_b_Shielding2_lv,
@@ -248,7 +240,7 @@ void DetectorConstruction::AddGioveShielding()
 													 MuonVetoWidth/2. - 6*thickness,
 													 MuonVetoWidth/2. - 6*thickness);
 	pbShielding3_lv = new G4LogicalVolume(pbShielding3,
-																				G4Material::GetMaterial("G4_Pb"),
+																				fMaterialPb,
 																				"Pb_shielding3");
 	pbShielding3_pv = new G4PVPlacement(0,
 																			{0,0,0},
@@ -263,13 +255,13 @@ void DetectorConstruction::AddGioveShielding()
 
 	//////////////////////////////////////////////////////////////////////////////
 
-	//Shield interior
+	//Shield interior - Air
 	shieldInterior = new G4Box("shieldInterior",
 													 MuonVetoWidth/2. - 7*thickness,
 													 MuonVetoWidth/2. - 7*thickness,
 													 MuonVetoWidth/2. - 7*thickness);
 	shieldInterior_lv = new G4LogicalVolume(shieldInterior,
-																				G4Material::GetMaterial("G4_Pb"),
+																				fMaterialAir,
 																				"shieldInterior");
 	shieldInterior_pv = new G4PVPlacement(0,
 																			{0,0,0},
@@ -741,4 +733,39 @@ void DetectorConstruction::DefineMaterials()
 	fMaterialGammaCatcher->AddMaterial(fMaterialPXE,24.68*perCent);
 	fMaterialGammaCatcher->AddMaterial(fMaterialPPO,0.38*perCent);
 
+	/////////////////////////////////////////////////////////////
+	//////////////// Polyethylene materials /////////////////////
+	/////////////////////////////////////////////////////////////
+
+	//Values taken from the Very Near Site simulation
+	G4double density, fractionmass;
+	G4int nelements;
+
+	fPol = new G4Material("Pol",density= 0.96*g/cm3, nelements= 2);
+	fPol->AddElement(elH, fractionmass= 14.86*perCent);
+	fPol->AddElement(elC, fractionmass= 85.14*perCent);
+
+	// Polyethylene with boron at 1.75% - Has borated polyethylene any oxygen elements? FIXME
+	fPolBor1_75pc = new G4Material("PolBor1_75pc",density= 0.96*g/cm3, nelements= 3);
+	fPolBor1_75pc->AddElement(elH, fractionmass= 14.6*perCent);
+	fPolBor1_75pc->AddElement(elC, fractionmass= 83.65*perCent);
+	fPolBor1_75pc->AddElement(elB, fractionmass= 1.75 *perCent);
+
+	// Polyethylene with boron at 3% - Has borated polyethylene any oxygen elements? FIXME
+	fPolBor3pc = new G4Material("PolBor3pc",density= 0.96*g/cm3, nelements= 3);
+	fPolBor3pc->AddElement(elH, fractionmass= 14.424*perCent);
+	fPolBor3pc->AddElement(elC, fractionmass= 82.586*perCent);
+	fPolBor3pc->AddElement(elB, fractionmass= 3.00*perCent);
+
+	// Polyethylene with boron at 3.5% - Has borated polyethylene any oxygen elements? FIXME
+	fPolBor3_5pc = new G4Material("PolBor3_5pc",density= 0.96*g/cm3, nelements= 3);
+	fPolBor3_5pc->AddElement(elH, fractionmass= 14.340*perCent);
+	fPolBor3_5pc->AddElement(elC, fractionmass= 82.160*perCent);
+	fPolBor3_5pc->AddElement(elB, fractionmass= 3.50 *perCent);
+
+	// Polyethylene with boron at 10% - Has borated polyethylene any oxygen elements? FIXME
+	fPolBor10pc = new G4Material("PolBor10pc",density= 0.96*g/cm3, nelements= 3);
+	fPolBor10pc->AddElement(elH, fractionmass= 13.374*perCent);
+	fPolBor10pc->AddElement(elC, fractionmass= 76.626*perCent);
+	fPolBor10pc->AddElement(elB, fractionmass= 10.00 *perCent);
 }

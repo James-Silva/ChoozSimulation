@@ -251,6 +251,11 @@ private:
 
 	// Material properties
 	G4Material* 		fMaterialGalactic;
+	G4Material*			fPol;
+	G4Material* 		fPolBor1_75pc;
+	G4Material* 		fPolBor3pc;
+	G4Material* 		fPolBor3_5pc;
+	G4Material* 		fPolBor10pc;
 	G4Material*			fMaterialGe;
 	G4Material*			fMaterialSi;
 	G4Material*			fMaterialAir;
