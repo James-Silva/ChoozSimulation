@@ -46,9 +46,6 @@ private:
 	G4VPhysicalVolume*  ConstructDetectors() noexcept;
 	G4VPhysicalVolume*  ConstructSingleDetector() noexcept;
 	G4VPhysicalVolume*  ConstructNuDetector() noexcept;
-	void AddConcreteFloor() noexcept;
-	void AddCoffinWalls() noexcept;
-	void AddConcreteWalls() noexcept;
 };
 
 
