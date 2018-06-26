@@ -2,7 +2,7 @@
 #include "DetectorMessenger.hh"
 
 #include "G4Material.hh"
-#include "G4NistManager.hh"
+#include "Materials.hh"
 #include "G4Box.hh"
 #include "G4Cons.hh"
 #include "G4Tubs.hh"
@@ -21,6 +21,7 @@
 #include "G4Element.hh"
 #include "G4SDManager.hh"
 #include "CrystalSensitiveDetector.hh"
+//#include "Shieldings.hh"
 
 #include <cstdlib>
 #include <cmath>
@@ -28,62 +29,68 @@
 using namespace std;
 
 DetectorConstruction::DetectorConstruction()
-:G4VUserDetectorConstruction(),floorWidthX(2210*mm),floorWidthZ(3810*mm),floorThickness(0.5*m),wallsHeight(2.5*m),fADRheight(34*cm),
-fADRheightaboveground(100*cm),fvec_roomoffset(-750*mm,-1525*mm,-(floorThickness/2.)-1.25*fADRheight)
-{
-	// materials
-	DefineMaterials();
-	// create commands for interactive definition of the calorimeter
-  fDetectorMessenger = new DetectorMessenger(this);
-}
+:G4VUserDetectorConstruction(), detectorMessenger(new DetectorMessenger(this))
+{}
 
-DetectorConstruction::~DetectorConstruction()
-{ delete fDetectorMessenger;}
+DetectorConstruction::~DetectorConstruction() { delete detectorMessenger; }
 
-G4VPhysicalVolume*  DetectorConstruction::Construct()
-{
+G4VPhysicalVolume*  DetectorConstruction::Construct() noexcept {
+	Materials::CreateMaterials();
   InitializeWorld();
 	ConstructPit(); //Rock Surrounding the Detector
 	ConstructOuterDetectors(); //Air around the crystal
 	//ConstructADR();
-	AddGioveShielding();
-  phystest = ConstructDetectors();
+	//AddGioveShielding();
+  auto phystest = ConstructDetectors();
 
   return phystest;
 }
 
-void DetectorConstruction::InitializeWorld()
-{
-  fWorldSize  = 20.*m;
-  fSolidWorld = new G4Box("fSolidWorld", fWorldSize/2., fWorldSize/2., fWorldSize/2.);
-  fLogicWorld = new G4LogicalVolume(fSolidWorld, fMaterialGalactic, "world");
-  fLogicWorld->SetVisAttributes(G4VisAttributes::GetInvisible());
-  fPhysiWorld = new G4PVPlacement(0, G4ThreeVector(), fLogicWorld, "world", 0, false, 0);
+void DetectorConstruction::InitializeWorld() noexcept {
+  constexpr auto worldSize  = 20.*m;
+  auto solidWorld = new G4Box("world", worldSize/2., worldSize/2., worldSize/2.);
+  logicWorld = new G4LogicalVolume(solidWorld,
+																	G4Material::GetMaterial("G4_Galactic"),
+																	"world");
+  logicWorld->SetVisAttributes(G4VisAttributes::GetInvisible());
+  physicalWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "world", 0,
+																		false, 0);
 }
 
-void DetectorConstruction::ConstructPit()
-{
-	if(!fPhysiWorld)
+void DetectorConstruction::ConstructPit() noexcept {
+	if(!physicalWorld)
 	{
 		G4cout << "ERROR in DetectorConstruction::ConstructPit" << G4endl;
 		G4cout << "World volume does not exist!!" << G4endl;
 		return;
 	}
-	G4ThreeVector vec_offset(0*mm,0*mm,750*mm);
-	G4ThreeVector concrete_offset(0*mm,0*mm,100*mm);
-	zeroradius = 0.*cm;
-	startAngle = 0.*deg;
-	spanningAngleFull = 360.*deg;
-	G4Box *solidRock = new G4Box("Rock",6.*m,6.*m,5.*m);
-	G4Tubs *PitTube = new G4Tubs("Pittube", zeroradius, 4350*mm, 8500*mm/2.0, startAngle, spanningAngleFull);
-	G4Tubs *Jacket2Tube = new G4Tubs("JacketShell21", zeroradius, 4250*mm, 8400*mm/2.0,startAngle, spanningAngleFull);
-	G4Tubs *Jacket21Tube = new G4Tubs("JacketShell21", zeroradius, 4350*mm, 8500*mm/2.0,startAngle, spanningAngleFull);
-	this->PitSolid = new G4SubtractionSolid("ChoozPit",solidRock,PitTube,0,vec_offset);
-	this->PitLog = new G4LogicalVolume(PitSolid, fMaterialChoozRock, "logicalRock");
-	this->PitPhys =  new G4PVPlacement(0, -vec_offset, PitLog, "PVRock", fLogicWorld, false, 0);
-	this->PitJacketSolid = new G4SubtractionSolid("ChoozPit_ConcreteJacket",Jacket21Tube,Jacket2Tube,0,concrete_offset);
-	this->PitJacketLog = new G4LogicalVolume(PitJacketSolid, fMaterialConcrete, "logicalConcrete");
-	this->PitJacketPhys =  new G4PVPlacement(0,G4ThreeVector(0), PitJacketLog, "ConcreteJacket", fLogicWorld, false, 0);
+	const G4ThreeVector vec_offset(0*mm,0*mm,750*mm);
+	const G4ThreeVector concrete_offset(0*mm,0*mm,100*mm);
+	constexpr int zeroradius = 0.*cm;
+	constexpr int startAngle = 0.*deg;
+	constexpr int spanningAngleFull = 360.*deg;
+
+  auto solidRock = new G4Box("Rock", 6.*m, 6.*m, 5.*m);
+	auto PitTube = new G4Tubs("Pittube", zeroradius, 4350*mm, 8500*mm/2.0,
+														startAngle, spanningAngleFull);
+	auto Jacket2Tube = new G4Tubs("JacketShell21", zeroradius, 4250*mm,
+																8400*mm/2.0,startAngle, spanningAngleFull);
+	auto Jacket21Tube = new G4Tubs("JacketShell21", zeroradius, 4350*mm,
+																 8500*mm/2.0,startAngle, spanningAngleFull);
+	auto PitSolid = new G4SubtractionSolid("ChoozPit", solidRock, PitTube, 0,
+																				 vec_offset);
+	auto PitLog = new G4LogicalVolume(PitSolid,
+																		G4Material::GetMaterial("ChoozRock"),
+																		"logicalRock");
+	new G4PVPlacement(0, -vec_offset, PitLog, "PVRock", logicWorld, false, 0);
+	auto PitJacketSolid = new G4SubtractionSolid("ChoozPit_ConcreteJacket",
+																							 Jacket21Tube, Jacket2Tube, 0,
+																							 concrete_offset);
+	auto PitJacketLog = new G4LogicalVolume(PitJacketSolid,
+																					G4Material::GetMaterial("G4_CONCRETE"),
+																					"logicalConcrete");
+	new G4PVPlacement(0, G4ThreeVector(0), PitJacketLog, "ConcreteJacket",
+										logicWorld, false, 0);
 
 	G4VisAttributes visRock(G4Colour(0.398,0.199,0.));
 	visRock.SetForceWireframe(true);
@@ -94,452 +101,328 @@ void DetectorConstruction::ConstructPit()
 
 }
 
-void DetectorConstruction::ConstructOuterDetectors()
-{
-	zeroradius = 0.*cm;
-	startAngle = 0.*deg;
-	spanningAngleFull = 360.*deg;
-	G4ThreeVector vec_zero(0*mm,0*mm,50*mm); // Offset include to have top of water shield line up with top of pit
-	G4ThreeVector vec_offset(0*mm,0*mm,+1000*mm);
-	this->TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 1000.0*mm, 3200.0*mm,startAngle, spanningAngleFull);
-	this->TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4250.0*mm, 4200*mm,startAngle, spanningAngleFull);
-	//this->WaterTubeSolid = new G4SubtractionSolid("WaterShielding",TempTube_outer,TempTube_inner,0,vec_offset);
-	//this->WaterTubeLog = new G4LogicalVolume(WaterTubeSolid, fMaterialWater, "WaterShielding");
-	//this->WaterTubePhys = new G4PVPlacement(0,vec_zero, WaterTubeLog, "WaterShielding",fLogicWorld, false,0);
-	//Surround Detector with water instead of air
-	this->AirTubeSolid = new G4SubtractionSolid("AirShielding",TempTube_outer,TempTube_inner,0,vec_offset);
-	this->AirTubeLog = new G4LogicalVolume(AirTubeSolid, fMaterialAir, "AirShielding");
-	this->AirTubePhys = new G4PVPlacement(0,vec_zero, AirTubeLog, "AirShielding",fLogicWorld, false,0);
+void DetectorConstruction::ConstructOuterDetectors() noexcept{
+	constexpr int zeroradius = 0.*cm;
+	constexpr int startAngle = 0.*deg;
+	constexpr int spanningAngleFull = 360.*deg;
+	// Offset include to have top of water shield line up with top of pit
+	const G4ThreeVector vec_zero(0*mm,0*mm,50*mm);
+	const G4ThreeVector vec_offset(0*mm,0*mm,+1000*mm);
+
+	auto TempTube_inner = new G4Tubs("Temp_inner", zeroradius, 1000.0*mm,
+																	 3200.0*mm,startAngle, spanningAngleFull);
+	auto TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4250.0*mm,
+																	 4200*mm,startAngle, spanningAngleFull);
+	auto AirTubeSolid = new G4SubtractionSolid("AirShielding", TempTube_outer,
+																						 TempTube_inner,0,vec_offset);
+	auto AirTubeLog = new G4LogicalVolume(AirTubeSolid,
+																				G4Material::GetMaterial("G4_AIR"),
+																				"AirShielding");
+	new G4PVPlacement(0,vec_zero, AirTubeLog, "AirShielding",logicWorld, false,0);
+
 	G4VisAttributes visAirTube(G4Colour(0,0,1));
 	visAirTube.SetForceWireframe(true);
 	visAirTube.SetForceAuxEdgeVisible(true);
 	AirTubeLog->SetVisAttributes(visAirTube);
 }
 
-void DetectorConstruction::AddGioveShielding()
-{
+// void DetectorConstruction::AddLayer(material, thickness)
+// {
+//
+// 	//Shieldings::AddLayer(material, thickness):
+//
+// 	 Shieldings shieldingBuilder;
+// 	 shieldingBuilder.AddLayer(material, thickness):
+// }
 
-	const double thickness = 50*mm;
-	const double MuonVetoWidth = 1000*mm;
-	const double MuonVetoHeight = 950*mm;
-
-	std::cout << "   ***** Chose GIOVE-like shielding configuration *****\n";
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	//Layer 1 - Polyethylene
-	muonShielding = new G4Box("muonShielding",
-														MuonVetoWidth/2.,
-													  MuonVetoWidth/2.,
-													  MuonVetoHeight/2.);
-	muonShielding_lv = new G4LogicalVolume(muonShielding,
-																				 fPol,
-																				 "muonShielding");
-	muonShielding_pv = new G4PVPlacement(0,
-																			{0,0,0},
-																			muonShielding_lv,
-																			"muonShielding",
-																			fLogicWorld,
-																			false,
-																			0);
-	G4VisAttributes visMuShielding(G4Colour(1.,0.,0.));
-	visMuShielding.SetForceWireframe(true);
-	muonShielding_lv->SetVisAttributes(visMuShielding);
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	//Layer 2 - Lead
-	pbShielding1 = new G4Box("Pb_shielding1",
-													 MuonVetoWidth/2. - 1*thickness,
-													 MuonVetoWidth/2. - 1*thickness,
-													 MuonVetoWidth/2. - 1*thickness);
-  pbShielding1_lv = new G4LogicalVolume(pbShielding1,
-																				fMaterialPb,
-																				"Pb_shielding1");
-	pbShielding1_pv = new G4PVPlacement(0,
-																		  {0,0,0},
-																			pbShielding1_lv,
-																			"Pb_shielding1",
-																			fLogicWorld,
-																			false,
-																			0);
-	G4VisAttributes visPbShielding1(G4Colour(1.,0.,0.));
-	visPbShielding1.SetForceWireframe(true);
-	pbShielding1_lv->SetVisAttributes(visPbShielding1);
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	//Layer 3 - 10% Borated Polyethylene
-	pe_b_Shielding1 = new G4Box("PE_B_shielding1",
-															 MuonVetoWidth/2. - 2*thickness,
-															 MuonVetoWidth/2. - 2*thickness,
-															 MuonVetoWidth/2. - 2*thickness);
-
-  pe_b_Shielding1_lv = new G4LogicalVolume(pe_b_Shielding1,
-																					 fPolBor10pc,
-																					 "PE_B_shielding1");
-	pe_b_Shielding1_pv = new G4PVPlacement(0,
-																			  {0,0,0},
-																				pe_b_Shielding1_lv,
-																				"PE_B_shielding1",
-																				fLogicWorld,
-																				false,
-																				0);
-	G4VisAttributes visPE_B_Shielding1(G4Colour(1.,0.,0.));
-	visPE_B_Shielding1.SetForceWireframe(true);
-	pe_b_Shielding1_lv->SetVisAttributes(visPE_B_Shielding1);
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	//Layer 4 - Lead
-	pbShielding2 = new G4Box("Pb_shielding2",
-													 MuonVetoWidth/2. - 3*thickness,
-													 MuonVetoWidth/2. - 3*thickness,
-													 MuonVetoWidth/2. - 3*thickness);
-  pbShielding2_lv = new G4LogicalVolume(pbShielding2,
-																				fMaterialPb,
-																				"Pb_shielding2");
-	pbShielding2_pv = new G4PVPlacement(0,
-																		  {0,0,0},
-																			pbShielding2_lv,
-																			"Pb_shielding2",
-																			fLogicWorld,
-																			false,
-																			0);
-	G4VisAttributes visPbShielding2(G4Colour(1.,0.,0.));
-	visPbShielding2.SetForceWireframe(true);
-	pbShielding2_lv->SetVisAttributes(visPbShielding2);
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	//Layer 5 - 3% Borated Polyethylene
-	pe_b_Shielding2 = new G4Box("PE_B_shielding2",
-															 MuonVetoWidth/2. - 4*thickness,
-															 MuonVetoWidth/2. - 4*thickness,
-															 MuonVetoWidth/2. - 4*thickness);
-
-  pe_b_Shielding2_lv = new G4LogicalVolume(pe_b_Shielding2,
-																					 fPolBor3pc,
-																					 "PE_B_shielding2");
-	pe_b_Shielding2_pv = new G4PVPlacement(0,
-																			  {0,0,0},
-																				pe_b_Shielding2_lv,
-																				"PE_B_shielding2",
-																				fLogicWorld,
-																				false,
-																				0);
-	G4VisAttributes visPE_B_Shielding2(G4Colour(1.,0.,0.));
-	visPE_B_Shielding2.SetForceWireframe(true);
-	pe_b_Shielding2_lv->SetVisAttributes(visPE_B_Shielding2);
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	//Layer 6 - Lead
-	pbShielding3 = new G4Box("Pb_shielding3",
-													 MuonVetoWidth/2. - 6*thickness,
-													 MuonVetoWidth/2. - 6*thickness,
-													 MuonVetoWidth/2. - 6*thickness);
-	pbShielding3_lv = new G4LogicalVolume(pbShielding3,
-																				fMaterialPb,
-																				"Pb_shielding3");
-	pbShielding3_pv = new G4PVPlacement(0,
-																			{0,0,0},
-																			pbShielding3_lv,
-																			"Pb_shielding3",
-																			fLogicWorld,
-																			false,
-																			0);
-	G4VisAttributes visPbShielding3(G4Colour(1.,0.,0.));
-	visPbShielding3.SetForceWireframe(true);
-	pbShielding3_lv->SetVisAttributes(visPbShielding3);
-
-	//////////////////////////////////////////////////////////////////////////////
-
-	//Shield interior - Air
-	shieldInterior = new G4Box("shieldInterior",
-													 MuonVetoWidth/2. - 7*thickness,
-													 MuonVetoWidth/2. - 7*thickness,
-													 MuonVetoWidth/2. - 7*thickness);
-	shieldInterior_lv = new G4LogicalVolume(shieldInterior,
-																				fMaterialAir,
-																				"shieldInterior");
-	shieldInterior_pv = new G4PVPlacement(0,
-																			{0,0,0},
-																			shieldInterior_lv,
-																			"shieldInterior",
-																			fLogicWorld,
-																			false,
-																			0);
-	G4VisAttributes visshieldInterior(G4Colour(1.,0.,0.));
-	visshieldInterior.SetForceWireframe(true);
-	shieldInterior_lv->SetVisAttributes(visshieldInterior);
-
+//void DetectorConstruction::AddGioveShielding() noexcept {
+	Shieldings shieldingBuilder;
+	shieldingBuilder.ConstructGioveShielding(logicWorld);
 }
 
-void DetectorConstruction::ConstructADR()
-{
+void DetectorConstruction::ConstructADR() noexcept {
 	// copper plate
-	outerRadius5 = 12.*cm;
-	hz5 = 1.*cm;
-	zeroradius = 0.*cm;
-	startAngle = 0.*deg;
-	startAngle90 = 90.*deg;
-	spanningAngleFull = 360.*deg;
-	G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-
-
-	this->plateTube = new G4Tubs("Plate", zeroradius, outerRadius5, hz5/2., startAngle90, spanningAngleFull);
-	this->plateLog = new G4LogicalVolume(plateTube, fMaterialCu, "Copper Plate");
-	this->platePhys = new G4PVPlacement(0, vec_zero, plateLog, "Copper Plate", fLogicWorld, false,0);
+	constexpr double outerRadius5 = 12.*cm;
+	constexpr double hz5 = 1.*cm;
+	constexpr int zeroradius = 0.*cm;
+	constexpr int startAngle = 0.*deg;
+	constexpr int startAngle90 = 90.*deg;
+	constexpr int spanningAngleFull = 360.*deg;
+	const G4ThreeVector vec_zero(0*mm, 0*mm, 0*mm);
+	auto plateTube = new G4Tubs("Plate", zeroradius, outerRadius5, hz5/2.,
+															startAngle90, spanningAngleFull);
+	auto plateLog = new G4LogicalVolume(plateTube, G4Material::GetMaterial("G4_Cu"),
+																			"Copper Plate");
+	new G4PVPlacement(0, vec_zero, plateLog, "Copper Plate", logicWorld, false, 0);
 	G4VisAttributes visplate(G4Colour(1.,0.,0.));
 	visplate.SetForceWireframe(true);
 	visplate.SetForceSolid(true);
 	plateLog->SetVisAttributes(visplate);
 
 	// inner Aluminum tube
-	outerRadius1 = 13.97*cm;
-	hz1 = 28.4*cm;
-	outerRadius11 = 12.94*cm;
-	hz11 = 27.4*cm;
-	this->shell1Tube = new G4Tubs("Shell1", zeroradius, outerRadius1, hz1/2.0, startAngle, spanningAngleFull);
-	this->shell11Tube = new G4Tubs("Shell11", zeroradius, outerRadius11, hz11/2.0,startAngle, spanningAngleFull);
-	G4SubtractionSolid* shellinnerAlTube = new G4SubtractionSolid("Inner Shell",shell1Tube,shell11Tube);
-	this->shellinnerAlTubeLog = new G4LogicalVolume(shellinnerAlTube, fMaterialAl, "Inner Shell");
-	this->shellinnerAlTubePhys = new G4PVPlacement(0,vec_zero, shellinnerAlTubeLog, "Inner shell",fLogicWorld, false,0);
+	constexpr double outerRadius1 = 13.97*cm;
+	constexpr double hz1 = 28.4*cm;
+	constexpr double outerRadius11 = 12.94*cm;
+	constexpr double hz11 = 27.4*cm;
+	auto shell1Tube = new G4Tubs("Shell1", zeroradius, outerRadius1, hz1/2.0,
+															 startAngle, spanningAngleFull);
+	auto shell11Tube = new G4Tubs("Shell11", zeroradius, outerRadius11, hz11/2.0,
+																startAngle, spanningAngleFull);
+	auto shellinnerAlTube = new G4SubtractionSolid("Inner Shell", shell1Tube,
+																								 shell11Tube);
+	auto shellinnerAlTubeLog = new G4LogicalVolume(shellinnerAlTube,
+																								 G4Material::GetMaterial("G4_Al"),
+																								 "Inner Shell");
+	new G4PVPlacement(0, vec_zero, shellinnerAlTubeLog, "Inner shell", logicWorld,
+										false,0);
 	G4VisAttributes visinnerAlTube(G4Colour(0.41,0.41,0.41));
 	visinnerAlTube.SetForceWireframe(true);
 	visinnerAlTube.SetForceAuxEdgeVisible(true);
 	shellinnerAlTubeLog->SetVisAttributes(visinnerAlTube);
 
 	// outer Aluminum tube/can
-	outerRadius2 = 16.94*cm;
-	hz2 = 29.4*cm;
-	outerRadius21 = 15.94*cm;
-	hz21 = 29.3*cm;
-	this->shell2Tube = new G4Tubs("Shell2", zeroradius, outerRadius2, hz2/2.0, startAngle, spanningAngleFull);
-	this->shell21Tube = new G4Tubs("Shell21", zeroradius, outerRadius21, hz21/2.0,startAngle, spanningAngleFull);
-	G4SubtractionSolid* shellouterAlTube = new G4SubtractionSolid("Inner Shell",shell2Tube,shell21Tube);
-	this->shellouterAlTubeLog = new G4LogicalVolume(shellouterAlTube, fMaterialAl, "Outer Shell");
-	this->shellouterAlTubePhys = new G4PVPlacement(0,vec_zero, shellouterAlTubeLog, "Outer shell",fLogicWorld, false,0);
+	constexpr double outerRadius2 = 16.94*cm;
+	constexpr double hz2 = 29.4*cm;
+	constexpr double outerRadius21 = 15.94*cm;
+	constexpr double hz21 = 29.3*cm;
+	auto shell2Tube = new G4Tubs("Shell2", zeroradius, outerRadius2, hz2/2.0,
+															 startAngle, spanningAngleFull);
+	auto shell21Tube = new G4Tubs("Shell21", zeroradius, outerRadius21, hz21/2.0,
+																startAngle, spanningAngleFull);
+	auto shellouterAlTube = new G4SubtractionSolid("Inner Shell", shell2Tube,
+																								 shell21Tube);
+	auto shellouterAlTubeLog = new G4LogicalVolume(shellouterAlTube,
+																								 G4Material::GetMaterial("G4_Al"),
+																								 "Outer Shell");
+	new G4PVPlacement(0, vec_zero, shellouterAlTubeLog, "Outer shell", logicWorld,
+	 									false, 0);
 	G4VisAttributes visouterAlTube(G4Colour(0.41,0.41,0.41));
 	visouterAlTube.SetForceWireframe(true);
 	visouterAlTube.SetForceAuxEdgeVisible(true);
 	shellouterAlTubeLog->SetVisAttributes(visouterAlTube);
 
 	// Tungsten tube/can/sheild
-	outerRadius3 = 12.1*cm;
-	hz3 = 20.0*cm;
-	outerRadius31 = 12.0*cm;
-	hz31 = 19.9*cm;
-	this->tungTube = new G4Tubs("Tungshell", zeroradius, outerRadius3, hz3/2.0, startAngle, spanningAngleFull);
-	this->tung1Tube = new G4Tubs("Tungshell", zeroradius, outerRadius31, hz31/2.0,startAngle, spanningAngleFull);
-	G4SubtractionSolid* fulltungTube = new G4SubtractionSolid("Tungsten Shell",tungTube,tung1Tube);
-	this->fulltungTubeLog = new G4LogicalVolume(fulltungTube, fMaterialW, "Tungsten Shell");
-	this->fulltungTubePhys = new G4PVPlacement(0,vec_zero, fulltungTubeLog, "Tungsten shell",fLogicWorld, false,0);
+	constexpr double outerRadius3 = 12.1*cm;
+	constexpr double hz3 = 20.0*cm;
+	constexpr double outerRadius31 = 12.0*cm;
+	constexpr double hz31 = 19.9*cm;
+	auto tungTube = new G4Tubs("Tungshell", zeroradius, outerRadius3, hz3/2.0,
+														 startAngle, spanningAngleFull);
+	auto tung1Tube = new G4Tubs("Tungshell", zeroradius, outerRadius31, hz31/2.0,
+															startAngle, spanningAngleFull);
+	auto fulltungTube = new G4SubtractionSolid("Tungsten Shell",tungTube,tung1Tube);
+	auto fulltungTubeLog = new G4LogicalVolume(fulltungTube,
+																						 G4Material::GetMaterial("G4_W"),
+																						 "Tungsten Shell");
+	new G4PVPlacement(0, vec_zero, fulltungTubeLog, "Tungsten shell", logicWorld,
+										false, 0);
 	G4VisAttributes vistungTube(G4Colour(0.18,0.31,0.31));
 	vistungTube.SetForceWireframe(true);
 	vistungTube.SetForceAuxEdgeVisible(true);
 	fulltungTubeLog->SetVisAttributes(vistungTube);
 
 	// Scintillator Tube
-	outerRadius4 = 17.5*cm;
-	hz4 = 31.4*cm;
-	outerRadius41 = 16.5*cm;
-	hz41 = 30.4*cm;
-	this->scinTube = new G4Tubs("Scinshell", zeroradius, outerRadius4, hz4/2.0, startAngle, spanningAngleFull);
-	this->scin1Tube = new G4Tubs("Scinshell", zeroradius, outerRadius41, hz41/2.0,startAngle, spanningAngleFull);
-	G4SubtractionSolid* fullscinTube = new G4SubtractionSolid("Scintillator Shell",scinTube,scin1Tube);
-	this->fullscinTubeLog = new G4LogicalVolume(fullscinTube, fMaterialScintillator, "Scintillator Shell");
-	this->fullscinTubePhys = new G4PVPlacement(0,vec_zero, fullscinTubeLog, "Scintillator shell",fLogicWorld, false,0);
+	constexpr double outerRadius4 = 17.5*cm;
+	constexpr double hz4 = 31.4*cm;
+	constexpr double outerRadius41 = 16.5*cm;
+	constexpr double hz41 = 30.4*cm;
+	auto scinTube = new G4Tubs("Scinshell", zeroradius, outerRadius4, hz4/2.0,
+														 startAngle, spanningAngleFull);
+	auto scin1Tube = new G4Tubs("Scinshell", zeroradius, outerRadius41, hz41/2.0,
+															startAngle, spanningAngleFull);
+	auto  fullscinTube = new G4SubtractionSolid("Scintillator Shell", scinTube,
+																							scin1Tube);
+	auto fullscinTubeLog = new G4LogicalVolume(fullscinTube,
+		 																				 G4Material::GetMaterial("Scintillator"),
+																						 "Scintillator Shell");
+	new G4PVPlacement(0, vec_zero, fullscinTubeLog, "Scintillator shell",
+										logicWorld, false, 0);
 	G4VisAttributes visscinTube(G4Colour(0.0,0.0,1.0));
 	visscinTube.SetForceWireframe(true);
 	visscinTube.SetForceAuxEdgeVisible(true);
 	fullscinTubeLog->SetVisAttributes(visscinTube);
 }
 
-G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()
-{
-  DetectorSize = 5.2*cm; // Size needed for 1 Kg of detector material
+G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors() noexcept {
+	constexpr double DetectorSize = 5.2*cm; // Size needed for 1 Kg of detector material
+	std::vector<std::string> CyrstalLabels = {"Crystal_1", "Crystal_2","Crystal_3",
+																						"Crystal_4","Crystal_5"};
+	std::vector<G4double> Cyrstalpos_x = {0.*cm, -6.*cm, 6.*cm, 6.*cm, -6.*cm};
+	std::vector<G4double> Cyrstalpos_y = {0.*cm, 6.*cm, 6.*cm, -6.*cm, -6.*cm};
+	std::vector<G4double> Cyrstalpos_z = {0.*cm, 0.*cm, 0.*cm, 0.*cm, 0.*cm};
+	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+	const G4ThreeVector vec_offset(0*mm,0*mm,0.5*cm+DetectorSize/2.0);
+	G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
+	visDetector.SetForceWireframe(true);
+	visDetector.SetForceAuxEdgeVisible(true);
+	for(size_t jCrys = 0; jCrys < 1; jCrys++)
+	{
+		v_CrystalBoxes.push_back(new G4Box(CyrstalLabels[jCrys],DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0));
+		v_CrystalBoxesLog.push_back(new G4LogicalVolume(v_CrystalBoxes[jCrys], G4Material::GetMaterial("G4_Os"),CyrstalLabels[jCrys]));
+		G4ThreeVector crys_pos(Cyrstalpos_x[jCrys],Cyrstalpos_y[jCrys],Cyrstalpos_z[jCrys]);
+		v_CrystalBoxesPhys.push_back(new G4PVPlacement(0,crys_pos+vec_offset,v_CrystalBoxesLog[jCrys],CyrstalLabels[jCrys],logicWorld,false,0));
+		v_CrystalBoxesLog[jCrys]->SetVisAttributes(visDetector);
+		if (jCrys==0)
+		{
+			CrystalSensitiveDetector *Crystal1_SD = new CrystalSensitiveDetector("Crystal_1SD");
+			G4SDManager::GetSDMpointer()->AddNewDetector(Crystal1_SD);
+			v_CrystalBoxesLog[jCrys]->SetSensitiveDetector(Crystal1_SD);
+		}
 
-  std::vector<std::string> CyrstalLabels = {"Crystal_1", "Crystal_2","Crystal_3", "Crystal_4","Crystal_5"};
-  std::vector<G4double> Cyrstalpos_x = {0.*cm, -6.*cm, 6.*cm, 6.*cm, -6.*cm};
-  std::vector<G4double> Cyrstalpos_y = {0.*cm, 6.*cm, 6.*cm, -6.*cm, -6.*cm};
-  std::vector<G4double> Cyrstalpos_z = {0.*cm, 0.*cm, 0.*cm, 0.*cm, 0.*cm};
-  G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
-  visDetector.SetForceWireframe(true);
-  visDetector.SetForceAuxEdgeVisible(true);
-  G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-  G4ThreeVector vec_offset(0*mm,0*mm,0.5*cm+DetectorSize/2.0);
-  G4SDManager* SDmanager = G4SDManager::GetSDMpointer();
-  for(size_t jCrys = 0; jCrys < 1; jCrys++)
-  {
-    v_CrystalBoxes.push_back(new G4Box(CyrstalLabels[jCrys],DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0));
-    v_CrystalBoxesLog.push_back(new G4LogicalVolume(v_CrystalBoxes[jCrys], fMaterialOs,CyrstalLabels[jCrys]));
-    G4ThreeVector crys_pos(Cyrstalpos_x[jCrys],Cyrstalpos_y[jCrys],Cyrstalpos_z[jCrys]);
-    v_CrystalBoxesPhys.push_back(new G4PVPlacement(0,crys_pos+vec_offset,v_CrystalBoxesLog[jCrys],CyrstalLabels[jCrys],fLogicWorld,false,0));
-    v_CrystalBoxesLog[jCrys]->SetVisAttributes(visDetector);
-    if (jCrys==0)
-    {
-      CrystalSensitiveDetector *Crystal1_SD = new CrystalSensitiveDetector("Crystal_1SD");
-      SDmanager->AddNewDetector(Crystal1_SD);
-      v_CrystalBoxesLog[jCrys]->SetSensitiveDetector(Crystal1_SD);
-    }
-
-  }
-  return fPhysiWorld;
+	}
+	return physicalWorld;
 }
 
-G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector()
-{
-  // arbitrarily assuming 4-inch iZIP here [AJA]
-  // Taking out 4-inch iZIP for now [AFL - March 2016]
-  G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-  this->crystalBox_single = new G4Box("Single Crystal",DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0);
-  this->crystalLog_single = new G4LogicalVolume(crystalBox_single,fMaterialZn, "Single Crystal");
-  this->crystalPhys_single = new G4PVPlacement(0, vec_zero, crystalLog_single, "Single Crystal",fLogicWorld, false,0);
-  G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
-  visDetector.SetForceWireframe(true);
-  visDetector.SetForceAuxEdgeVisible(true);
-  crystalLog_single->SetVisAttributes(visDetector);
-  return fPhysiWorld;
+G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector() noexcept {
+	// arbitrarily assuming 4-inch iZIP here [AJA]
+	// Taking out 4-inch iZIP for now [AFL - March 2016]
+	constexpr double DetectorSize = 5.2*cm;
+	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+	auto crystalBox_single = new G4Box("Single Crystal", DetectorSize/2.0, DetectorSize/2.0,DetectorSize/2.0);
+	auto crystalLog_single = new G4LogicalVolume(crystalBox_single,G4Material::GetMaterial("Zn"), "Single Crystal");
+	new G4PVPlacement(0, vec_zero, crystalLog_single, "Single Crystal",logicWorld, false,0);
+	G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
+	visDetector.SetForceWireframe(true);
+	visDetector.SetForceAuxEdgeVisible(true);
+	crystalLog_single->SetVisAttributes(visDetector);
+	return physicalWorld;
 }
 
-G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()
-{
-  startAngle = 0.*deg;
-  spanningAngleFull = 360.*deg;
+void DetectorConstruction::ConstructPolySheilding(const double innerR,
+																									const double outerR,
+																									const double topthickness)
+																									noexcept {
+	// detector shielding is arbitrarily assuemd to be two concentric cylinders of
+	// polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
+	// Taking out this version of shielding while I work on the ATR geometry [AFL]
+	// Lead Tube
+	constexpr int zeroradius = 0.*cm;
+	constexpr int startAngle = 0.*deg;
+	constexpr int spanningAngleFull = 360.*deg;
+	const int outerRadius_shield = 1.0*outerR*cm;
+	const int outerRadius_shield1 = 1.0*innerR*cm;
+  constexpr double heightADR = 34*cm;
+	const auto heightADR1 = heightADR-2*(topthickness*cm);
+  const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
 
-  G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
-  visDetector.SetForceWireframe(true);
-  visDetector.SetForceAuxEdgeVisible(true);
-  G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+  auto shieldTube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield, heightADR/2.0, startAngle, spanningAngleFull);
+	auto shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, heightADR1/2.0,startAngle, spanningAngleFull);
+	auto fullshieldTube = new G4SubtractionSolid("Borated_Poly_Shield",shieldTube,shield1Tube);
+	auto fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, G4Material::GetMaterial("PolBor3pc"), "Borated_Poly_Shield");
+	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Borated_Poly_Shield",logicWorld, false,0);
 
-  G4SDManager* SDmanager = G4SDManager::GetSDMpointer();
-
-  TargetDetectorBox = new G4Tubs("NuDetector",0*m,1150*mm,1221*mm,startAngle, spanningAngleFull);
-  TargetDetectorLog = new G4LogicalVolume(TargetDetectorBox, fMaterialNuTarget,"NuDetector");
-  TargetDetectorPhys = new G4PVPlacement(0,vec_zero,TargetDetectorLog,"NuDetector",fLogicWorld,false,0);
-  TargetDetectorLog->SetVisAttributes(visDetector);
-  CrystalSensitiveDetector *NuDetector = new CrystalSensitiveDetector("NuDetector");
-  SDmanager->AddNewDetector(NuDetector);
-  TargetDetectorLog->SetSensitiveDetector(NuDetector);
-  return fPhysiWorld;
-}
-
-void DetectorConstruction::ConstructPolySheilding(G4double innerR, G4double outerR,G4double topthickness)
-{
-  // detector shielding is arbitrarily assuemd to be two concentric cylinders of
-  // polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
-  // Taking out this version of shielding while I work on the ATR geometry [AFL]
-  // Lead Tube
-  zeroradius = 0.*cm;
-  startAngle = 0.*deg;
-  spanningAngleFull = 360.*deg;
-  G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-  outerRadius_shield = 1.0*outerR*cm;
-
-  outerRadius_shield1 = 1.0*innerR*cm;
-  fADRheight1 = fADRheight-2*(topthickness*cm);
-  this->shieldTube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield, fADRheight/2.0, startAngle, spanningAngleFull);
-  this->shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, fADRheight1/2.0,startAngle, spanningAngleFull);
-  G4SubtractionSolid* fullshieldTube = new G4SubtractionSolid("Borated_Poly_Shield",shieldTube,shield1Tube);
-  this->fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, fMaterialPoly_Borated, "Borated_Poly_Shield");
-  this->fullshieldTubePhys = new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Borated_Poly_Shield",fLogicWorld, false,0);
   G4VisAttributes visshieldTube(G4Colour(1.0,0.586,0.0));
-  visshieldTube.SetForceWireframe(true);
-  visshieldTube.SetForceAuxEdgeVisible(true);
-  fullshieldTubeLog->SetVisAttributes(visshieldTube);
+	visshieldTube.SetForceWireframe(true);
+	visshieldTube.SetForceAuxEdgeVisible(true);
+	fullshieldTubeLog->SetVisAttributes(visshieldTube);
 }
 
-void DetectorConstruction::ConstructPbSheilding(G4double innerR, G4double outerR,G4double topthickness)
-{
-  // detector shielding is arbitrarily assuemd to be two concentric cylinders of
-  // polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
-  // Taking out this version of shielding while I work on the ATR geometry [AFL]
-  // Lead Tube
-  zeroradius = 0.*cm;
-  startAngle = 0.*deg;
-  spanningAngleFull = 360.*deg;
-  G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-  outerRadius_shield = 1.0*outerR*cm;
-  //fADRheight = 34*cm;
-  outerRadius_shield1 = 1.0*innerR*cm;
-  fADRheight1 = fADRheight-2*(topthickness*cm);
-  this->shieldTube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield, fADRheight/2.0, startAngle, spanningAngleFull);
-  this->shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, fADRheight1/2.0,startAngle, spanningAngleFull);
-  G4SubtractionSolid* fullshieldTube = new G4SubtractionSolid("Shielding Shell (Pb)",shieldTube,shield1Tube);
-  this->fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, fMaterialPb, "Shielding Shell (Pb)");
-  this->fullshieldTubePhys = new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Shielding shell (Pb)",fLogicWorld, false,0);
+void DetectorConstruction::ConstructPbSheilding(const double innerR,
+																								const double outerR,
+																								const double topthickness)
+																								noexcept {
+	// detector shielding is arbitrarily assuemd to be two concentric cylinders of
+	// polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
+	// Taking out this version of shielding while I work on the ATR geometry [AFL]
+	// Lead Tube
+	constexpr int zeroradius = 0.*cm;
+	constexpr int startAngle = 0.*deg;
+	constexpr int spanningAngleFull = 360.*deg;
+	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+	const int outerRadius_shield = 1.0*outerR*cm;
+	const int outerRadius_shield1 = 1.0*innerR*cm;
+  constexpr double heightADR = 34*cm;
+	const auto heightADR1 = heightADR-2*(topthickness*cm);
+	auto shieldTube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield, heightADR/2.0, startAngle, spanningAngleFull);
+	auto shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, heightADR1/2.0,startAngle, spanningAngleFull);
+	auto fullshieldTube = new G4SubtractionSolid("Shielding Shell (Pb)",shieldTube,shield1Tube);
+	auto fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, G4Material::GetMaterial("Lead"), "Shielding Shell (Pb)");
+	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Shielding shell (Pb)",logicWorld, false,0);
+
   G4VisAttributes visshieldTube(G4Colour(1.0,0.586,0.0));
-  visshieldTube.SetForceWireframe(true);
-  visshieldTube.SetForceAuxEdgeVisible(true);
-  fullshieldTubeLog->SetVisAttributes(visshieldTube);
+	visshieldTube.SetForceWireframe(true);
+	visshieldTube.SetForceAuxEdgeVisible(true);
+	fullshieldTubeLog->SetVisAttributes(visshieldTube);
 }
 
-void DetectorConstruction::AddConcreteFloor()
-{
-  if(!fPhysiWorld)
+void DetectorConstruction::AddConcreteFloor() noexcept {
+  if(!physicalWorld)
   {
     G4cout << "ERROR in DetectorConstruction::AddConcreteFloor" << G4endl;
     G4cout << "World volume does not exist!!" << G4endl;
     return;
   }
-  G4ThreeVector vec_heightaboveground(0.,0.,-fADRheightaboveground);
-  solidFloor = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
-  logFloor = new G4LogicalVolume(solidFloor, fMaterialConcrete, "logicalFloor");
-  physFloor = new G4PVPlacement(0, fvec_roomoffset+vec_heightaboveground, logFloor, "PVFloor", fLogicWorld, false, 0);
+  constexpr double floorWidthX = 2210*mm;
+  constexpr double floorWidthZ = 3810*mm;
+  constexpr double floorThickness = 0.5*m;
+  constexpr double heightADRaboveground = 100*cm;
+  constexpr double heightADR = 34*cm;
+  const G4ThreeVector vec_roomoffset = {-750*mm,-1525*mm,-(floorThickness/2.)-1.25*heightADR};
+  const G4ThreeVector vec_heightaboveground(0.,0.,-heightADRaboveground);
 
-  // Set the visualizer properties
+  auto solidFloor = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
+  auto logFloor = new G4LogicalVolume(solidFloor, G4Material::GetMaterial("G4_CONCRETE"), "logicalFloor");
+  new G4PVPlacement(0, vec_roomoffset+vec_heightaboveground, logFloor, "PVFloor", logicWorld, false, 0);
   G4VisAttributes visFloor(G4Colour(1.,0.,0.));
   visFloor.SetForceWireframe(true);
   logFloor->SetVisAttributes(visFloor);
 }
 
-void DetectorConstruction::AddCoffinWalls()
-{
-   G4double d_widthz = 5.839/2.0; // in meters
-   G4double d_widthx = 8.277/2.0;
-   G4double d_wallheight = 5.639/2.0;
-   G4double d_wallthickness = .1;
-   G4ThreeVector posWalls(0.,0.,0.);
-   G4ThreeVector posfloor(0.,0.,0.);
-   G4ThreeVector vec_heightaboveground(0.,0.,-fADRheightaboveground);
-   G4RotationMatrix* nullRotation = new G4RotationMatrix();
-   G4ThreeVector voidTranslation(0.0, -floorThickness, 0.0);
-   G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-   solidWallsOuterBox = new G4Box("solidWallsOuterBox", d_widthx*m, d_wallheight*m, d_widthz*m);
-   coffinfloor = new G4Box("coffinfloor", d_widthx*m, floorThickness, d_widthz*m);
-   solidWallsInnerVoid = new G4Box("solidWallsInnerVoid", d_widthx*m-2.0*d_wallthickness*m,d_wallheight*m-2.0*d_wallthickness*m, d_widthz*m-2.0*d_wallthickness*m);
-   solidWalls = new G4SubtractionSolid("solidWalls", solidWallsOuterBox, solidWallsInnerVoid, nullRotation, voidTranslation);
-   logWalls = new G4LogicalVolume(solidWalls, fMaterialConcrete, "logicalWalls");
-   logFloor = new G4LogicalVolume(coffinfloor, fMaterialConcrete, "coffinfloor");
-   physWalls = new G4PVPlacement(0, posWalls+fvec_roomoffset, logWalls, "PVWalls", fLogicWorld, false, 0);
-   physFloor = new G4PVPlacement(0, posfloor+fvec_roomoffset, logFloor, "PVfloor", fLogicWorld, false, 0);
-   G4VisAttributes viscoffin(G4Colour(1.,0.,0.));
-   viscoffin.SetForceWireframe(true);
-   logWalls->SetVisAttributes(viscoffin);
-   G4VisAttributes visfloor(G4Colour(1.,0.,0.));
-   visfloor.SetForceWireframe(false);
-   logFloor->SetVisAttributes(visfloor);
+void DetectorConstruction::AddCoffinWalls() noexcept {
+  constexpr double d_widthz = 5.839/2.0; // in meters
+  constexpr double d_widthx = 8.277/2.0;
+  constexpr double d_wallheight = 5.639/2.0;
+  constexpr double d_wallthickness = .1;
+  constexpr double floorThickness = 0.5*m;
+  constexpr double heightADRaboveground = 100*cm;
+  constexpr double heightADR = 34*cm;
+  const G4ThreeVector vec_roomoffset = {-750*mm,-1525*mm,-(floorThickness/2.)-1.25*heightADR};
+  const G4ThreeVector posWalls(0.,0.,0.);
+  const G4ThreeVector posfloor(0.,0.,0.);
+  const G4ThreeVector vec_heightaboveground(0.,0.,-heightADRaboveground);
+  const G4ThreeVector voidTranslation(0.0, -floorThickness, 0.0);
+  const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+  G4RotationMatrix* nullRotation = new G4RotationMatrix();
+
+  auto solidWallsOuterBox = new G4Box("solidWallsOuterBox", d_widthx*m, d_wallheight*m, d_widthz*m);
+  auto coffinfloor = new G4Box("coffinfloor", d_widthx*m, floorThickness, d_widthz*m);
+  auto solidWallsInnerVoid = new G4Box("solidWallsInnerVoid", d_widthx*m-2.0*d_wallthickness*m,d_wallheight*m-2.0*d_wallthickness*m, d_widthz*m-2.0*d_wallthickness*m);
+  auto solidWalls = new G4SubtractionSolid("solidWalls", solidWallsOuterBox, solidWallsInnerVoid, nullRotation, voidTranslation);
+  auto logWalls = new G4LogicalVolume(solidWalls, G4Material::GetMaterial("G4_CONCRETE"), "logicalWalls");
+  auto logFloor = new G4LogicalVolume(coffinfloor, G4Material::GetMaterial("G4_CONCRETE"), "coffinfloor");
+  new G4PVPlacement(0, posWalls+vec_roomoffset, logWalls, "PVWalls", logicWorld, false, 0);
+  new G4PVPlacement(0, posfloor+vec_roomoffset, logFloor, "PVfloor", logicWorld, false, 0);
+
+  G4VisAttributes viscoffin(G4Colour(1.,0.,0.));
+  viscoffin.SetForceWireframe(true);
+  logWalls->SetVisAttributes(viscoffin);
+  G4VisAttributes visfloor(G4Colour(1.,0.,0.));
+  visfloor.SetForceWireframe(false);
+  logFloor->SetVisAttributes(visfloor);
 }
 
-void DetectorConstruction::AddConcreteWalls()
-{
-  if(!fPhysiWorld)
+void DetectorConstruction::AddConcreteWalls() noexcept {
+  if(!physicalWorld)
   {
     G4cout << "ERROR in DetectorConstruction::AddConcreteWalls" << G4endl;
     G4cout << "World volume does not exist!!" << G4endl;
     return;
-    }
+  }
 
-    // always build the floor by default when the walls are built
-    if(!physFloor)
-      AddConcreteFloor();
+  // always build the floor by default when the walls are built
+  //if(!physFloor) { AddConcreteFloor(); }
 
-    // position vector of the walls
-  G4double offset = wallsHeight/2.0-fADRheightaboveground-0.5*fADRheight;
+  // position vector of the walls
+  constexpr double wallsHeight = 2.5*m;
+  constexpr double floorWidthX = 2210*mm;
+  constexpr double floorWidthZ = 3810*mm;
+  constexpr double floorThickness = 0.5*m;
+  constexpr double heightADRaboveground = 100*cm;
+  constexpr double heightADR = 34*cm;
+  double offset = wallsHeight/2.0-heightADRaboveground-0.5*heightADR;
+  const G4ThreeVector vec_roomoffset = {-750*mm,-1525*mm,-(floorThickness/2.)-1.25*heightADR};
   G4ThreeVector posWalls(0.,0.0,offset);
-  G4ThreeVector posCeiling(0.,0.0,floorThickness/2.0+1.38*wallsHeight-fADRheightaboveground-0.5*fADRheight);
+  G4ThreeVector posCeiling(0.,0.0,floorThickness/2.0+1.38*wallsHeight-heightADRaboveground-0.5*heightADR);
   G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
   G4ThreeVector vec_wallA(-2561*mm,2057*mm,offset);
   G4ThreeVector vec_wallB(+209.7*mm,2057*mm,offset);
@@ -550,25 +433,25 @@ void DetectorConstruction::AddConcreteWalls()
   // transformation variables to help build the walls using a subtraction solid
   G4ThreeVector voidTranslation(0.0, 0.0,-floorThickness);
 
-  inbetweenwall = new G4Box("Inbetweenwall",381*mm,229*mm,wallsHeight/2.0);
-  inbetweenwall_logvolume = new G4LogicalVolume(inbetweenwall,fMaterialConcrete,"inbetweenwall_logvolume");
-  inbetweenwall_B = new G4Box("Inbetweenwall_B",1123*mm,229*mm,wallsHeight/2.0);
-  inbetweenwall_logvolume_B = new G4LogicalVolume(inbetweenwall_B,fMaterialConcrete,"inbetweenwall_logvolume_B");
-  inbetweenwall_C = new G4Box("Inbetweenwall_C",457*mm,457*mm,wallsHeight/2.0);
-  inbetweenwall_logvolume_C = new G4LogicalVolume(inbetweenwall_C,fMaterialConcrete,"inbetweenwall_logvolume_C");
-  inbetweenwall_D = new G4Box("Inbetweenwall_D",229*mm,457*mm,wallsHeight/2.0);
-  inbetweenwall_logvolume_D = new G4LogicalVolume(inbetweenwall_D,fMaterialConcrete,"inbetweenwall_logvolume_D");
-  inbetweenwall_E = new G4Box("Inbetweenwall_E",267*mm,3125*mm,wallsHeight/2.0);
-  inbetweenwall_logvolume_E = new G4LogicalVolume(inbetweenwall_E,Chrysotile,"inbetweenwall_logvolume_E");
-  solidceiling = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
-  logceiling = new G4LogicalVolume(solidceiling, fMaterialConcrete, "logicalCeiling");
+  auto inbetweenwall = new G4Box("Inbetweenwall",381*mm,229*mm,wallsHeight/2.0);
+  auto inbetweenwall_logvolume = new G4LogicalVolume(inbetweenwall,G4Material::GetMaterial("G4_CONCRETE"),"inbetweenwall_logvolume");
+  auto inbetweenwall_B = new G4Box("Inbetweenwall_B",1123*mm,229*mm,wallsHeight/2.0);
+  auto inbetweenwall_logvolume_B = new G4LogicalVolume(inbetweenwall_B,G4Material::GetMaterial("G4_CONCRETE"),"inbetweenwall_logvolume_B");
+  auto inbetweenwall_C = new G4Box("Inbetweenwall_C",457*mm,457*mm,wallsHeight/2.0);
+  auto inbetweenwall_logvolume_C = new G4LogicalVolume(inbetweenwall_C,G4Material::GetMaterial("G4_CONCRETE"),"inbetweenwall_logvolume_C");
+  auto inbetweenwall_D = new G4Box("Inbetweenwall_D",229*mm,457*mm,wallsHeight/2.0);
+  auto inbetweenwall_logvolume_D = new G4LogicalVolume(inbetweenwall_D,G4Material::GetMaterial("G4_CONCRETE"),"inbetweenwall_logvolume_D");
+  auto inbetweenwall_E = new G4Box("Inbetweenwall_E",267*mm,3125*mm,wallsHeight/2.0);
+  auto inbetweenwall_logvolume_E = new G4LogicalVolume(inbetweenwall_E,G4Material::GetMaterial("Chrysotile"),"inbetweenwall_logvolume_E");
+  auto solidceiling = new G4Box("solidFloor", floorWidthX, floorWidthZ,floorThickness);
+  auto logceiling = new G4LogicalVolume(solidceiling, G4Material::GetMaterial("G4_CONCRETE"), "logicalCeiling");
 
-  physceiling = new G4PVPlacement(0, posCeiling+fvec_roomoffset, logceiling,"PVCeiling", fLogicWorld, false, 0);
-  physinbetweenwall = new G4PVPlacement(0,vec_wallA,inbetweenwall_logvolume,"PVinbetweenWall",fLogicWorld,false,0);
-  physinbetweenwall_B = new G4PVPlacement(0,vec_wallB,inbetweenwall_logvolume_B,"PVinbetweenWall",fLogicWorld,false,0);
-  physinbetweenwall_C = new G4PVPlacement(0,vec_wallC,inbetweenwall_logvolume_C,"PVinbetweenWall",fLogicWorld,false,0);
-  physinbetweenwall_D = new G4PVPlacement(0,vec_wallD,inbetweenwall_logvolume_D,"PVinbetweenWall",fLogicWorld,false,0);
-  physinbetweenwall_E = new G4PVPlacement(0,vec_wallE,inbetweenwall_logvolume_E,"PVinbetweenWall",fLogicWorld,false,0);
+  new G4PVPlacement(0, posCeiling+vec_roomoffset, logceiling,"PVCeiling", logicWorld, false, 0);
+  new G4PVPlacement(0,vec_wallA,inbetweenwall_logvolume,"PVinbetweenWall",logicWorld,false,0);
+  new G4PVPlacement(0,vec_wallB,inbetweenwall_logvolume_B,"PVinbetweenWall",logicWorld,false,0);
+  new G4PVPlacement(0,vec_wallC,inbetweenwall_logvolume_C,"PVinbetweenWall",logicWorld,false,0);
+  new G4PVPlacement(0,vec_wallD,inbetweenwall_logvolume_D,"PVinbetweenWall",logicWorld,false,0);
+  new G4PVPlacement(0,vec_wallE,inbetweenwall_logvolume_E,"PVinbetweenWall",logicWorld,false,0);
 
   G4VisAttributes visbetweenwall(G4Colour(0.,1.,0.));
   visbetweenwall.SetForceWireframe(true);
@@ -590,182 +473,44 @@ void DetectorConstruction::AddConcreteWalls()
   logceiling->SetVisAttributes(visceiling);
 }
 
-void DetectorConstruction::SetCrystalMaterial(G4String Material)
-{
-  if (Material == "Os" || Material == "Zn" || Material == "Zr")
-  {
-    crystalmaterial = Material;
-    if (Material == "Os")
-    {
-      for (int i=0;i<1;i++)
-      {
-        v_CrystalBoxesLog[i]->SetMaterial(fMaterialOs);
-      }
+G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector() noexcept {
+	constexpr double startAngle = 0.*deg;
+	constexpr double spanningAngleFull = 360.*deg;
+	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
+
+	auto TargetDetectorBox = new G4Tubs("NuDetector",0*m,1150*mm,1221*mm,startAngle, spanningAngleFull);
+	auto TargetDetectorLog = new G4LogicalVolume(TargetDetectorBox, G4Material::GetMaterial("NuTargetLiquid"),"NuDetector");
+	new G4PVPlacement(0,vec_zero,TargetDetectorLog,"NuDetector",logicWorld,false,0);
+
+  G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
+	TargetDetectorLog->SetVisAttributes(visDetector);
+  visDetector.SetForceWireframe(true);
+  visDetector.SetForceAuxEdgeVisible(true);
+
+	auto NuDetector = new CrystalSensitiveDetector("NuDetector");
+	G4SDManager::GetSDMpointer()->AddNewDetector(NuDetector);
+	TargetDetectorLog->SetSensitiveDetector(NuDetector);
+
+  return physicalWorld;
+}
+
+void DetectorConstruction::SetCrystalMaterial(G4String Material) noexcept {
+  if (Material == "Os" || Material == "Zn" || Material == "Zr") {
+    std::string crystalmaterial = Material;
+    if (Material == "Os") {
+      for (int i=0;i<1;i++){v_CrystalBoxesLog[i]->SetMaterial(G4Material::GetMaterial("G4_Os"));}
     }
-    if (Material == "Zn")
-    {
-      for (int i=0;i<1;i++)
-      {
-        v_CrystalBoxesLog[i]->SetMaterial(fMaterialZn);
-      }
+    if (Material == "Zn") {
+      for (int i=0;i<1;i++){v_CrystalBoxesLog[i]->SetMaterial(G4Material::GetMaterial("G4_Zn"));}
     }
-    if (Material == "Zr")
-    {
-      for (int i=0;i<1;i++)
-      {
-        v_CrystalBoxesLog[i]->SetMaterial(fMaterialZr);
-      }
+    if (Material == "Zr") {
+      for (int i=0;i<1;i++){v_CrystalBoxesLog[i]->SetMaterial(G4Material::GetMaterial("G4_Zr"));}
     }
-  }
-  else
-  {
+  } else {
     std::cerr << "ERROR in SetCrystalMaterial source type must be Os or Zn setting to Os!" << std::endl;
-    crystalmaterial = "Os";
-    for (int i=0;i<1;i++)
-    {
-      v_CrystalBoxesLog[i]->SetMaterial(fMaterialOs);
+    for (int i=0;i<1;i++) {
+      v_CrystalBoxesLog[i]->SetMaterial(G4Material::GetMaterial("G4_Os"));
     }
   }
   G4RunManager::GetRunManager()->GeometryHasBeenModified();
-}
-
-void DetectorConstruction::DefineMaterials()
-{
-	// use G4-NIST materials data base
-	G4NistManager* man = G4NistManager::Instance();
-	fMaterialGalactic = man->FindOrBuildMaterial("G4_Galactic");
-	fMaterialGe = man->FindOrBuildMaterial("G4_Ge");
-	fMaterialSi = man->FindOrBuildMaterial("G4_Si");
-	fMaterialAir = man->FindOrBuildMaterial("G4_AIR");
-	fMaterialPoly = man->FindOrBuildMaterial("G4_POLYETHYLENE");
-	fMaterialConcrete = man->FindOrBuildMaterial("G4_CONCRETE");
-	fMaterialWater = man->FindOrBuildMaterial("G4_WATER");
-	fMaterialLead = man->FindOrBuildMaterial("G4_Pb");
-	fMaterialOs = man->FindOrBuildMaterial("G4_Os");
-	fMaterialAl = man->FindOrBuildMaterial("G4_Al");
-	fMaterialW = man->FindOrBuildMaterial("G4_W");
-	fMaterialCu = man->FindOrBuildMaterial("G4_Cu");
-	fMaterialPb = man->FindOrBuildMaterial("G4_Pb");
-	fMaterialZn = man->FindOrBuildMaterial("G4_Zn");
-	fMaterialZr = man->FindOrBuildMaterial("G4_Zr");
-	fMaterialGd = man->FindOrBuildMaterial("G4_Gd");
-
-	elH = man->FindOrBuildElement("H");
-	elO = man->FindOrBuildElement("O");
-	elSi = man->FindOrBuildElement("Si");
-	elMg = man->FindOrBuildElement("Mg");
-	elAl = man->FindOrBuildElement("Al");
-	elFe = man->FindOrBuildElement("Fe");
-	elK = man->FindOrBuildElement("K");
-	elB = man->FindOrBuildElement("B");
-	elC = man->FindOrBuildElement("C");
-
-
-	fMaterialScintillator = new G4Material("Scintillator",1.032*g/cm3,2);
-	fMaterialScintillator->AddElement(elC,9);
-	fMaterialScintillator->AddElement(elH,10);
-
-	Chrysotile = new G4Material("Chrysotile",2.53*g/cm3,4);
-	Chrysotile->AddElement(elMg,3);
-	Chrysotile->AddElement(elSi,2);
-	Chrysotile->AddElement(elO,9);
-	Chrysotile->AddElement(elH,4);
-	fMaterialPoly_Borated = new G4Material("BoratedPoly",1.07*g/cm3,2);
-	fMaterialPoly_Borated->AddMaterial(fMaterialPoly,95.0*perCent);
-	fMaterialPoly_Borated->AddElement(elB,5.0*perCent);
-
-	fMaterialQuartz = new G4Material("Quartz",2.81*g/cm3,2);
-	fMaterialQuartz->AddElement(elSi,1);
-	fMaterialQuartz->AddElement(elO,2);
-
-	fMaterialCorundum = new G4Material("Corundum",2.81*g/cm3,2);
-	fMaterialCorundum->AddElement(elAl,2);
-	fMaterialCorundum->AddElement(elO,3);
-
-	fMaterialIronOxide = new G4Material("IronOxide",2.81*g/cm3,2);
-	fMaterialIronOxide->AddElement(elFe,1);
-	fMaterialIronOxide->AddElement(elO,1);
-
-	fMaterialMgOxide = new G4Material("MgOxide",2.81*g/cm3,2);
-	fMaterialMgOxide->AddElement(elMg,1);
-	fMaterialMgOxide->AddElement(elO,1);
-
-	fMaterialKOxide = new G4Material("KOxide",2.81*g/cm3,2);
-	fMaterialKOxide->AddElement(elK,2);
-	fMaterialKOxide->AddElement(elO,1);
-
-	fMaterialChoozRock = new G4Material("ChoozRock",2.81*g/cm3,5);
-	fMaterialChoozRock->AddMaterial(fMaterialQuartz,58.0*perCent);
-	fMaterialChoozRock->AddMaterial(fMaterialCorundum,19.0*perCent);
-	fMaterialChoozRock->AddMaterial(fMaterialIronOxide,17.0*perCent);
-	fMaterialChoozRock->AddMaterial(fMaterialMgOxide,4.0*perCent);
-	fMaterialChoozRock->AddMaterial(fMaterialKOxide,2.0*perCent);
-
-	mineraloil = new G4Material("MineralOil",0.86*g/cm3,2);
-	mineraloil->AddElement(elC,25);
-	mineraloil->AddElement(elH,43);
-
-	fMaterialSteel = new G4Material("Steel",7.9*g/cm3,2);
-	fMaterialSteel->AddElement(elFe,98.0*perCent);
-	fMaterialSteel->AddElement(elC,2.0*perCent);
-
-	fMaterialDodecane = new G4Material("Dodecane",0.75*g/cm3,2);
-	fMaterialDodecane->AddElement(elC,12);
-	fMaterialDodecane->AddElement(elH,24);
-
-	fMaterialPXE = new G4Material("PXE",0.988*g/cm3,2);
-	fMaterialPXE->AddElement(elC,16);
-	fMaterialPXE->AddElement(elH,18);
-
-	fMaterialPPO = new G4Material("PPO",1.06*g/cm3,3);
-	fMaterialPPO->AddElement(elC,3);
-	fMaterialPPO->AddElement(elH,6);
-	fMaterialPPO->AddElement(elO,1);
-
-	fMaterialNuTarget = new G4Material("NuTargetLiquid",804.59*kg/m3,4);
-	fMaterialNuTarget->AddMaterial(fMaterialDodecane,74.5*perCent);
-	fMaterialNuTarget->AddMaterial(fMaterialPXE,24.6*perCent);
-	fMaterialNuTarget->AddMaterial(fMaterialPPO,0.8*perCent);
-	fMaterialNuTarget->AddMaterial(fMaterialGd,0.1*perCent);
-
-	fMaterialGammaCatcher = new G4Material("GammaCatcherLiquid",800.6*kg/m3,3);
-	fMaterialGammaCatcher->AddMaterial(fMaterialDodecane,74.94*perCent);
-	fMaterialGammaCatcher->AddMaterial(fMaterialPXE,24.68*perCent);
-	fMaterialGammaCatcher->AddMaterial(fMaterialPPO,0.38*perCent);
-
-	/////////////////////////////////////////////////////////////
-	//////////////// Polyethylene materials /////////////////////
-	/////////////////////////////////////////////////////////////
-
-	//Values taken from the Very Near Site simulation
-	G4double density, fractionmass;
-	G4int nelements;
-
-	fPol = new G4Material("Pol",density= 0.96*g/cm3, nelements= 2);
-	fPol->AddElement(elH, fractionmass= 14.86*perCent);
-	fPol->AddElement(elC, fractionmass= 85.14*perCent);
-
-	// Polyethylene with boron at 1.75% - Has borated polyethylene any oxygen elements? FIXME
-	fPolBor1_75pc = new G4Material("PolBor1_75pc",density= 0.96*g/cm3, nelements= 3);
-	fPolBor1_75pc->AddElement(elH, fractionmass= 14.6*perCent);
-	fPolBor1_75pc->AddElement(elC, fractionmass= 83.65*perCent);
-	fPolBor1_75pc->AddElement(elB, fractionmass= 1.75 *perCent);
-
-	// Polyethylene with boron at 3% - Has borated polyethylene any oxygen elements? FIXME
-	fPolBor3pc = new G4Material("PolBor3pc",density= 0.96*g/cm3, nelements= 3);
-	fPolBor3pc->AddElement(elH, fractionmass= 14.424*perCent);
-	fPolBor3pc->AddElement(elC, fractionmass= 82.586*perCent);
-	fPolBor3pc->AddElement(elB, fractionmass= 3.00*perCent);
-
-	// Polyethylene with boron at 3.5% - Has borated polyethylene any oxygen elements? FIXME
-	fPolBor3_5pc = new G4Material("PolBor3_5pc",density= 0.96*g/cm3, nelements= 3);
-	fPolBor3_5pc->AddElement(elH, fractionmass= 14.340*perCent);
-	fPolBor3_5pc->AddElement(elC, fractionmass= 82.160*perCent);
-	fPolBor3_5pc->AddElement(elB, fractionmass= 3.50 *perCent);
-
-	// Polyethylene with boron at 10% - Has borated polyethylene any oxygen elements? FIXME
-	fPolBor10pc = new G4Material("PolBor10pc",density= 0.96*g/cm3, nelements= 3);
-	fPolBor10pc->AddElement(elH, fractionmass= 13.374*perCent);
-	fPolBor10pc->AddElement(elC, fractionmass= 76.626*perCent);
-	fPolBor10pc->AddElement(elB, fractionmass= 10.00 *perCent);
 }
