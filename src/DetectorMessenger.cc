@@ -1,5 +1,6 @@
 #include "DetectorMessenger.hh"
 #include "DetectorConstruction.hh"
+#include "Shieldings.hh"
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithAnInteger.hh"
@@ -8,7 +9,7 @@
 #include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
-using namespace std; 
+using namespace std;
 
 DetectorMessenger::DetectorMessenger( DetectorConstruction* Det)
 : G4UImessenger(), fDetector(Det)
@@ -24,9 +25,6 @@ DetectorMessenger::DetectorMessenger( DetectorConstruction* Det)
   fTypeCmd_setcrystalmaterial = new G4UIcmdWithAString("/ricochetchoozsim/detector/setcrystalmaterial",this);
   fTypeCmd_setcrystalmaterial->SetGuidance("Set Crystal Material (Zn,Zr or Default = Os)");
   fTypeCmd_setcrystalmaterial->SetDefaultValue("Os");
-
-  
-
 }
 
 
@@ -42,19 +40,23 @@ DetectorMessenger::~DetectorMessenger()
 void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {
   if(command == shieldingCmdPb)
-  {	
-    fDetector->ConstructPbSheilding(shieldingCmdPb->GetNew3VectorRawValue(newValue).getX(),
-    	shieldingCmdPb->GetNew3VectorRawValue(newValue).getY(),
-    	shieldingCmdPb->GetNew3VectorRawValue(newValue).getZ());  
+  {
+    DetectorComponents::ConstructPbSheilding(
+        shieldingCmdPb->GetNew3VectorRawValue(newValue).getX(),
+        shieldingCmdPb->GetNew3VectorRawValue(newValue).getY(),
+        shieldingCmdPb->GetNew3VectorRawValue(newValue).getZ(),
+        fDetector->GetWorldVolume());
   }
   if(command == shieldingCmdPoly)
-  {	
-    fDetector->ConstructPolySheilding(shieldingCmdPoly->GetNew3VectorRawValue(newValue).getX(),
-      shieldingCmdPoly->GetNew3VectorRawValue(newValue).getY(),
-    	shieldingCmdPoly->GetNew3VectorRawValue(newValue).getZ());  
+  {
+    DetectorComponents::ConstructPolySheilding(
+        shieldingCmdPoly->GetNew3VectorRawValue(newValue).getX(),
+        shieldingCmdPoly->GetNew3VectorRawValue(newValue).getY(),
+        shieldingCmdPoly->GetNew3VectorRawValue(newValue).getZ(),
+        fDetector->GetWorldVolume());
   }
 	if(command == fTypeCmd_setcrystalmaterial)
-  { 
+  {
     fDetector->SetCrystalMaterial(newValue);
   }
 

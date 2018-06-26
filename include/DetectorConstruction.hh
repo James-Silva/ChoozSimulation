@@ -18,7 +18,7 @@ class G4Material;
 class G4Element;
 class DetectorMessenger;
 class Materials;
-// class Shieldings;
+class Shieldings;
 
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
@@ -26,16 +26,8 @@ public:
 	DetectorConstruction();
 	virtual ~DetectorConstruction();
 	virtual G4VPhysicalVolume* Construct() noexcept;
-	void ConstructADR() noexcept;
-	void ConstructPit() noexcept;
-	void ConstructOuterDetectors() noexcept;
-	void InitializeWorld() noexcept;
-	void ConstructPolySheilding(const double innerR, const double outerR,
-														  const double topthickness) noexcept;
-	void ConstructPbSheilding(const double innerR, const double outerR,
-													  const double topthickness) noexcept;
 	void SetCrystalMaterial(G4String Material) noexcept;
-	void AddGioveShielding() noexcept;
+	inline G4LogicalVolume* GetWorldVolume() {return logicWorld;}
 
 private:
 	DetectorMessenger* 							detectorMessenger;
@@ -46,6 +38,11 @@ private:
 	std::vector<G4VPhysicalVolume*>	v_CrystalBoxesPhys;
 
 private:
+	void InitializeWorld() noexcept;
+	void ConstructPit() noexcept;
+	void ConstructOuterDetectors() noexcept;
+	void ConstructADR() noexcept;
+//	void AddLayer(const std::string material, const double thickness);
 	G4VPhysicalVolume*  ConstructDetectors() noexcept;
 	G4VPhysicalVolume*  ConstructSingleDetector() noexcept;
 	G4VPhysicalVolume*  ConstructNuDetector() noexcept;

@@ -43,12 +43,12 @@ int main(int argc,char** argv)
     visManager->Initialize();
     G4UIExecutive* ui = new G4UIExecutive(argc, argv);
     ui->SessionStart();
-    
+
     UImanager->ApplyCommand("/control/execute "+fileName);
     delete ui;
     delete visManager;
   }
-  if(argc == 2) UImanager->ApplyCommand("/control/execute "+fileName);    
+  else if(argc == 2) UImanager->ApplyCommand("/control/execute "+fileName);    
 
   return 0;
 }

@@ -17,15 +17,14 @@ public:
 
   virtual void BeginOfRunAction(const G4Run*);
   virtual void EndOfRunAction(const G4Run*);
-  inline void SetAutoSeed (const G4bool val) {fAutoSeed = val;}    
+  inline void SetAutoSeed (const G4bool val) {fAutoSeed = val;}
 
 private:
-  HistoManager* fHistoManager;  
+  HistoManager* fHistoManager;
   G4int fSaveRndm;
-  G4bool fAutoSeed;  
+  G4bool fAutoSeed;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
-

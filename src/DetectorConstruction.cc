@@ -21,7 +21,7 @@
 #include "G4Element.hh"
 #include "G4SDManager.hh"
 #include "CrystalSensitiveDetector.hh"
-//#include "Shieldings.hh"
+#include "Shieldings.hh"
 
 #include <cstdlib>
 #include <cmath>
@@ -40,7 +40,7 @@ G4VPhysicalVolume*  DetectorConstruction::Construct() noexcept {
 	ConstructPit(); //Rock Surrounding the Detector
 	ConstructOuterDetectors(); //Air around the crystal
 	//ConstructADR();
-	//AddGioveShielding();
+	DetectorComponents::ConstructGioveShielding(logicWorld);
   auto phystest = ConstructDetectors();
 
   return phystest;
@@ -126,19 +126,17 @@ void DetectorConstruction::ConstructOuterDetectors() noexcept{
 	AirTubeLog->SetVisAttributes(visAirTube);
 }
 
-// void DetectorConstruction::AddLayer(material, thickness)
+// void DetectorConstruction::AddLayer(const std::string& material,
+// 																	  const double thickness)
 // {
 //
 // 	//Shieldings::AddLayer(material, thickness):
-//
-// 	 Shieldings shieldingBuilder;
-// 	 shieldingBuilder.AddLayer(material, thickness):
+// 	//Add full Giove, Poly, and Lead
+// 	//Move ADR out
+// 	 //
+// 	//  Shieldings shieldingBuilder;
+// 	//  shieldingBuilder.AddLayer(material, thickness):
 // }
-
-//void DetectorConstruction::AddGioveShielding() noexcept {
-	Shieldings shieldingBuilder;
-	shieldingBuilder.ConstructGioveShielding(logicWorld);
-}
 
 void DetectorConstruction::ConstructADR() noexcept {
 	// copper plate
@@ -255,7 +253,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors() noexcept {
 	G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
 	visDetector.SetForceWireframe(true);
 	visDetector.SetForceAuxEdgeVisible(true);
-	for(size_t jCrys = 0; jCrys < 1; jCrys++)
+	for(size_t jCrys = 0; jCrys < 1; ++jCrys)
 	{
 		v_CrystalBoxes.push_back(new G4Box(CyrstalLabels[jCrys],DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0));
 		v_CrystalBoxesLog.push_back(new G4LogicalVolume(v_CrystalBoxes[jCrys], G4Material::GetMaterial("G4_Os"),CyrstalLabels[jCrys]));
@@ -286,63 +284,6 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector() noexcept {
 	visDetector.SetForceAuxEdgeVisible(true);
 	crystalLog_single->SetVisAttributes(visDetector);
 	return physicalWorld;
-}
-
-void DetectorConstruction::ConstructPolySheilding(const double innerR,
-																									const double outerR,
-																									const double topthickness)
-																									noexcept {
-	// detector shielding is arbitrarily assuemd to be two concentric cylinders of
-	// polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
-	// Taking out this version of shielding while I work on the ATR geometry [AFL]
-	// Lead Tube
-	constexpr int zeroradius = 0.*cm;
-	constexpr int startAngle = 0.*deg;
-	constexpr int spanningAngleFull = 360.*deg;
-	const int outerRadius_shield = 1.0*outerR*cm;
-	const int outerRadius_shield1 = 1.0*innerR*cm;
-  constexpr double heightADR = 34*cm;
-	const auto heightADR1 = heightADR-2*(topthickness*cm);
-  const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-
-  auto shieldTube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield, heightADR/2.0, startAngle, spanningAngleFull);
-	auto shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, heightADR1/2.0,startAngle, spanningAngleFull);
-	auto fullshieldTube = new G4SubtractionSolid("Borated_Poly_Shield",shieldTube,shield1Tube);
-	auto fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, G4Material::GetMaterial("PolBor3pc"), "Borated_Poly_Shield");
-	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Borated_Poly_Shield",logicWorld, false,0);
-
-  G4VisAttributes visshieldTube(G4Colour(1.0,0.586,0.0));
-	visshieldTube.SetForceWireframe(true);
-	visshieldTube.SetForceAuxEdgeVisible(true);
-	fullshieldTubeLog->SetVisAttributes(visshieldTube);
-}
-
-void DetectorConstruction::ConstructPbSheilding(const double innerR,
-																								const double outerR,
-																								const double topthickness)
-																								noexcept {
-	// detector shielding is arbitrarily assuemd to be two concentric cylinders of
-	// polyethylene and lead; poly is 10cm thick and lead is 4cm thick (again arbitrarily)
-	// Taking out this version of shielding while I work on the ATR geometry [AFL]
-	// Lead Tube
-	constexpr int zeroradius = 0.*cm;
-	constexpr int startAngle = 0.*deg;
-	constexpr int spanningAngleFull = 360.*deg;
-	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
-	const int outerRadius_shield = 1.0*outerR*cm;
-	const int outerRadius_shield1 = 1.0*innerR*cm;
-  constexpr double heightADR = 34*cm;
-	const auto heightADR1 = heightADR-2*(topthickness*cm);
-	auto shieldTube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield, heightADR/2.0, startAngle, spanningAngleFull);
-	auto shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, heightADR1/2.0,startAngle, spanningAngleFull);
-	auto fullshieldTube = new G4SubtractionSolid("Shielding Shell (Pb)",shieldTube,shield1Tube);
-	auto fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, G4Material::GetMaterial("Lead"), "Shielding Shell (Pb)");
-	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Shielding shell (Pb)",logicWorld, false,0);
-
-  G4VisAttributes visshieldTube(G4Colour(1.0,0.586,0.0));
-	visshieldTube.SetForceWireframe(true);
-	visshieldTube.SetForceAuxEdgeVisible(true);
-	fullshieldTubeLog->SetVisAttributes(visshieldTube);
 }
 
 void DetectorConstruction::AddConcreteFloor() noexcept {
