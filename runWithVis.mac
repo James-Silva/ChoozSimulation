@@ -1,0 +1,41 @@
+/vis/open OGL
+/vis/viewer/create
+/vis/viewer/set/autoRefresh false
+/vis/verbose errors
+
+/vis/drawVolume
+
+/vis/scene/add/trajectories smooth
+/vis/modeling/trajectories/create/drawByCharge
+/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
+# (if too many tracks cause core dump => /tracking/storeTrajectory 0)
+
+/vis/scene/add/hits # Draw hits at end of event:
+
+/vis/scene/endOfEventAction accumulate # Superimpose all of the events
+
+# Re-establish auto refreshing and verbosity:
+/vis/viewer/set/autoRefresh true
+/vis/verbose warnings
+
+/control/verbose 2
+
+/ricochetchoozsim/tree/setOutputFileName RicochetChoozTestOutput.root
+
+#source radius must be greater than source thickness (4250 mm is inside pit radius, so radius+0.5*thickness)
+/ricochetchoozsim/generator/setsourceradius 15 mm
+#set source height must equal 7000 mm (tank height) + source thickness
+/ricochetchoozsim/generator/setsourcethickness 10 mm
+/ricochetchoozsim/generator/setsourceheight 8410  mm
+/ricochetchoozsim/generator/setsourceheightoffset +50 mm
+
+/ricochetchoozsim/detector/setcrystalmaterial Zn
+
+#/ricochetchoozsim/shielding/setPolyshielding 19. 24. 1. cm
+#/ricochetchoozsim/detector/setLayerThickness 50 mm
+#/ricochetchoozsim/detector/addLayerWithMaterial G4_Pb
+
+/ricochetchoozsim/generator/neutronsource 5000 keV
+
+/run/beamOn 10

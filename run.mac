@@ -1,29 +1,23 @@
 /control/verbose 2
-/run/verbose 2
-/event/verbose 0
-/tracking/verbose 0
-
-
-/control/verbose 0
 /run/verbose 0
 /event/verbose 0
 /tracking/verbose 0
 
-/ricochetchoozsim/tree/setOutputFileName RicochetChoozTestOutput.root
-
+/ricochetchoozsim/tree/setOutputFileName RicochetChoozOutput.root
 
 #source radius must be greater than source thickness (4250 mm is inside pit radius, so radius+0.5*thickness)
-/ricochetchoozsim/generator/setsourceradius 10 mm
+/ricochetchoozsim/generator/setsourceradius 15 mm
 #set source height must equal 7000 mm (tank height) + source thickness
-/ricochetchoozsim/generator/setsourcethickness 10 mm 
+/ricochetchoozsim/generator/setsourcethickness 10 mm
 /ricochetchoozsim/generator/setsourceheight 8410  mm
 /ricochetchoozsim/generator/setsourceheightoffset +50 mm
-#/ricochetchoozsim/shielding/setPolyshielding 19. 24. 1. cm 
+
 /ricochetchoozsim/detector/setcrystalmaterial Zn
+
+#/ricochetchoozsim/shielding/setPolyshielding 19. 24. 1. cm
+#/ricochetchoozsim/detector/setLayerThickness 50 mm
+#/ricochetchoozsim/detector/addLayerWithMaterial G4_AIR
+
 /ricochetchoozsim/generator/neutronsource 5000 keV
-#/ricochetchoozsim/generator/SetNeutronSource true
-#/ricochetchoozsim/generator/setneutronsourcespectrum /home/aleder/Geant4_WorkDir/RicochetChoozSimulation_build/Choozneutronspectrum_MeV.txt
-#/ricochetchoozsim/generator/setneutronsourcespectrum /home/aleder/Geant4_WorkDir/RicochetChoozSimulation_build/AlphaN_neutronspectrum_MeV.txt
-#/ricochetchoozsim/generator/SetNeutronSource_xlog true
 
 /run/beamOn 1000
