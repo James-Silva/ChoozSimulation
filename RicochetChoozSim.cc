@@ -3,6 +3,8 @@
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
+#include "Materials.hh"
+
 
 #include "DetectorConstruction.hh"
 #include "PhysicsList.hh"
@@ -20,6 +22,9 @@ int main(int argc,char** argv)
   // Construct the default run manager
   G4RunManager runManager;
 
+  // Create Materials
+  detectorcomponents::Materials::CreateMaterials();
+
   // Set mandatory initialization classes
   DetectorConstruction* detector = new DetectorConstruction;
   runManager.SetUserInitialization(detector);
@@ -36,19 +41,20 @@ int main(int argc,char** argv)
   //runManager.SetRunIDCounter(atoi(argv[2]));
 
   G4String fileName{argv[1]};
-  if(argc == 3 && std::string(argv[2]) == "vis")
+  // Run Command: ./RicochetChoozSim runWithVis.mac --vis
+  if(argc == 3 && std::string(argv[2]) == "--vis")
   {
       // enable visualizer if selected
     G4VisManager* visManager = new G4VisExecutive;
     visManager->Initialize();
     G4UIExecutive* ui = new G4UIExecutive(argc, argv);
+    UImanager->ApplyCommand("/control/execute "+fileName);
     ui->SessionStart();
 
-    UImanager->ApplyCommand("/control/execute "+fileName);
     delete ui;
     delete visManager;
   }
-  else if(argc == 2) UImanager->ApplyCommand("/control/execute "+fileName);    
+  else if(argc == 2) UImanager->ApplyCommand("/control/execute "+fileName);
 
   return 0;
 }
