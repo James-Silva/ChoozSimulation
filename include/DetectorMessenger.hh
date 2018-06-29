@@ -4,12 +4,13 @@
 #include "globals.hh"
 #include "G4UImessenger.hh"
 
-
 class DetectorConstruction;
 class G4UIcmdWithAString;
 class G4UIcmdWithABool;
 class G4UIcmdWith3VectorAndUnit;
 class G4UIcmdWithAString;
+class G4UIcmdWith3Vector;
+class G4UIcmdWithADoubleAndUnit;
 
 class DetectorMessenger: public G4UImessenger
 {
@@ -20,13 +21,16 @@ class DetectorMessenger: public G4UImessenger
     virtual void SetNewValue(G4UIcommand*, G4String);
 
   private:
-    DetectorConstruction* 		fDetector;
+    DetectorConstruction* 		  fDetector;
     G4UIdirectory*             	fDetDir;
     G4UIdirectory*             	fshieldDir;
     G4UIcmdWith3VectorAndUnit*  shieldingCmdPb;
     G4UIcmdWith3VectorAndUnit*  shieldingCmdPoly;
-    G4UIcmdWithAString* fTypeCmd_setcrystalmaterial;
+    G4UIcmdWithAString*         setcrystalmaterial;
+    double                      layerThickness;
+    G4UIcmdWithADoubleAndUnit*  setLayerThicknessCmd;
+    G4UIcmdWithAString*         addLayerWithMaterialCmd;
 };
 
 
-#endif
+#endif // DetectorMessenger_h

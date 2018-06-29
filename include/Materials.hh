@@ -5,10 +5,21 @@
 
 class G4String;
 
+namespace detectorcomponents
+{
+
+// Builds a list of materials that Geant stores and are available for access.
+//
+// Example:
+//    // It is crucial that CreateMaterials() is called before any materials are
+//    //acessed.
+//    Materials::CreateMaterials(); // Only needs to be called once
+//    auto log = new G4LogicalVolume(solid, G4Material::GetMaterial("G4_Cu"),...
+//
 class Materials
 {
 public:
-
+  //Builds materials for the entire program
   static void CreateMaterials() {
     if (materials == nullptr) { materials = new Materials(); }
   }
@@ -29,5 +40,7 @@ private:
 
   static Materials* materials;
 };
+
+} // namespace detectorcomponents
 
 #endif // MATERIALS_HH

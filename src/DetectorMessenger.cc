@@ -9,22 +9,39 @@
 #include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithAString.hh"
+#include "G4UIcmdWith3Vector.hh"
+
 using namespace std;
 
 DetectorMessenger::DetectorMessenger( DetectorConstruction* Det)
-: G4UImessenger(), fDetector(Det)
+: G4UImessenger(), fDetector(Det), layerThickness(0)
 {
   fDetDir = new G4UIdirectory("/ricochetchoozsim/detector/");
   fDetDir->SetGuidance("detector control");
+  //////////////////////////////////////////////////////////////////////////////
   fshieldDir = new G4UIdirectory("/ricochetchoozsim/shielding/");
   fshieldDir->SetGuidance("shielding control");
-  shieldingCmdPb = new G4UIcmdWith3VectorAndUnit("/ricochetchoozsim/shielding/setPbshielding", this);
+  //////////////////////////////////////////////////////////////////////////////
+  shieldingCmdPb = new G4UIcmdWith3VectorAndUnit("/ricochetchoozsim/shielding/setPbshielding",
+                                                 this);
   shieldingCmdPb->SetGuidance("Determine inner and outer shielding (syntax: inner radius outer radius top thickness cm)");
-  shieldingCmdPoly = new G4UIcmdWith3VectorAndUnit("/ricochetchoozsim/shielding/setPolyshielding", this);
-  shieldingCmdPoly->SetGuidance("Determine inner and outer shielding (syntax: inner radius outer radius top thickness cm)");
-  fTypeCmd_setcrystalmaterial = new G4UIcmdWithAString("/ricochetchoozsim/detector/setcrystalmaterial",this);
-  fTypeCmd_setcrystalmaterial->SetGuidance("Set Crystal Material (Zn,Zr or Default = Os)");
-  fTypeCmd_setcrystalmaterial->SetDefaultValue("Os");
+  //////////////////////////////////////////////////////////////////////////////
+  shieldingCmdPoly = new G4UIcmdWith3VectorAndUnit("/ricochetchoozsim/shielding/setPolyshielding",
+                                                   this);
+  shieldingCmdPoly->SetGuidance("Determine inner and outer shielding (syntax:inner radius outer radius top thickness cm)");
+  //////////////////////////////////////////////////////////////////////////////
+  setcrystalmaterial = new G4UIcmdWithAString("/ricochetchoozsim/detector/setcrystalmaterial",
+                                              this);
+  setcrystalmaterial->SetGuidance("Set Crystal Material (Zn,Zr or Default = Os)");
+  setcrystalmaterial->SetDefaultValue("Os");
+  //////////////////////////////////////////////////////////////////////////////
+  setLayerThicknessCmd = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/detector/setLayerThickness",
+                                              this);
+  setLayerThicknessCmd->SetGuidance("Set the layer thickness. Must be done before setting the material.");
+  //////////////////////////////////////////////////////////////////////////////
+  addLayerWithMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/detector/addLayerWithMaterial",
+                                                this);
+  addLayerWithMaterialCmd->SetGuidance("Add a Layer centered around the origin of the world.");
 }
 
 
@@ -34,30 +51,40 @@ DetectorMessenger::~DetectorMessenger()
   delete fshieldDir;
   delete shieldingCmdPb;
   delete shieldingCmdPoly;
+  delete setLayerThicknessCmd;
+  delete addLayerWithMaterialCmd;
 }
 
 
 void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {
-  if(command == shieldingCmdPb)
-  {
-    DetectorComponents::ConstructPbSheilding(
+  if (command == shieldingCmdPb) {
+    detectorcomponents::ConstructPbSheilding(
         shieldingCmdPb->GetNew3VectorRawValue(newValue).getX(),
         shieldingCmdPb->GetNew3VectorRawValue(newValue).getY(),
         shieldingCmdPb->GetNew3VectorRawValue(newValue).getZ(),
         fDetector->GetWorldVolume());
   }
-  if(command == shieldingCmdPoly)
-  {
-    DetectorComponents::ConstructPolySheilding(
+  else if (command == shieldingCmdPoly) {
+    detectorcomponents::ConstructPolySheilding(
         shieldingCmdPoly->GetNew3VectorRawValue(newValue).getX(),
         shieldingCmdPoly->GetNew3VectorRawValue(newValue).getY(),
         shieldingCmdPoly->GetNew3VectorRawValue(newValue).getZ(),
         fDetector->GetWorldVolume());
   }
-	if(command == fTypeCmd_setcrystalmaterial)
-  {
+	else if (command == setcrystalmaterial) {
     fDetector->SetCrystalMaterial(newValue);
+  }
+  else if (command == setLayerThicknessCmd) {
+    this->layerThickness = setLayerThicknessCmd->GetNewDoubleValue(newValue);
+  }
+  else if (command == addLayerWithMaterialCmd) {
+    if (layerThickness > 0) {
+      fDetector->AddLayer(newValue, layerThickness);
+    } else {
+      std::cout<<"\n\nThickness not set. Layer not created.\n\n"<<std::endl;
+      return;
+    }
   }
 
 }

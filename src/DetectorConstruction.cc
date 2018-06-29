@@ -2,7 +2,6 @@
 #include "DetectorMessenger.hh"
 
 #include "G4Material.hh"
-#include "Materials.hh"
 #include "G4Box.hh"
 #include "G4Cons.hh"
 #include "G4Tubs.hh"
@@ -21,7 +20,6 @@
 #include "G4Element.hh"
 #include "G4SDManager.hh"
 #include "CrystalSensitiveDetector.hh"
-#include "Shieldings.hh"
 
 #include <cstdlib>
 #include <cmath>
@@ -34,19 +32,18 @@ DetectorConstruction::DetectorConstruction()
 
 DetectorConstruction::~DetectorConstruction() { delete detectorMessenger; }
 
-G4VPhysicalVolume*  DetectorConstruction::Construct() noexcept {
-	Materials::CreateMaterials();
+G4VPhysicalVolume*  DetectorConstruction::Construct()  {
   InitializeWorld();
 	ConstructPit(); //Rock Surrounding the Detector
 	ConstructOuterDetectors(); //Air around the crystal
 	//ConstructADR();
-	DetectorComponents::ConstructGioveShielding(logicWorld);
+	//AddLayer("G4_Pb",50*mm);
   auto phystest = ConstructDetectors();
 
   return phystest;
 }
 
-void DetectorConstruction::InitializeWorld() noexcept {
+void DetectorConstruction::InitializeWorld()  {
   constexpr auto worldSize  = 20.*m;
   auto solidWorld = new G4Box("world", worldSize/2., worldSize/2., worldSize/2.);
   logicWorld = new G4LogicalVolume(solidWorld,
@@ -57,7 +54,7 @@ void DetectorConstruction::InitializeWorld() noexcept {
 																		false, 0);
 }
 
-void DetectorConstruction::ConstructPit() noexcept {
+void DetectorConstruction::ConstructPit()  {
 	if(!physicalWorld)
 	{
 		G4cout << "ERROR in DetectorConstruction::ConstructPit" << G4endl;
@@ -66,9 +63,9 @@ void DetectorConstruction::ConstructPit() noexcept {
 	}
 	const G4ThreeVector vec_offset(0*mm,0*mm,750*mm);
 	const G4ThreeVector concrete_offset(0*mm,0*mm,100*mm);
-	constexpr int zeroradius = 0.*cm;
-	constexpr int startAngle = 0.*deg;
-	constexpr int spanningAngleFull = 360.*deg;
+	constexpr double zeroradius = 0.*cm;
+	constexpr double startAngle = 0.*deg;
+	constexpr double spanningAngleFull = 360.*deg;
 
   auto solidRock = new G4Box("Rock", 6.*m, 6.*m, 5.*m);
 	auto PitTube = new G4Tubs("Pittube", zeroradius, 4350*mm, 8500*mm/2.0,
@@ -101,10 +98,10 @@ void DetectorConstruction::ConstructPit() noexcept {
 
 }
 
-void DetectorConstruction::ConstructOuterDetectors() noexcept{
-	constexpr int zeroradius = 0.*cm;
-	constexpr int startAngle = 0.*deg;
-	constexpr int spanningAngleFull = 360.*deg;
+void DetectorConstruction::ConstructOuterDetectors() {
+	constexpr double zeroradius = 0.*cm;
+	constexpr double startAngle = 0.*deg;
+	constexpr double spanningAngleFull = 360.*deg;
 	// Offset include to have top of water shield line up with top of pit
 	const G4ThreeVector vec_zero(0*mm,0*mm,50*mm);
 	const G4ThreeVector vec_offset(0*mm,0*mm,+1000*mm);
@@ -126,19 +123,12 @@ void DetectorConstruction::ConstructOuterDetectors() noexcept{
 	AirTubeLog->SetVisAttributes(visAirTube);
 }
 
-// void DetectorConstruction::AddLayer(const std::string& material,
-// 																	  const double thickness)
-// {
-//
-// 	//Shieldings::AddLayer(material, thickness):
-// 	//Add full Giove, Poly, and Lead
-// 	//Move ADR out
-// 	 //
-// 	//  Shieldings shieldingBuilder;
-// 	//  shieldingBuilder.AddLayer(material, thickness):
-// }
+void DetectorConstruction::AddLayer(const std::string& material,
+																	  const double thickness) {
+		shieldBuilder.AddG4Box(material, thickness, logicWorld);
+}
 
-void DetectorConstruction::ConstructADR() noexcept {
+void DetectorConstruction::ConstructADR()  {
 	// copper plate
 	constexpr double outerRadius5 = 12.*cm;
 	constexpr double hz5 = 1.*cm;
@@ -241,7 +231,7 @@ void DetectorConstruction::ConstructADR() noexcept {
 	fullscinTubeLog->SetVisAttributes(visscinTube);
 }
 
-G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors() noexcept {
+G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()  {
 	constexpr double DetectorSize = 5.2*cm; // Size needed for 1 Kg of detector material
 	std::vector<std::string> CyrstalLabels = {"Crystal_1", "Crystal_2","Crystal_3",
 																						"Crystal_4","Crystal_5"};
@@ -271,7 +261,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors() noexcept {
 	return physicalWorld;
 }
 
-G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector() noexcept {
+G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector()  {
 	// arbitrarily assuming 4-inch iZIP here [AJA]
 	// Taking out 4-inch iZIP for now [AFL - March 2016]
 	constexpr double DetectorSize = 5.2*cm;
@@ -286,7 +276,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector() noexcept {
 	return physicalWorld;
 }
 
-G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector() noexcept {
+G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()  {
 	constexpr double startAngle = 0.*deg;
 	constexpr double spanningAngleFull = 360.*deg;
 	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
@@ -307,7 +297,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector() noexcept {
   return physicalWorld;
 }
 
-void DetectorConstruction::SetCrystalMaterial(G4String Material) noexcept {
+void DetectorConstruction::SetCrystalMaterial(G4String Material)  {
   if (Material == "Os" || Material == "Zn" || Material == "Zr") {
     std::string crystalmaterial = Material;
     if (Material == "Os") {

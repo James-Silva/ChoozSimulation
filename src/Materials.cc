@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-using namespace std;
+namespace detectorcomponents {
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +23,7 @@ Materials::Materials()
 {
   double density, fractionmass;
   int nelements;
-  
+
   // use G4-NIST materials data base
   G4NistManager* man = G4NistManager::Instance();
   man->FindOrBuildMaterial("G4_Galactic");
@@ -162,3 +162,5 @@ Materials::Materials()
   materialGammaCatcher->AddMaterial(materialPXE,24.68*perCent);
   materialGammaCatcher->AddMaterial(materialPPO,0.38*perCent);
 }
+
+} // namespace detectorcomponents
