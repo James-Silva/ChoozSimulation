@@ -27,6 +27,7 @@ class DetectorMessenger: public G4UImessenger
     G4UIcmdWith3VectorAndUnit*  shieldingCmdPb;
     G4UIcmdWith3VectorAndUnit*  shieldingCmdPoly;
     G4UIcmdWithAString*         setcrystalmaterial;
+    G4UIcmdWithAString*         outerDetectorMaterialCmd;
     double                      layerThickness;
     G4UIcmdWithADoubleAndUnit*  setLayerThicknessCmd;
     G4UIcmdWithAString*         addLayerWithMaterialCmd;

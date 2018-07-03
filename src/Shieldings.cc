@@ -29,16 +29,22 @@ void LayerConstructor::AddG4Box(const std::string& material,
   }
 
   std::string layerName = "Shieling Layer "+ std::to_string(layerNum);
-  auto solid = new G4Box(layerName, boxLength/2, boxLength/2, boxLength/2);
+  auto outerLayer = new G4Box("tempOuterLayer", boxLength/2, boxLength/2, boxLength/2);
+  boxLength = boxLength - 2*thickness;
+  auto innerLayer = new G4Box("tempInnerLayer", boxLength/2, boxLength/2, boxLength/2);
+  auto solid = new G4SubtractionSolid(layerName, outerLayer, innerLayer);
   auto logic = new G4LogicalVolume(solid, G4Material::GetMaterial(material),
                                    layerName);
-  new G4PVPlacement(0, {0,0,0}, logic, layerName, mother, false, 0);
+
+
+
+  new G4PVPlacement(0, {0,0,0}, logic, layerName, mother, false, 0, true);
 
   G4VisAttributes vis(G4Colour(1., 0.5, 0.));
   vis.SetForceWireframe(true);
 	logic->SetVisAttributes(vis);
 
-  boxLength = boxLength - 2*thickness;
+
   ++layerNum;
 }
 
@@ -60,7 +66,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
     																				  G4Material::GetMaterial("Pol"),
     																				  "muonShielding");
 	new G4PVPlacement(0, {0, 0, 0}, muonShielding_lv, "muonShielding", mother,
-  									false, 0);
+  									false, 0, true);
 	G4VisAttributes visMuShielding(G4Colour(1.,0.,0.));
 	visMuShielding.SetForceWireframe(true);
 	muonShielding_lv->SetVisAttributes(visMuShielding);
@@ -76,7 +82,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
       																				G4Material::GetMaterial("G4_Pb"),
       																				"Pb_shielding1");
 	new G4PVPlacement(0, {0,0,0}, pbShielding1_lv, "Pb_shielding1", muonShielding_lv,
-  									false, 0);
+  									false, 0, true);
 	G4VisAttributes visPbShielding1(G4Colour(1.,0.,0.));
 	visPbShielding1.SetForceWireframe(true);
 	pbShielding1_lv->SetVisAttributes(visPbShielding1);
@@ -93,7 +99,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
 																					 G4Material::GetMaterial("PolBor10pc"),
 																					 "PE_B_shielding1");
 	new G4PVPlacement(0, {0,0,0}, pe_b_Shielding1_lv, "PE_B_shielding1", pbShielding1_lv,
-										false, 0);
+										false, 0, true);
 	G4VisAttributes visPE_B_Shielding1(G4Colour(1.,0.,0.));
 	visPE_B_Shielding1.SetForceWireframe(true);
 	pe_b_Shielding1_lv->SetVisAttributes(visPE_B_Shielding1);
@@ -109,7 +115,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
       																			 G4Material::GetMaterial("G4_Pb"),
       																			 "Pb_shielding2");
 	new G4PVPlacement(0, {0,0,0}, pbShielding2_lv, "Pb_shielding2", pe_b_Shielding1_lv,
-										false, 0);
+										false, 0, true);
 	G4VisAttributes visPbShielding2(G4Colour(1.,0.,0.));
 	visPbShielding2.SetForceWireframe(true);
 	pbShielding2_lv->SetVisAttributes(visPbShielding2);
@@ -126,7 +132,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
 																					      G4Material::GetMaterial("PolBor3pc"),
 																					      "PE_B_shielding2");
 	new G4PVPlacement(0, {0,0,0}, pe_b_Shielding2_lv, "PE_B_shielding2",
-										pbShielding2_lv, false, 0);
+										pbShielding2_lv, false, 0, true);
 	G4VisAttributes visPE_B_Shielding2(G4Colour(1.,0.,0.));
 	visPE_B_Shielding2.SetForceWireframe(true);
 	pe_b_Shielding2_lv->SetVisAttributes(visPE_B_Shielding2);
@@ -142,7 +148,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
 																				G4Material::GetMaterial("G4_Pb"),
 																				"Pb_shielding3");
 	new G4PVPlacement(0, {0,0,0}, pbShielding3_lv, "Pb_shielding3",
-  									pe_b_Shielding2_lv, false, 0);
+  									pe_b_Shielding2_lv, false, 0, true);
 	G4VisAttributes visPbShielding3(G4Colour(1.,0.,0.));
 	visPbShielding3.SetForceWireframe(true);
 	pbShielding3_lv->SetVisAttributes(visPbShielding3);
@@ -158,7 +164,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
 																				G4Material::GetMaterial("G4_AIR"),
 																				"shieldInterior");
 	new G4PVPlacement(0, {0,0,0}, shieldInterior_lv, "shieldInterior",
-  									pbShielding3_lv, false, 0);
+  									pbShielding3_lv, false, 0, true);
 	G4VisAttributes visshieldInterior(G4Colour(1.,0.,0.));
 	visshieldInterior.SetForceWireframe(true);
 	shieldInterior_lv->SetVisAttributes(visshieldInterior);
@@ -184,7 +190,7 @@ void ConstructPolySheilding(const double innerR, const double outerR,
 	auto shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, heightADR1/2.0,startAngle, spanningAngleFull);
 	auto fullshieldTube = new G4SubtractionSolid("Borated_Poly_Shield",shieldTube,shield1Tube);
 	auto fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, G4Material::GetMaterial("PolBor3pc"), "Borated_Poly_Shield");
-	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Borated_Poly_Shield",mother, false,0);
+	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Borated_Poly_Shield",mother, false, 0, true);
 
   G4VisAttributes visshieldTube(G4Colour(1.0,0.586,0.0));
 	visshieldTube.SetForceWireframe(true);
@@ -210,7 +216,7 @@ void ConstructPbSheilding(const double innerR, const double outerR,
 	auto shield1Tube = new G4Tubs("Polyshield", zeroradius, outerRadius_shield1, heightADR1/2.0,startAngle, spanningAngleFull);
 	auto fullshieldTube = new G4SubtractionSolid("Shielding Shell (Pb)",shieldTube,shield1Tube);
 	auto fullshieldTubeLog = new G4LogicalVolume(fullshieldTube, G4Material::GetMaterial("Lead"), "Shielding Shell (Pb)");
-	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Shielding shell (Pb)",mother, false,0);
+	new G4PVPlacement(0,vec_zero, fullshieldTubeLog, "Shielding shell (Pb)",mother, false, 0, true);
 
   G4VisAttributes visshieldTube(G4Colour(1.0,0.586,0.0));
 	visshieldTube.SetForceWireframe(true);

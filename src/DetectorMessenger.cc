@@ -13,8 +13,8 @@
 
 using namespace std;
 
-DetectorMessenger::DetectorMessenger( DetectorConstruction* Det)
-: G4UImessenger(), fDetector(Det), layerThickness(0)
+DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
+    :G4UImessenger(), fDetector(Det), layerThickness(0)
 {
   fDetDir = new G4UIdirectory("/ricochetchoozsim/detector/");
   fDetDir->SetGuidance("detector control");
@@ -42,6 +42,10 @@ DetectorMessenger::DetectorMessenger( DetectorConstruction* Det)
   addLayerWithMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/detector/addLayerWithMaterial",
                                                 this);
   addLayerWithMaterialCmd->SetGuidance("Add a Layer centered around the origin of the world.");
+  //////////////////////////////////////////////////////////////////////////////
+  outerDetectorMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/detector/setOuterDetectorMaterial",
+                                                    this);
+  outerDetectorMaterialCmd->SetGuidance("Set Outer Detector Material. Default Air.");
 }
 
 
@@ -53,6 +57,7 @@ DetectorMessenger::~DetectorMessenger()
   delete shieldingCmdPoly;
   delete setLayerThicknessCmd;
   delete addLayerWithMaterialCmd;
+  delete outerDetectorMaterialCmd;
 }
 
 
@@ -79,12 +84,11 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
     this->layerThickness = setLayerThicknessCmd->GetNewDoubleValue(newValue);
   }
   else if (command == addLayerWithMaterialCmd) {
-    if (layerThickness > 0) {
-      fDetector->AddLayer(newValue, layerThickness);
-    } else {
-      std::cout<<"\n\nThickness not set. Layer not created.\n\n"<<std::endl;
-      return;
-    }
+    if (layerThickness > 0) fDetector->AddLayer(newValue, layerThickness);
+    else std::cerr<<"\n\nThickness not set. Layer not created.\n\n"<<std::endl;
+  }
+  else if (command == outerDetectorMaterialCmd) {
+    // fDetector->SetCrystalMaterial(newValue);
   }
 
 }

@@ -37,7 +37,6 @@ G4VPhysicalVolume*  DetectorConstruction::Construct()  {
 	ConstructPit(); //Rock Surrounding the Detector
 	ConstructOuterDetectors(); //Air around the crystal
 	//ConstructADR();
-	//AddLayer("G4_Pb",50*mm);
   auto phystest = ConstructDetectors();
 
   return phystest;
@@ -51,7 +50,7 @@ void DetectorConstruction::InitializeWorld()  {
 																	"world");
   logicWorld->SetVisAttributes(G4VisAttributes::GetInvisible());
   physicalWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "world", 0,
-																		false, 0);
+																		false, 0, true);
 }
 
 void DetectorConstruction::ConstructPit()  {
@@ -79,7 +78,7 @@ void DetectorConstruction::ConstructPit()  {
 	auto PitLog = new G4LogicalVolume(PitSolid,
 																		G4Material::GetMaterial("ChoozRock"),
 																		"logicalRock");
-	new G4PVPlacement(0, -vec_offset, PitLog, "PVRock", logicWorld, false, 0);
+	new G4PVPlacement(0, -vec_offset, PitLog, "PVRock", logicWorld, false, 0, true);
 	auto PitJacketSolid = new G4SubtractionSolid("ChoozPit_ConcreteJacket",
 																							 Jacket21Tube, Jacket2Tube, 0,
 																							 concrete_offset);
@@ -87,7 +86,7 @@ void DetectorConstruction::ConstructPit()  {
 																					G4Material::GetMaterial("G4_CONCRETE"),
 																					"logicalConcrete");
 	new G4PVPlacement(0, G4ThreeVector(0), PitJacketLog, "ConcreteJacket",
-										logicWorld, false, 0);
+										logicWorld, false, 0, true);
 
 	G4VisAttributes visRock(G4Colour(0.398,0.199,0.));
 	visRock.SetForceWireframe(true);
@@ -115,7 +114,7 @@ void DetectorConstruction::ConstructOuterDetectors() {
 	auto AirTubeLog = new G4LogicalVolume(AirTubeSolid,
 																				G4Material::GetMaterial("G4_AIR"),
 																				"AirShielding");
-	new G4PVPlacement(0,vec_zero, AirTubeLog, "AirShielding",logicWorld, false,0);
+	new G4PVPlacement(0,vec_zero, AirTubeLog, "AirShielding",logicWorld, false,0,true);
 
 	G4VisAttributes visAirTube(G4Colour(0,0,1));
 	visAirTube.SetForceWireframe(true);
@@ -141,7 +140,7 @@ void DetectorConstruction::ConstructADR()  {
 															startAngle90, spanningAngleFull);
 	auto plateLog = new G4LogicalVolume(plateTube, G4Material::GetMaterial("G4_Cu"),
 																			"Copper Plate");
-	new G4PVPlacement(0, vec_zero, plateLog, "Copper Plate", logicWorld, false, 0);
+	new G4PVPlacement(0, vec_zero, plateLog, "Copper Plate", logicWorld, false, 0, true);
 	G4VisAttributes visplate(G4Colour(1.,0.,0.));
 	visplate.SetForceWireframe(true);
 	visplate.SetForceSolid(true);
@@ -162,7 +161,7 @@ void DetectorConstruction::ConstructADR()  {
 																								 G4Material::GetMaterial("G4_Al"),
 																								 "Inner Shell");
 	new G4PVPlacement(0, vec_zero, shellinnerAlTubeLog, "Inner shell", logicWorld,
-										false,0);
+										false,0,true);
 	G4VisAttributes visinnerAlTube(G4Colour(0.41,0.41,0.41));
 	visinnerAlTube.SetForceWireframe(true);
 	visinnerAlTube.SetForceAuxEdgeVisible(true);
@@ -183,7 +182,7 @@ void DetectorConstruction::ConstructADR()  {
 																								 G4Material::GetMaterial("G4_Al"),
 																								 "Outer Shell");
 	new G4PVPlacement(0, vec_zero, shellouterAlTubeLog, "Outer shell", logicWorld,
-	 									false, 0);
+	 									false, 0, true);
 	G4VisAttributes visouterAlTube(G4Colour(0.41,0.41,0.41));
 	visouterAlTube.SetForceWireframe(true);
 	visouterAlTube.SetForceAuxEdgeVisible(true);
@@ -203,7 +202,7 @@ void DetectorConstruction::ConstructADR()  {
 																						 G4Material::GetMaterial("G4_W"),
 																						 "Tungsten Shell");
 	new G4PVPlacement(0, vec_zero, fulltungTubeLog, "Tungsten shell", logicWorld,
-										false, 0);
+										false, 0, true);
 	G4VisAttributes vistungTube(G4Colour(0.18,0.31,0.31));
 	vistungTube.SetForceWireframe(true);
 	vistungTube.SetForceAuxEdgeVisible(true);
@@ -224,7 +223,7 @@ void DetectorConstruction::ConstructADR()  {
 		 																				 G4Material::GetMaterial("Scintillator"),
 																						 "Scintillator Shell");
 	new G4PVPlacement(0, vec_zero, fullscinTubeLog, "Scintillator shell",
-										logicWorld, false, 0);
+										logicWorld, false, 0, true);
 	G4VisAttributes visscinTube(G4Colour(0.0,0.0,1.0));
 	visscinTube.SetForceWireframe(true);
 	visscinTube.SetForceAuxEdgeVisible(true);
@@ -248,7 +247,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()  {
 		v_CrystalBoxes.push_back(new G4Box(CyrstalLabels[jCrys],DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0));
 		v_CrystalBoxesLog.push_back(new G4LogicalVolume(v_CrystalBoxes[jCrys], G4Material::GetMaterial("G4_Os"),CyrstalLabels[jCrys]));
 		G4ThreeVector crys_pos(Cyrstalpos_x[jCrys],Cyrstalpos_y[jCrys],Cyrstalpos_z[jCrys]);
-		v_CrystalBoxesPhys.push_back(new G4PVPlacement(0,crys_pos+vec_offset,v_CrystalBoxesLog[jCrys],CyrstalLabels[jCrys],logicWorld,false,0));
+		v_CrystalBoxesPhys.push_back(new G4PVPlacement(0,crys_pos+vec_offset,v_CrystalBoxesLog[jCrys],CyrstalLabels[jCrys],logicWorld,false,0,true));
 		v_CrystalBoxesLog[jCrys]->SetVisAttributes(visDetector);
 		if (jCrys==0)
 		{
@@ -268,7 +267,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructSingleDetector()  {
 	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
 	auto crystalBox_single = new G4Box("Single Crystal", DetectorSize/2.0, DetectorSize/2.0,DetectorSize/2.0);
 	auto crystalLog_single = new G4LogicalVolume(crystalBox_single,G4Material::GetMaterial("Zn"), "Single Crystal");
-	new G4PVPlacement(0, vec_zero, crystalLog_single, "Single Crystal",logicWorld, false,0);
+	new G4PVPlacement(0, vec_zero, crystalLog_single, "Single Crystal",logicWorld, false,0,true);
 	G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
 	visDetector.SetForceWireframe(true);
 	visDetector.SetForceAuxEdgeVisible(true);
@@ -283,7 +282,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()  {
 
 	auto TargetDetectorBox = new G4Tubs("NuDetector",0*m,1150*mm,1221*mm,startAngle, spanningAngleFull);
 	auto TargetDetectorLog = new G4LogicalVolume(TargetDetectorBox, G4Material::GetMaterial("NuTargetLiquid"),"NuDetector");
-	new G4PVPlacement(0,vec_zero,TargetDetectorLog,"NuDetector",logicWorld,false,0);
+	new G4PVPlacement(0,vec_zero,TargetDetectorLog,"NuDetector",logicWorld,false,0,true);
 
   G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
 	TargetDetectorLog->SetVisAttributes(visDetector);
