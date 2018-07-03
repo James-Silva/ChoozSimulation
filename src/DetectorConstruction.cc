@@ -27,7 +27,9 @@
 using namespace std;
 
 DetectorConstruction::DetectorConstruction()
-:G4VUserDetectorConstruction(), detectorMessenger(new DetectorMessenger(this))
+:G4VUserDetectorConstruction(),
+ detectorMessenger(new DetectorMessenger(this)),
+ outerDetectorMaterial(G4Material::GetMaterial("G4_AIR"))
 {}
 
 DetectorConstruction::~DetectorConstruction() { delete detectorMessenger; }
@@ -109,17 +111,17 @@ void DetectorConstruction::ConstructOuterDetectors() {
 																	 3200.0*mm,startAngle, spanningAngleFull);
 	auto TempTube_outer = new G4Tubs("Temp_outer", zeroradius, 4250.0*mm,
 																	 4200*mm,startAngle, spanningAngleFull);
-	auto AirTubeSolid = new G4SubtractionSolid("AirShielding", TempTube_outer,
-																						 TempTube_inner,0,vec_offset);
-	auto AirTubeLog = new G4LogicalVolume(AirTubeSolid,
-																				G4Material::GetMaterial("G4_AIR"),
-																				"AirShielding");
-	new G4PVPlacement(0,vec_zero, AirTubeLog, "AirShielding",logicWorld, false,0,true);
+	auto tubeSolid = new G4SubtractionSolid("OuterDetector", TempTube_outer,
+																					TempTube_inner,0,vec_offset);
+	auto tubeLog = new G4LogicalVolume(tubeSolid,
+																		 outerDetectorMaterial,
+																		 "OuterDetector");
+	new G4PVPlacement(0,vec_zero, tubeLog, "OuterDetector",logicWorld, false,0,true);
 
-	G4VisAttributes visAirTube(G4Colour(0,0,1));
-	visAirTube.SetForceWireframe(true);
-	visAirTube.SetForceAuxEdgeVisible(true);
-	AirTubeLog->SetVisAttributes(visAirTube);
+	G4VisAttributes visTube(G4Colour(0,0,1));
+	visTube.SetForceWireframe(true);
+	visTube.SetForceAuxEdgeVisible(true);
+	tubeLog->SetVisAttributes(visTube);
 }
 
 void DetectorConstruction::AddLayer(const std::string& material,

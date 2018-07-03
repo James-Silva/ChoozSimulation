@@ -88,7 +88,7 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
     else std::cerr<<"\n\nThickness not set. Layer not created.\n\n"<<std::endl;
   }
   else if (command == outerDetectorMaterialCmd) {
-    // fDetector->SetCrystalMaterial(newValue);
+    fDetector->setOuterDetectorMaterial(newValue);
   }
 
 }

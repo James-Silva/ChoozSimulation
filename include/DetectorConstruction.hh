@@ -36,9 +36,6 @@ public:
 	// shieldings or ADR.
 	virtual G4VPhysicalVolume* Construct() ;
 
-	// Changes the center crystal detector material to Os, Zn. or Zr
-	void SetCrystalMaterial(G4String Material) ;
-
 	// Adds a G4Box of a given material and thickness around the origin.
 	// Can be called multiple times to create multiple layers without
 	// specifing positions of each one.
@@ -65,12 +62,18 @@ private:
 	DetectorMessenger* 							detectorMessenger;
 	G4LogicalVolume*								logicWorld;
 	G4VPhysicalVolume* 						  physicalWorld;
+	G4Material* 										outerDetectorMaterial;
 	std::vector<G4Box*>	            v_CrystalBoxes;
 	std::vector<G4LogicalVolume*>	  v_CrystalBoxesLog;
 	std::vector<G4VPhysicalVolume*>	v_CrystalBoxesPhys;
 	detectorcomponents::LayerConstructor shieldBuilder;
 
 public:
+	// Changes the center crystal detector material to Os, Zn. or Zr
+	void SetCrystalMaterial(G4String Material) ;
+	void setOuterDetectorMaterial(const std::string& mat) {
+		outerDetectorMaterial = G4Material::GetMaterial(mat);
+	}
 	G4LogicalVolume* GetWorldVolume() {return logicWorld;}
 };
 
