@@ -35,15 +35,11 @@ void LayerConstructor::AddG4Box(const std::string& material,
   auto solid = new G4SubtractionSolid(layerName, outerLayer, innerLayer);
   auto logic = new G4LogicalVolume(solid, G4Material::GetMaterial(material),
                                    layerName);
-
-
-
   new G4PVPlacement(0, {0,0,0}, logic, layerName, mother, false, 0, true);
 
   G4VisAttributes vis(G4Colour(1., 0.5, 0.));
   vis.SetForceWireframe(true);
 	logic->SetVisAttributes(vis);
-
 
   ++layerNum;
 }
@@ -170,6 +166,7 @@ void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {
 	shieldInterior_lv->SetVisAttributes(visshieldInterior);
 
 }
+
 void ConstructPolySheilding(const double innerR, const double outerR,
 														const double topthickness, G4LogicalVolume* mother)
 														noexcept {
@@ -197,6 +194,7 @@ void ConstructPolySheilding(const double innerR, const double outerR,
 	visshieldTube.SetForceAuxEdgeVisible(true);
 	fullshieldTubeLog->SetVisAttributes(visshieldTube);
 }
+
 void ConstructPbSheilding(const double innerR, const double outerR,
 													const double topthickness, G4LogicalVolume* mother)
 													noexcept {
