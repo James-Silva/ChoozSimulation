@@ -35,11 +35,11 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
   setcrystalmaterial->SetGuidance("Set Crystal Material (Zn,Zr or Default = Os)");
   setcrystalmaterial->SetDefaultValue("Os");
   //////////////////////////////////////////////////////////////////////////////
-  setLayerThicknessCmd = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/detector/setLayerThickness",
+  setLayerThicknessCmd = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setLayerThickness",
                                               this);
   setLayerThicknessCmd->SetGuidance("Set the layer thickness. Must be done before setting the material.");
   //////////////////////////////////////////////////////////////////////////////
-  addLayerWithMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/detector/addLayerWithMaterial",
+  addLayerWithMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/shielding/addLayerWithMaterial",
                                                 this);
   addLayerWithMaterialCmd->SetGuidance("Add a Layer centered around the origin of the world.");
   //////////////////////////////////////////////////////////////////////////////

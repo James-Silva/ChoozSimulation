@@ -38,6 +38,8 @@
 
 ########################Set Shieldings########################
 #/ricochetchoozsim/shielding/setPolyshielding 19. 24. 1. cm
+#/ricochetchoozsim/shielding/setLayerThickness 50 mm
+#/ricochetchoozsim/shielding/addLayerWithMaterial Pol
 
 ########################Set Materials########################
 /ricochetchoozsim/detector/setcrystalmaterial Zn
