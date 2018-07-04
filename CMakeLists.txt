@@ -48,7 +48,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 # Add the executable, and link it to the Geant4 libraries
 #
 
-set(CMAKE_CXX_STANDARD 14) 
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(RicochetChoozSim RicochetChoozSim.cc ${sources} ${headers})
@@ -62,14 +62,14 @@ option(USE_CMS_CVMFS "Rely on the CMS CVMFS Geant4 set up" OFF)
 if(USE_CMS_CVMFS)
     set(dummy ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cms_cvfms.success)
     add_custom_command (
-        OUTPUT  ${dummy} 
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/replace_CMS_paths.sh ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cmake.check_cache 
+        OUTPUT  ${dummy}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/replace_CMS_paths.sh ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/cmake.check_cache
         COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/replace_CMS_paths.sh ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY} ${PROJECT_NAME}
         COMMAND touch ${dummy}
     )
     add_custom_target(
        ReplaceCMSPaths
-       DEPENDS ${dummy} 
+       DEPENDS ${dummy}
        )
     add_dependencies(${PROJECT_NAME} ReplaceCMSPaths)
 endif(USE_CMS_CVMFS)
@@ -79,12 +79,11 @@ endif(USE_CMS_CVMFS)
 # relies on these scripts being in the current working directory.
 #
 set(RicochetChoozSim_SCRIPTS
-    run.mac
-    vis.mac
-    fast_neutron_spectrum.txt
+  run.mac
+  runWithVis.mac
   )
 
-foreach(_script ${RicohetChoozSim_SCRIPTS})
+foreach(_script ${RicochetChoozSim_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}
