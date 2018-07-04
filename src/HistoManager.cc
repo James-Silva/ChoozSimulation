@@ -60,9 +60,9 @@ void HistoManager::book(const G4Run* aRun)
   eventtree->Branch("Edep_Detector", &edep_detector);
   eventtree->Branch("energy", &primaryEnergy);
   // eventtree->Branch("int_Gdflag", &i_Gdflag);
-  eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
-  eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
-  eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
+  //eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
+  //eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
+  //eventtree->Branch("NeutronInteractionZ0", &NeutronRecoilZ0);
   //eventtree->Branch("NeutronInteractionProcess", s_NeutronProcess,"string/C",1024);
   // othervolumestree = new TTree("othervolumetree", "eventtree");
   // othervolumestree->Branch("Detector_crosscheck", &edep_detector_crosscheck);
