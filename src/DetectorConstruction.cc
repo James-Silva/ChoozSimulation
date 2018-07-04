@@ -147,18 +147,18 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()  {
 	visDetector.SetForceAuxEdgeVisible(true);
 	for(size_t jCrys = 0; jCrys < 1; ++jCrys)
 	{
-		v_CrystalBoxes.push_back(new G4Box(CyrstalLabels[jCrys],DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0));
-		v_CrystalBoxesLog.push_back(new G4LogicalVolume(v_CrystalBoxes[jCrys], G4Material::GetMaterial("G4_Os"),CyrstalLabels[jCrys]));
+		auto solid = new G4Box(CyrstalLabels[jCrys],DetectorSize/2.0,DetectorSize/2.0,DetectorSize/2.0);
+		v_CrystalBoxesLog.push_back(new G4LogicalVolume(solid, G4Material::GetMaterial("G4_Os"),CyrstalLabels[jCrys]));
 		G4ThreeVector crys_pos(Cyrstalpos_x[jCrys],Cyrstalpos_y[jCrys],Cyrstalpos_z[jCrys]);
-		v_CrystalBoxesPhys.push_back(new G4PVPlacement(0,crys_pos+vec_offset,v_CrystalBoxesLog[jCrys],CyrstalLabels[jCrys],logicWorld,false,0,true));
-		v_CrystalBoxesLog[jCrys]->SetVisAttributes(visDetector);
-		if (jCrys==0)
-		{
+		new G4PVPlacement(0,crys_pos+vec_offset,v_CrystalBoxesLog[jCrys],CyrstalLabels[jCrys],logicWorld,false,0,true);
+
+    v_CrystalBoxesLog[jCrys]->SetVisAttributes(visDetector);
+
+    if (jCrys==0) {
 			CrystalSensitiveDetector *Crystal1_SD = new CrystalSensitiveDetector("Crystal_1SD");
 			G4SDManager::GetSDMpointer()->AddNewDetector(Crystal1_SD);
 			v_CrystalBoxesLog[jCrys]->SetSensitiveDetector(Crystal1_SD);
 		}
-
 	}
 	return physicalWorld;
 }

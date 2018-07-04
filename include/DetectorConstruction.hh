@@ -59,13 +59,11 @@ private:
 	G4VPhysicalVolume*  ConstructSingleDetector() ;
 	G4VPhysicalVolume*  ConstructNuDetector() ;
 
-	DetectorMessenger* 							detectorMessenger;
-	G4LogicalVolume*								logicWorld;
-	G4VPhysicalVolume* 						  physicalWorld;
-	G4Material* 										outerDetectorMaterial;
-	std::vector<G4Box*>	            v_CrystalBoxes;
-	std::vector<G4LogicalVolume*>	  v_CrystalBoxesLog;
-	std::vector<G4VPhysicalVolume*>	v_CrystalBoxesPhys;
+	DetectorMessenger* 									 detectorMessenger;
+	G4LogicalVolume*										 logicWorld;
+	G4VPhysicalVolume* 						 		   physicalWorld;
+	G4Material* 											   outerDetectorMaterial;
+	std::vector<G4LogicalVolume*>	  		 v_CrystalBoxesLog;
 	detectorcomponents::LayerConstructor shieldBuilder;
 
 public:
