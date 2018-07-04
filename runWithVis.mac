@@ -37,6 +37,7 @@
 /ricochetchoozsim/generator/setsourceheightoffset +50 mm
 
 ########################Set Shieldings########################
+#/ricochetchoozsim/detector/constructADR true
 #/ricochetchoozsim/shielding/setPolyshielding 19. 24. 1. cm
 #/ricochetchoozsim/shielding/setLayerThickness 50 mm
 #/ricochetchoozsim/shielding/addLayerWithMaterial Pol

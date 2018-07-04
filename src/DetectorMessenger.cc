@@ -46,6 +46,10 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
   outerDetectorMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/detector/setOuterDetectorMaterial",
                                                     this);
   outerDetectorMaterialCmd->SetGuidance("Set Outer Detector Material. Default Air.");
+  //////////////////////////////////////////////////////////////////////////////
+  condtructADRCmd = new G4UIcmdWithABool("/ricochetchoozsim/detector/constructADR", this);
+  condtructADRCmd->SetGuidance("Construct ADR (true or false)");
+  condtructADRCmd->SetDefaultValue("false");
 }
 
 
@@ -58,6 +62,7 @@ DetectorMessenger::~DetectorMessenger()
   delete setLayerThicknessCmd;
   delete addLayerWithMaterialCmd;
   delete outerDetectorMaterialCmd;
+  delete condtructADRCmd;
 }
 
 
@@ -90,5 +95,8 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
   else if (command == outerDetectorMaterialCmd) {
     fDetector->setOuterDetectorMaterial(newValue);
   }
-
+  if(command == condtructADRCmd && newValue == "true")
+  {
+    fDetector->ConstructADR();
+  }
 }

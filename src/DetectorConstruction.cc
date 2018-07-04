@@ -39,7 +39,6 @@ G4VPhysicalVolume*  DetectorConstruction::Construct()  {
   InitializeWorld();
 	ConstructPit(); //Rock Surrounding the Detector
 	ConstructOuterDetectors(); //Air around the crystal
-	ConstructADR();
   auto phystest = ConstructDetectors();
 
   return phystest;

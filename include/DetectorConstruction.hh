@@ -45,6 +45,9 @@ public:
 	//		AddLayer("G4_Pb",50*mm,"G4Box");
 	//		AddLayer("G4_Pb",50*mm,"G4Box");
 	void AddLayer(const std::string& material, double thickness);
+	
+	// Original Fridge surrounding the crystal detector
+	void ConstructADR() ;
 
 private:
 	// Creates the world. Fills the logicWorld and physicalWorld variables.
@@ -53,8 +56,6 @@ private:
 	void ConstructPit() ;
 	// Water or Air tube that surrounds the inner crystal detector
 	void ConstructOuterDetectors() ;
-	// Original Fridge surrounding the crystal detector
-	void ConstructADR() ;
 	G4VPhysicalVolume*  ConstructDetectors() ;
 	G4VPhysicalVolume*  ConstructSingleDetector() ;
 	G4VPhysicalVolume*  ConstructNuDetector() ;
