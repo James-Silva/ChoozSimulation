@@ -81,10 +81,11 @@ endif(USE_CMS_CVMFS)
 set(RicochetChoozSim_SCRIPTS
     run.mac
     vis.mac
+    fast_neutrons.mac
     fast_neutron_spectrum.txt
   )
 
-foreach(_script ${RicohetChoozSim_SCRIPTS})
+foreach(_script ${RicochetChoozSim_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}

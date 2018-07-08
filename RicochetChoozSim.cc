@@ -35,16 +35,18 @@ int main(int argc,char** argv)
   // set the run ID
   //runManager.SetRunIDCounter(atoi(argv[2]));
 
+ // Example: ./RicochetSim vis.mac -vis
   G4String fileName{argv[1]};
-  if(argc == 3 && std::string(argv[2]) == "vis")
+  if(argc == 3 && std::string(argv[2]) == "-vis")
   {
       // enable visualizer if selected
     G4VisManager* visManager = new G4VisExecutive;
     visManager->Initialize();
     G4UIExecutive* ui = new G4UIExecutive(argc, argv);
-    ui->SessionStart();
     
     UImanager->ApplyCommand("/control/execute "+fileName);
+    ui->SessionStart();
+    
     delete ui;
     delete visManager;
   }
