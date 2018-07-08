@@ -8,4 +8,4 @@
 /ricochetchoozsim/generator/setsourceheight 8.4 m
 /ricochetchoozsim/generator/setneutronsourcespectrum fast_neutron_spectrum.txt
 
-/run/beamOn 1000
+/run/beamOn 10
