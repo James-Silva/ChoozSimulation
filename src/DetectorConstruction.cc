@@ -113,7 +113,7 @@ void DetectorConstruction::ConstructOuterDetectors() {
 																	 4200*mm,startAngle, spanningAngleFull);
 	auto tubeSolid = new G4SubtractionSolid("OuterDetector", TempTube_outer,
 																					TempTube_inner,0,vec_offset);
-	auto tubeLog = new G4LogicalVolume(tubeSolid,
+	tubeLog = new G4LogicalVolume(tubeSolid,
 																		 outerDetectorMaterial,
 																		 "OuterDetector");
 	new G4PVPlacement(0,vec_zero, tubeLog, "OuterDetector",logicWorld, false,0,true);
@@ -196,6 +196,10 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()  {
 	TargetDetectorLog->SetSensitiveDetector(NuDetector);
 
   return physicalWorld;
+}
+
+void DetectorConstruction::setOuterDetectorMaterial(const std::string& mat) {
+  if (tubeLog) tubeLog->SetMaterial(G4Material::GetMaterial(mat));
 }
 
 void DetectorConstruction::SetCrystalMaterial(G4String Material)  {

@@ -1,0 +1,11 @@
+/control/verbose 0
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+
+/ricochetchoozsim/generator/SetNeutronSource true
+/ricochetchoozsim/generator/setsourceradius 4.25 m
+/ricochetchoozsim/generator/setsourceheight 8.4 m
+/ricochetchoozsim/generator/setneutronsourcespectrum fast_neutron_spectrum.txt
+
+/run/beamOn 10

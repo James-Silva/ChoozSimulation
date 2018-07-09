@@ -45,7 +45,7 @@ public:
 	//		AddLayer("G4_Pb",50*mm,"G4Box");
 	//		AddLayer("G4_Pb",50*mm,"G4Box");
 	void AddLayer(const std::string& material, double thickness);
-	
+
 	// Original Fridge surrounding the crystal detector
 	void ConstructADR() ;
 
@@ -64,15 +64,14 @@ private:
 	G4LogicalVolume*										 logicWorld;
 	G4VPhysicalVolume* 						 		   physicalWorld;
 	G4Material* 											   outerDetectorMaterial;
+	G4LogicalVolume*										 tubeLog;
 	std::vector<G4LogicalVolume*>	  		 v_CrystalBoxesLog;
 	detectorcomponents::LayerConstructor shieldBuilder;
 
 public:
 	// Changes the center crystal detector material to Os, Zn. or Zr
 	void SetCrystalMaterial(G4String Material) ;
-	void setOuterDetectorMaterial(const std::string& mat) {
-		outerDetectorMaterial = G4Material::GetMaterial(mat);
-	}
+	void setOuterDetectorMaterial(const std::string& mat);
 	G4LogicalVolume* GetWorldVolume() {return logicWorld;}
 };
 
