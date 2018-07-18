@@ -26,9 +26,11 @@ class LayerConstructor {
   // Places a G4Box at the origin of a given mother volume with a given
   // material, thickness. Does not produce the box if it would have a length
   // less than zero. Sets the color of each layer to orange.
-  // Decreases the variable boxLength after each call by the created thickness.
+  // Decreases the member variable boxLength after each call by the created thickness.
   // This makes it easier to create a lot of layers and not worry about having
   // to input the boxLength each time. The max box length is set in this class.
+  // This method is called in the DetectorConstructor due to call from the
+  // DetectorMessanger. 
   void AddG4Box(const std::string& material, const double thickness,
                 G4LogicalVolume* mother);
 

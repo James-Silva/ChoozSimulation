@@ -27,11 +27,12 @@ void LayerConstructor::AddG4Box(const std::string& material,
                   " addition is too large to be added\n\n" << std::endl;
     return;
   }
-
   std::string layerName = "Shieling Layer "+ std::to_string(layerNum);
+  // The member variable boxLength is set in the middle of creating the solid.
   auto outerLayer = new G4Box("tempOuterLayer", boxLength/2, boxLength/2, boxLength/2);
-  boxLength = boxLength - 2*thickness;
+  boxLength = boxLength - 2*thickness;  // The boxLength is decremented 
   auto innerLayer = new G4Box("tempInnerLayer", boxLength/2, boxLength/2, boxLength/2);
+
   auto solid = new G4SubtractionSolid(layerName, outerLayer, innerLayer);
   auto logic = new G4LogicalVolume(solid, G4Material::GetMaterial(material),
                                    layerName);
