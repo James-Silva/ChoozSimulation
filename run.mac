@@ -27,9 +27,10 @@
 
 ########################Set Source Type########################
 #/ricochetchoozsim/generator/neutronsource 5000 keV
+#/ricochetchoozsim/generator/SetPointNeutronSource 0 0 0 mm
 /ricochetchoozsim/generator/SetNeutronSource true
 /ricochetchoozsim/generator/setneutronsourcespectrum input_spectra/Joe-32GeV-10MeVthreshold.txt
 #/ricochetchoozsim/generator/SetNeutronSource_xlog true
 
 
-/run/beamOn 1000
+/run/beamOn 10
