@@ -54,26 +54,26 @@ public:
     G4ThreeVector GenerateIsotropicVector();
     virtual void print(std::ostream& output, double scalingUnit) const;//print in HEPEvt format if scalingUnit == CLHEP::GeV
 private:
-    TH1D 			h_Spectrum;
-    std::vector<double> 	vec_SpectralEnergies;
-    std::vector<double> 	vec_SpectralVals;
+    TH1D 			                  h_Spectrum;
+    std::vector<double> 	      vec_SpectralEnergies;
+    std::vector<double> 	      vec_SpectralVals;
     G4double                    neutronradius;
     G4double                    sourceoffsetz;
     G4double                    sourceRadius;
     G4double                    sourceHeight;
-    G4double 			bottomProbability; //ratio of the bottom surface to the side surface
+    G4double 			              bottomProbability; //ratio of the bottom surface to the side surface
     G4double                    sourcethickness;
     PrimaryGeneratorMessenger		messenger;
-    G4ParticleGun          		particleGun;
-    DetectorConstruction*    				detectorConstruction;
-    HistoManager*						fHistoManager;
-    G4ThreeVector                   neutronsourcepos;
-    G4ThreeVector                   gammasourcepos;
+    G4ParticleGun          		  particleGun;
+    DetectorConstruction*    	  detectorConstruction;
+    HistoManager*						    fHistoManager;
+    G4ThreeVector               neutronsourcepos;
+    G4ThreeVector               gammasourcepos;
     G4VUserPrimaryGeneratorAction*  particleSource;    //pointer a to G4  class
 
-    G4String sourceType; 
+    G4String sourceType;
     bool logaxis;
-    
+
     void updateBottomProbability();
 };
 
@@ -81,19 +81,19 @@ std::ostream& operator<<(std::ostream& output, const PrimaryGeneratorAction& pri
 
 template <class T, class K>
 K interpolate(const std::map<T,K>& map, T x){
-  
+
   auto itUpper = map.upper_bound(x);
-  
+
   if(itUpper == map.end()) return (--itUpper)->second;
   else if(itUpper == map.begin()) return itUpper->second;
   else{
-    
+
     auto itLower = itUpper;
     --itLower;
     return itLower->second + (x - itLower->first) * (itUpper->second - itLower->second) / (itUpper->first - itLower->first) ;//y1 + (x - x1) (y2 - y1) / (x2 - x1)
-    
+
   }
-  
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

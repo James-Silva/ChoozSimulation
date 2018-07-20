@@ -40,6 +40,7 @@ Materials::Materials()
   man->FindOrBuildMaterial("G4_Pb");
   man->FindOrBuildMaterial("G4_Zn");
   man->FindOrBuildMaterial("G4_Zr");
+  man->FindOrBuildMaterial("G4_Fe");
   G4Material* materialGd = man->FindOrBuildMaterial("G4_Gd");
   G4Material* materialPoly = man->FindOrBuildMaterial("G4_POLYETHYLENE");
   G4Element* elH = man->FindOrBuildElement("H");
