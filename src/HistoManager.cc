@@ -58,7 +58,7 @@ void HistoManager::book(const G4Run* aRun)
 
   eventtree = new TTree("eventtree", "eventtree");
   eventtree->Branch("Edep_Detector", &edep_detector);
-  eventtree->Branch("energy", &primaryEnergy);
+  // eventtree->Branch("energy", &primaryEnergy);
   // eventtree->Branch("int_Gdflag", &i_Gdflag);
   //eventtree->Branch("NeutronInteractionX0", &NeutronRecoilX0);
   //eventtree->Branch("NeutronInteractionY0", &NeutronRecoilY0);
@@ -161,15 +161,15 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
 {
   TString s_currentvol;
   TString s_currentprocess;
-  G4int i_PDGID;
-  bool b_gdflag = false;
-  bool b_ncapflag = false;
+  // G4int i_PDGID;
+  // bool b_gdflag = false;
+  // bool b_ncapflag = false;
   edep_detector = 0.;
   // NeutronRecoilX0  = -99999;
   // NeutronRecoilY0  = -99999;
   // NeutronRecoilZ0  = -99999;
 
-  i_Gdflag = 0;
+  // i_Gdflag = 0;
 
   if (!anEvent || !theHits)
     return;
@@ -181,25 +181,25 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
   // G4ThreeVector primaryR0 = G4ThreeVector(anEvent->GetPrimaryVertex()->GetX0(),
   //                                         anEvent->GetPrimaryVertex()->GetY0(),
   //                                         anEvent->GetPrimaryVertex()->GetZ0());
-  primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
-  primaryEnergy = primaryEnergy/keV;
+  // primaryEnergy = anEvent->GetPrimaryVertex()->GetPrimary()->GetKineticEnergy();
+  // primaryEnergy = primaryEnergy/keV;
   //std::cout << "Primary Energy (keV): " << primaryEnergy << std::endl;
   for(G4int i_hitcounter = 0; i_hitcounter < nhits; i_hitcounter++)
   {
     s_currentvol = (*theHits)[i_hitcounter]->GetVolume();
     s_currentprocess = (*theHits)[i_hitcounter]->GetProcessID();
-    s_NeutronProcess = s_currentprocess;
-    i_PDGID = (*theHits)[i_hitcounter]->GetPDGID();
-    if (i_PDGID == 1000641580)
-    {
-       b_gdflag = true;
-       std::cout << "Gd Detected" <<  std::endl;
-    }
+    // s_NeutronProcess = s_currentprocess;
+    // i_PDGID = (*theHits)[i_hitcounter]->GetPDGID();
+    // if (i_PDGID == 1000641580)
+    // {
+    //    b_gdflag = true;
+    //    std::cout << "Gd Detected" <<  std::endl;
+    // }
     if (s_currentvol == "Crystal_1")
     {
       edep_detector += (*theHits)[i_hitcounter]->GetEdep();
-      if (s_currentprocess == "hadElastic")
-      {
+      // if (s_currentprocess == "hadElastic")
+      // {
         // b_ncapflag = true;
         // NeutronRecoilX0 = (*theHits)[i_hitcounter]->GetPosition0().getX();
         // NeutronRecoilY0 = (*theHits)[i_hitcounter]->GetPosition0().getY();
@@ -209,14 +209,14 @@ void HistoManager::FillTree(const G4Event* anEvent, CrystalHitsCollection* theHi
         // std::cout << "ParentID: " << (*theHits)[i_hitcounter]->GetParentID() << std::endl;
         // std::cout << "TrackID: " << (*theHits)[i_hitcounter]->GetTrackID() << std::endl;
 
-      }
+      // }
     }
 
   }
-  if (b_ncapflag == true && b_gdflag == true)
-  {
-    i_Gdflag = 1;
-  }
+  // if (b_ncapflag == true && b_gdflag == true)
+  // {
+  //   i_Gdflag = 1;
+  // }
   edep_detector = edep_detector/keV;
   //std::cout << "Primary Energy: " << primaryEnergy << " keV"  <<  std::endl;
   //std::cout << "Total: " << edep_nudetector << " keV"  << std::endl;
