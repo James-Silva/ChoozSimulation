@@ -30,7 +30,7 @@ void LayerConstructor::AddG4Box(const std::string& material,
   std::string layerName = "Shieling Layer "+ std::to_string(layerNum);
   // The member variable boxLength is set in the middle of creating the solid.
   auto outerLayer = new G4Box("tempOuterLayer", boxLength/2, boxLength/2, boxLength/2);
-  boxLength = boxLength - 2*thickness;  // The boxLength is decremented 
+  boxLength = boxLength - 2*thickness;  // The boxLength is decremented
   auto innerLayer = new G4Box("tempInnerLayer", boxLength/2, boxLength/2, boxLength/2);
 
   auto solid = new G4SubtractionSolid(layerName, outerLayer, innerLayer);
@@ -38,11 +38,22 @@ void LayerConstructor::AddG4Box(const std::string& material,
                                    layerName);
   new G4PVPlacement(0, {0,0,0}, logic, layerName, mother, false, 0, true);
 
-  G4VisAttributes vis(G4Colour(1., 0.5, 0.));
-  vis.SetForceWireframe(true);
-	logic->SetVisAttributes(vis);
-
+  this->setLayerColour(logic, material);
   ++layerNum;
+}
+
+void LayerConstructor::setLayerColour(G4LogicalVolume* logic, const std::string& material) {
+  if (material == "G4_Pb") {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour().Red()));
+  } else if (material == "Pol") {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1.0, 0)));
+  } else if (material == "PolBor3pc") {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour(0.25, 0.8, 0.25)));
+  } else if (material == "PolBor10pc") {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour(0.5, 0.6, 0.5)));
+  } else {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour().Magenta()));
+  }
 }
 
 void ConstructGioveShielding(G4LogicalVolume* mother) noexcept {

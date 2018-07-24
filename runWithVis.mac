@@ -19,4 +19,14 @@
 /vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 
+#Set Visulizer to better see shielding
+/vis/viewer/set/style s
+/vis/viewer/addCutawayPlane
+/vis/viewer/set/upVector 1 0 0
+/vis/viewer/set/viewpointThetaPhi -90 0
+/vis/viewer/set/style s
+/vis/viewer/addCutawayPlane
+/vis/viewer/set/upVector 1 0 0
+/vis/viewer/zoom 1.7
+
 /control/execute run.mac

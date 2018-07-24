@@ -91,10 +91,8 @@ void DetectorConstruction::ConstructPit()  {
 										logicWorld, false, 0, true);
 
 	G4VisAttributes visRock(G4Colour(0.398,0.199,0.));
-	visRock.SetForceWireframe(true);
 	PitLog->SetVisAttributes(visRock);
 	G4VisAttributes visJacket(G4Colour(0.625,0.625,0.625));
-	visJacket.SetForceWireframe(true);
 	PitJacketLog->SetVisAttributes(visJacket);
 
 }
@@ -118,10 +116,13 @@ void DetectorConstruction::ConstructOuterDetectors() {
 																		 "OuterDetector");
 	new G4PVPlacement(0,vec_zero, tubeLog, "OuterDetector",logicWorld, false,0,true);
 
-	G4VisAttributes visTube(G4Colour(0,0,1));
-	visTube.SetForceWireframe(true);
-	visTube.SetForceAuxEdgeVisible(true);
+  G4VisAttributes visTube(G4Colour(0.25,0.5,1.0,0.05));
+  visTube.SetForceAuxEdgeVisible(true);
 	tubeLog->SetVisAttributes(visTube);
+}
+
+void DetectorConstruction::setOuterDetectorMaterial(const std::string& mat) {
+  if (!tubeLog) tubeLog->SetMaterial(G4Material::GetMaterial(mat));
 }
 
 void DetectorConstruction::AddLayer(const std::string& material, const double thickness) {
@@ -141,8 +142,7 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()  {
 	std::vector<G4double> Cyrstalpos_z = {0.*cm, 0.*cm, 0.*cm, 0.*cm, 0.*cm};
 	const G4ThreeVector vec_zero(0*mm,0*mm,0*mm);
 	const G4ThreeVector vec_offset(0*mm,0*mm,0.5*cm+DetectorSize/2.0);
-	G4VisAttributes visDetector(G4Colour(0.0,1.0,0.0));
-	visDetector.SetForceWireframe(true);
+	G4VisAttributes visDetector(G4Colour().Cyan());
 	visDetector.SetForceAuxEdgeVisible(true);
 	for(size_t jCrys = 0; jCrys < 1; ++jCrys)
 	{
@@ -198,9 +198,6 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()  {
   return physicalWorld;
 }
 
-void DetectorConstruction::setOuterDetectorMaterial(const std::string& mat) {
-  if (tubeLog) tubeLog->SetMaterial(G4Material::GetMaterial(mat));
-}
 
 void DetectorConstruction::SetCrystalMaterial(G4String Material)  {
   if (Material == "Os" || Material == "Zn" || Material == "Zr") {

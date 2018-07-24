@@ -30,11 +30,12 @@ class LayerConstructor {
   // This makes it easier to create a lot of layers and not worry about having
   // to input the boxLength each time. The max box length is set in this class.
   // This method is called in the DetectorConstructor due to call from the
-  // DetectorMessanger. 
+  // DetectorMessanger.
   void AddG4Box(const std::string& material, const double thickness,
                 G4LogicalVolume* mother);
 
  private:
+  void setLayerColour(G4LogicalVolume* logic, const std::string& material);
   double boxLength;
   int layerNum;
 };
