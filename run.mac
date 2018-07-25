@@ -18,6 +18,7 @@
 ########################Set Shieldings########################
 #/ricochetchoozsim/detector/constructADR true
 #/ricochetchoozsim/shielding/setPolyshielding 19. 24. 1. cm
+#/ricochetchoozsim/shielding/setLayerLength 1. m
 #/ricochetchoozsim/shielding/setLayerThickness 50 mm
 #/ricochetchoozsim/shielding/addLayerWithMaterial Pol
 
@@ -31,6 +32,6 @@
 /ricochetchoozsim/generator/SetNeutronSource true
 /ricochetchoozsim/generator/setneutronsourcespectrum input_spectra/Joe-32GeV-10MeVthreshold.txt
 #/ricochetchoozsim/generator/SetNeutronSource_xlog true
-
+#/ricochetchoozsim/generator/genMuonFromSpectrum DC_MUSIC_sim_ND_Full_Info.root
 
 /run/beamOn 10

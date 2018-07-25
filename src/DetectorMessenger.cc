@@ -37,7 +37,7 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 
   /////////////Commands to add layers areound the cyrstal///////////////////////
   /// Example ///
-  // /ricochetchoozsim/shielding/setLayerLength 1m         //Sets the layer length that the new layer is subtracted from
+  // /ricochetchoozsim/shielding/setLayerLength 1. m         //Sets the layer length that the new layer is subtracted from
   // /ricochetchoozsim/shielding/setLayerThickness 50 mm   //Sets the thickness of the Layers added
   // /ricochetchoozsim/shielding/addLayerWithMaterial Pol  //Adds the layers with a specified material (1m->.95m)
   setLayerLengthCmd = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setLayerLength", this);
