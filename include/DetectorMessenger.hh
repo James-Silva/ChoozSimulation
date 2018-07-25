@@ -31,6 +31,7 @@ class DetectorMessenger: public G4UImessenger
     G4UIcmdWithABool*           condtructADRCmd;
     double                      layerThickness;
     G4UIcmdWithADoubleAndUnit*  setLayerThicknessCmd;
+    G4UIcmdWithADoubleAndUnit*  setLayerLengthCmd;
     G4UIcmdWithAString*         addLayerWithMaterialCmd;
 };
 

@@ -46,6 +46,12 @@ public:
 	//		AddLayer("G4_Pb",50*mm,"G4Box");
 	void AddLayer(const std::string& material, double thickness);
 
+	// The G4Box created in AddLayer subtracts its thickness from a default value
+	// of 1m. That value is changed with SetLayerLength and this method is called
+	// from the messenger class. It must be called before AddLayer to effect the
+	// layer that is being added.
+	void SetLayerLength(double length);
+
 	// Original Fridge surrounding the crystal detector
 	void ConstructADR() ;
 

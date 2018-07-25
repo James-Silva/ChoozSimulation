@@ -34,19 +34,26 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
                                               this);
   setcrystalmaterial->SetGuidance("Set Crystal Material (Zn,Zr or Default = Os)");
   setcrystalmaterial->SetDefaultValue("Os");
-  //////////////////////////////////////////////////////////////////////////////
-  setLayerThicknessCmd = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setLayerThickness",
-                                              this);
+
+  /////////////Commands to add layers areound the cyrstal///////////////////////
+  /// Example ///
+  // /ricochetchoozsim/shielding/setLayerLength 1m         //Sets the layer length that the new layer is subtracted from
+  // /ricochetchoozsim/shielding/setLayerThickness 50 mm   //Sets the thickness of the Layers added
+  // /ricochetchoozsim/shielding/addLayerWithMaterial Pol  //Adds the layers with a specified material (1m->.95m)
+  setLayerLengthCmd = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setLayerLength", this);
+  setLayerLengthCmd->SetGuidance("Set the layer length before a layer is subtracted from it. Default 1m.");
+
+  setLayerThicknessCmd = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setLayerThickness", this);
   setLayerThicknessCmd->SetGuidance("Set the layer thickness. Must be done before setting the material.");
-  //////////////////////////////////////////////////////////////////////////////
-  addLayerWithMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/shielding/addLayerWithMaterial",
-                                                this);
+
+  addLayerWithMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/shielding/addLayerWithMaterial", this);
   addLayerWithMaterialCmd->SetGuidance("Add a Layer centered around the origin of the world.");
-  //////////////////////////////////////////////////////////////////////////////
-  outerDetectorMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/detector/setOuterDetectorMaterial",
-                                                    this);
+
+  ////Commands to set the material from the outer rock to the inner crystal/////
+  outerDetectorMaterialCmd = new G4UIcmdWithAString("/ricochetchoozsim/detector/setOuterDetectorMaterial", this);
   outerDetectorMaterialCmd->SetGuidance("Set Outer Detector Material. Default Air.");
-  //////////////////////////////////////////////////////////////////////////////
+
+  ////////////////////////Construct the ADR/////////////////////////////////////
   condtructADRCmd = new G4UIcmdWithABool("/ricochetchoozsim/detector/constructADR", this);
   condtructADRCmd->SetGuidance("Construct ADR (true or false)");
   condtructADRCmd->SetDefaultValue("false");
@@ -63,6 +70,7 @@ DetectorMessenger::~DetectorMessenger()
   delete addLayerWithMaterialCmd;
   delete outerDetectorMaterialCmd;
   delete condtructADRCmd;
+  delete setLayerLengthCmd;
 }
 
 
@@ -91,6 +99,9 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
   else if (command == addLayerWithMaterialCmd) {
     if (layerThickness > 0) fDetector->AddLayer(newValue, layerThickness);
     else std::cerr<<"\n\nThickness not set. Layer not created.\n\n"<<std::endl;
+  }
+  else if (command == setLayerLengthCmd) {
+    fDetector->SetLayerLength(setLayerThicknessCmd->GetNewDoubleValue(newValue));
   }
   else if (command == outerDetectorMaterialCmd) {
     fDetector->setOuterDetectorMaterial(newValue);

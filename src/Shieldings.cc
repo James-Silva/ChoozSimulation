@@ -46,12 +46,16 @@ void LayerConstructor::setLayerColour(G4LogicalVolume* logic, const std::string&
   if (material == "G4_Pb") {
     logic->SetVisAttributes(new G4VisAttributes(G4Colour().Red()));
   } else if (material == "Pol") {
-    logic->SetVisAttributes(new G4VisAttributes(G4Colour(0., 1.0, 0)));
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour().Green()));
   } else if (material == "PolBor3pc") {
-    logic->SetVisAttributes(new G4VisAttributes(G4Colour(0.25, 0.8, 0.25)));
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour().White()));
   } else if (material == "PolBor10pc") {
-    logic->SetVisAttributes(new G4VisAttributes(G4Colour(0.5, 0.6, 0.5)));
-  } else {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour().Brown()));
+  } else if (material == "G4_WATER") {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour().Blue()));
+  } else if (material == "G4_AIR") {
+    logic->SetVisAttributes(new G4VisAttributes(G4Colour(1.,1.,0.,0.6))); //Yellow
+  }  else {
     logic->SetVisAttributes(new G4VisAttributes(G4Colour().Magenta()));
   }
 }

@@ -116,7 +116,7 @@ void DetectorConstruction::ConstructOuterDetectors() {
 																		 "OuterDetector");
 	new G4PVPlacement(0,vec_zero, tubeLog, "OuterDetector",logicWorld, false,0,true);
 
-  G4VisAttributes visTube(G4Colour(0.25,0.5,1.0,0.05));
+  G4VisAttributes visTube(G4Colour(1.,1.,0.,0.4));
   visTube.SetForceAuxEdgeVisible(true);
 	tubeLog->SetVisAttributes(visTube);
 }
@@ -126,7 +126,11 @@ void DetectorConstruction::setOuterDetectorMaterial(const std::string& mat) {
 }
 
 void DetectorConstruction::AddLayer(const std::string& material, const double thickness) {
-		shieldBuilder.AddG4Box(material, thickness, logicWorld);
+	shieldBuilder.AddG4Box(material, thickness, logicWorld);
+}
+
+void DetectorConstruction::SetLayerLength(double length) {
+  shieldBuilder.SetBoxLength(length);
 }
 
 void DetectorConstruction::ConstructADR()  {
