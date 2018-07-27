@@ -1,18 +1,19 @@
 // PrimaryGeneratorAction.cc
 
-#include "PrimaryGeneratorAction.hh"
-
-#include "DetectorConstruction.hh"
-
+#include "TMath.h"
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
-#include "TMath.h"
 #include "G4UnitsTable.hh"
-#include "GPSPrimaryGeneratorAction.hh"
 #include "TRandom3.h"
+#include <TFile.h>
+#include <TH1.h>
+#include "PrimaryGeneratorAction.hh"
+#include "DetectorConstruction.hh"
+#include "GPSPrimaryGeneratorAction.hh"
+#include "TTreeContainer.hh"
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorConstruction_, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
@@ -52,6 +53,19 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   {
     setNeutronMomentum();
     setPointNeutronPosition();
+    particleGun.GeneratePrimaryVertex(anEvent);
+  }
+  else if (sourceType == "muonspectrum")
+  {
+    //Must check if TTree is read correctly (Error-Handling)
+    particleGun.SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle("mu-"));
+    particleGun.SetParticlePosition(this->GenerateTopEvent(10*m, 4.255*m));
+
+    double mass = G4ParticleTable::GetParticleTable()->FindParticle("mu-")->GetPDGMass();
+    primarygentools::TTreeContainer tc;
+    G4ThreeVector momentum = tc.getMomentumVec();
+    particleGun.SetParticleMomentumDirection(momentum.unit());
+    particleGun.SetParticleEnergy(std::sqrt(momentum*momentum+mass*mass)-mass);
     particleGun.GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "gammapoint")
@@ -201,6 +215,14 @@ void PrimaryGeneratorAction::updateBottomProbability()
 void PrimaryGeneratorAction::setSourceHeightOffset(G4double offset)
 {
   sourceoffsetz = offset;
+}
+
+void PrimaryGeneratorAction::genMuFromSpectrum(const std::string& fileName)
+{
+  sourceType = "muonspectrum";
+
+  // std::cout<<"\n\n"<<tc.getMomentumVec()<<"\n\n";
+  // std::cout<<"\n\n"<<px.GetEntry(23)<<"\n\n";
 }
 
 void PrimaryGeneratorAction::setNewNeutronSpectrumSource()

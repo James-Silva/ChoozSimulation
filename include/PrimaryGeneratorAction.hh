@@ -23,6 +23,8 @@
 
 class G4Event;
 class DetectorConstruction;
+class TFile;
+class TTree;
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
@@ -49,6 +51,7 @@ public:
     void SetGammaPointSource(G4ThreeVector pos);
     void SetGenerator(G4String generatorType);
     void setSourceThickness(G4double thickness);
+    void genMuFromSpectrum(const std::string& fileName);
     G4ThreeVector GenerateSideWallEvent(G4double radius,G4double height,G4double offset);
     G4ThreeVector GenerateTopEvent(G4double radius,G4double height);
     G4ThreeVector GenerateIsotropicVector();
@@ -70,9 +73,11 @@ private:
     G4ThreeVector               neutronsourcepos;
     G4ThreeVector               gammasourcepos;
     G4VUserPrimaryGeneratorAction*  particleSource;    //pointer a to G4  class
-
+    TFile*   file;
+    TTree*   tree;
+    Float_t  px,py,pz;
     G4String sourceType;
-    bool logaxis;
+    bool     logaxis;
 
     void updateBottomProbability();
 };

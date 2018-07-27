@@ -22,7 +22,7 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
 
   fTypeCmd_neutron = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/neutronsource",this);
   fTypeCmd_neutron->SetGuidance("Set type of particle generator and set energy");
-  
+
   fTypeCmd_gamma = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/gammasource",this);
   fTypeCmd_gamma->SetGuidance("Set type of particle generator and set energy");
 
@@ -41,15 +41,20 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
 
   fTypeCmd_heightoffset = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourceheightoffset",this);
   fTypeCmd_heightoffset->SetGuidance("Set source height offset (cylinder) (sets both gamma and neutron generator offset)");
-  fTypeCmd_heightoffset->SetDefaultValue(0*CLHEP::mm);  
+  fTypeCmd_heightoffset->SetDefaultValue(0*CLHEP::mm);
 
   fTypeCmd_spectrum = new G4UIcmdWithAString("/ricochetchoozsim/generator/setneutronsourcespectrum",this);
   fTypeCmd_spectrum->SetGuidance("Set source file for generating neutron spectrum");
 
+  // Takes in the name of a root file and creates an object of TTreeContainer
+  // Set the source type in PGA to generate a muon using the spectrum entered
+  fTypeCmd_genMuonFromSpect = new G4UIcmdWithAString("/ricochetchoozsim/generator/genMuonFromSpectrum",this);
+  fTypeCmd_genMuonFromSpect->SetGuidance("Generating muons from a given muon spectrum.");
+
   fTypeCmd_spectrum_bool = new G4UIcmdWithABool("/ricochetchoozsim/generator/SetNeutronSource", this);
   fTypeCmd_spectrum_bool->SetGuidance("Set neutron source (bool type true or false)");
   fTypeCmd_spectrum_bool->SetDefaultValue("false");
-  
+
   fTypeCmd_neutronpoint_vec = new G4UIcmdWith3VectorAndUnit("/ricochetchoozsim/generator/SetPointNeutronSource", this);
   fTypeCmd_neutronpoint_vec->SetGuidance("Set point neutron source (coordinates)");
 
@@ -67,6 +72,7 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
 PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger()
 {
   delete fTypeCmd_neutron;
+  delete fTypeCmd_genMuonFromSpect;
   delete fGeneratorDir;
 }
 
@@ -74,13 +80,13 @@ PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger()
 void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {
   if(command == fTypeCmd_neutron)
-  {     
+  {
     fGeneratorAction->setNewNeutronSource(fTypeCmd_neutron->GetNewDoubleValue(newValue));
   }
   if(command == fTypeCmd_gamma)
-  {     
+  {
     fGeneratorAction->setNewGammaSource(fTypeCmd_gamma->GetNewDoubleValue(newValue));
-  }  
+  }
   if(command == fTypeCmd_radius)
   {
     fGeneratorAction->setSourceRadius(fTypeCmd_radius->GetNewDoubleValue(newValue));
@@ -92,10 +98,14 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
   if(command == fTypeCmd_thickness)
   {
     fGeneratorAction->setSourceThickness(fTypeCmd_thickness->GetNewDoubleValue(newValue));
-  }  
+  }
   if(command == fTypeCmd_heightoffset)
   {
     fGeneratorAction->setSourceHeightOffset(fTypeCmd_heightoffset->GetNewDoubleValue(newValue));
+  }
+  if(command == fTypeCmd_genMuonFromSpect)
+  {
+    fGeneratorAction->genMuFromSpectrum(newValue);
   }
   if(command == fTypeCmd_spectrum)
   {
@@ -110,15 +120,15 @@ void PrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String newVa
     fGeneratorAction->setNewNeutronSpectrumSource_LogX();
   }
   if(command == fTypeCmd_neutronpoint_vec)
-  { 
-      fGeneratorAction->SetNeutronPointSource(fTypeCmd_neutronpoint_vec->GetNew3VectorValue(newValue));  
-  }  
+  {
+      fGeneratorAction->SetNeutronPointSource(fTypeCmd_neutronpoint_vec->GetNew3VectorValue(newValue));
+  }
   if(command == fTypeCmd_gammapoint_vec)
-  { 
-      fGeneratorAction->SetGammaPointSource(fTypeCmd_gammapoint_vec->GetNew3VectorValue(newValue));  
-  }    
+  {
+      fGeneratorAction->SetGammaPointSource(fTypeCmd_gammapoint_vec->GetNew3VectorValue(newValue));
+  }
   if(command == fTypeCmd_gps)
-  { 
-      fGeneratorAction->SetGenerator("GPS");  
-  } 
+  {
+      fGeneratorAction->SetGenerator("GPS");
+  }
 }
