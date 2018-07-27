@@ -13,19 +13,18 @@ namespace primarygentools {
 
 class TTreeContainer {
   public:
+    //
     TTreeContainer();
     G4ThreeVector getMomentumVec();
 
   private:
     std::mt19937 gen;
-
     TRandom3 randNum;
     TFile*   file;
     TTree*   tree;
-    Float_t px, py, pz, kinEnergy;
-
+    Float_t px, py, pz;
 };
 
-}
+} // namespace primarygentools
 
 #endif // TTREECONTAINER_H

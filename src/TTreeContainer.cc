@@ -19,12 +19,15 @@ TTreeContainer::TTreeContainer() {
   gen.seed(std::random_device()());
 }
 
+// NOTE: I HAD AN ISSUE IN THE PAST WITH THE ADDESSES
+
 G4ThreeVector TTreeContainer::getMomentumVec() {
-  // NOTE: Check if tree is alive
+  // TODO: Check if tree is alive
   std::uniform_int_distribution<int> dist(0, tree->GetEntries()-1);
   tree->GetEntry(dist(gen));
-  //Check if the entry is good
+  // TODO: Check if the entry is good
+  // std::cout<< G4ThreeVector(px,py,pz) <<std::endl;
   return {px,py,pz};
 }
 
-}
+} // namespace primarygentools

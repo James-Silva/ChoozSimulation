@@ -38,7 +38,6 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
   fTypeCmd_thickness->SetGuidance("Set Source thickness (side and bottom)");
   fTypeCmd_thickness->SetDefaultValue(100*CLHEP::mm);
 
-
   fTypeCmd_heightoffset = new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/generator/setsourceheightoffset",this);
   fTypeCmd_heightoffset->SetGuidance("Set source height offset (cylinder) (sets both gamma and neutron generator offset)");
   fTypeCmd_heightoffset->SetDefaultValue(0*CLHEP::mm);
@@ -46,8 +45,9 @@ PrimaryGeneratorMessenger::PrimaryGeneratorMessenger(PrimaryGeneratorAction* Pri
   fTypeCmd_spectrum = new G4UIcmdWithAString("/ricochetchoozsim/generator/setneutronsourcespectrum",this);
   fTypeCmd_spectrum->SetGuidance("Set source file for generating neutron spectrum");
 
-  // Takes in the name of a root file and creates an object of TTreeContainer
-  // Set the source type in PGA to generate a muon using the spectrum entered
+  // Takes in the name of a root file with muon data as a string.
+  // Calls a method in PGA that sets the source type to "muonspectrum" using
+  // the method genMuFromSpectrum(fileName).
   fTypeCmd_genMuonFromSpect = new G4UIcmdWithAString("/ricochetchoozsim/generator/genMuonFromSpectrum",this);
   fTypeCmd_genMuonFromSpect->SetGuidance("Generating muons from a given muon spectrum.");
 

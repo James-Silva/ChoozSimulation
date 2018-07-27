@@ -25,16 +25,6 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorCon
   gRandom->SetSeed(0);
 }
 
-void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
-{
-  if(generatorType == "GPS")
-  {
-    sourceType = "GPS";
-    particleSource = new GPSPrimaryGeneratorAction();
-  }
-}
-
-
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   // Set position differently depending on source type
@@ -62,7 +52,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     particleGun.SetParticlePosition(this->GenerateTopEvent(10*m, 4.255*m));
 
     double mass = G4ParticleTable::GetParticleTable()->FindParticle("mu-")->GetPDGMass();
-    G4ThreeVector momentum = tc.getMomentumVec();
+    G4ThreeVector momentum = muonTreeContatiner.getMomentumVec();
     particleGun.SetParticleMomentumDirection(momentum.unit());
     particleGun.SetParticleEnergy(std::sqrt(momentum*momentum+mass*mass)-mass);
     particleGun.GeneratePrimaryVertex(anEvent);
@@ -104,6 +94,21 @@ void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double 
 {
   particleGun.SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
   particleGun.SetParticleEnergy(kineticEnergy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
+}
+
+void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
+{
+  if(generatorType == "GPS")
+  {
+    sourceType = "GPS";
+    particleSource = new GPSPrimaryGeneratorAction();
+  }
+}
+
+void PrimaryGeneratorAction::genMuFromSpectrum(const std::string& fileName)
+{
+  // muonTreeContatiner(  );
+  sourceType = "muonspectrum";
 }
 
 void PrimaryGeneratorAction::setGammaPosition()
@@ -216,13 +221,6 @@ void PrimaryGeneratorAction::setSourceHeightOffset(G4double offset)
   sourceoffsetz = offset;
 }
 
-void PrimaryGeneratorAction::genMuFromSpectrum(const std::string& fileName)
-{
-  sourceType = "muonspectrum";
-
-  // std::cout<<"\n\n"<<tc.getMomentumVec()<<"\n\n";
-  // std::cout<<"\n\n"<<px.GetEntry(23)<<"\n\n";
-}
 
 void PrimaryGeneratorAction::setNewNeutronSpectrumSource()
 {
