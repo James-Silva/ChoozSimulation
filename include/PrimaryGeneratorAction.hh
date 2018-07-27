@@ -20,6 +20,7 @@
 #include "TH1D.h"
 #include "PrimaryGeneratorMessenger.hh"
 #include "HistoManager.hh"
+#include "TTreeContainer.hh"
 
 class G4Event;
 class DetectorConstruction;
@@ -73,6 +74,7 @@ private:
     G4ThreeVector               neutronsourcepos;
     G4ThreeVector               gammasourcepos;
     G4VUserPrimaryGeneratorAction*  particleSource;    //pointer a to G4  class
+    primarygentools::TTreeContainer tc;
     TFile*   file;
     TTree*   tree;
     Float_t  px,py,pz;

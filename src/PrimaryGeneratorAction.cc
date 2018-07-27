@@ -13,7 +13,7 @@
 #include "PrimaryGeneratorAction.hh"
 #include "DetectorConstruction.hh"
 #include "GPSPrimaryGeneratorAction.hh"
-#include "TTreeContainer.hh"
+
 
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorConstruction_, HistoManager* histo)
 : G4VUserPrimaryGeneratorAction(),
@@ -62,7 +62,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     particleGun.SetParticlePosition(this->GenerateTopEvent(10*m, 4.255*m));
 
     double mass = G4ParticleTable::GetParticleTable()->FindParticle("mu-")->GetPDGMass();
-    primarygentools::TTreeContainer tc;
     G4ThreeVector momentum = tc.getMomentumVec();
     particleGun.SetParticleMomentumDirection(momentum.unit());
     particleGun.SetParticleEnergy(std::sqrt(momentum*momentum+mass*mass)-mass);
