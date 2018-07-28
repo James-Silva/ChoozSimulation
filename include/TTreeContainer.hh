@@ -5,24 +5,33 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include "TRandom3.h"
 #include <random>
 #include "G4ThreeVector.hh"
 
 namespace primarygentools {
 
+struct MomentumAddress {
+  Float_t px = -1, py = -1, pz = -1;
+};
+
 class TTreeContainer {
   public:
-    //
+    // Seeds the random number generator.
     TTreeContainer();
-    G4ThreeVector getMomentumVec();
+
+    // Set the member variables px,py,pz to the addresses from branches
+    // of the given
+    void setPxPyPzBranchAddress(const char* fileName, const char* treeName);
+
+    // Randomly generates an index of the given TTree and returns
+    // the px, py, pz values at that point.
+    G4ThreeVector getMomentumVec(); 
 
   private:
     std::mt19937 gen;
-    TRandom3 randNum;
     TFile*   file;
     TTree*   tree;
-    Float_t px, py, pz;
+    MomentumAddress momentumAddress;
 };
 
 } // namespace primarygentools

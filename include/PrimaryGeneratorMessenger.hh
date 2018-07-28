@@ -21,7 +21,7 @@ class PrimaryGeneratorMessenger: public G4UImessenger
     // type of parameters they accept set.
     PrimaryGeneratorMessenger(PrimaryGeneratorAction*);
 
-    // Deletes the command objects that were created. TODO: Add all of the pointers
+    // Deletes the command objects that were created.
    ~PrimaryGeneratorMessenger();
 
     // Automatically called by Geant. Matches the macro command to one of the commands
@@ -46,7 +46,7 @@ class PrimaryGeneratorMessenger: public G4UImessenger
     G4UIcmdWithABool*           fTypeCmd_gps;
     G4UIcmdWith3VectorAndUnit*  fTypeCmd_neutronpoint_vec;
     G4UIcmdWith3VectorAndUnit*  fTypeCmd_gammapoint_vec;
-    G4UIcmdWithAString*         fTypeCmd_genMuonFromSpect;
+    G4UIcmdWithAString*         fTypeCmd_generateMuon;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -25,6 +25,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detectorCon
   gRandom->SetSeed(0);
 }
 
+// Sets the properties of the particles simulatied. Called automatically.
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   // Set position differently depending on source type
@@ -47,14 +48,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }
   else if (sourceType == "muonspectrum")
   {
-    //Must check if TTree is read correctly (Error-Handling)
     particleGun.SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle("mu-"));
-    particleGun.SetParticlePosition(this->GenerateTopEvent(10*m, 4.255*m));
-
-    double mass = G4ParticleTable::GetParticleTable()->FindParticle("mu-")->GetPDGMass();
-    G4ThreeVector momentum = muonTreeContatiner.getMomentumVec();
-    particleGun.SetParticleMomentumDirection(momentum.unit());
-    particleGun.SetParticleEnergy(std::sqrt(momentum*momentum+mass*mass)-mass);
+    particleGun.SetParticlePosition(this->GenerateTopEvent(sourceRadius, sourceHeight/2));
+    particleGun.SetParticleMomentum(muonTreeContatiner.getMomentumVec()*GeV);
     particleGun.GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "gammapoint")
@@ -84,13 +80,13 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
     particleSource->GeneratePrimaries(anEvent);
   }
   else
-    std::cerr << "ERROR in PrimaryGeneratorAction::GeneratePrimaries: Invalid source type selected!" << std::endl;
-
-  // Actually generate the event
-
+    std::cerr <<
+      "ERROR in PrimaryGeneratorAction::GeneratePrimaries: Invalid source type selected!"
+      << std::endl;
 }
 
-void PrimaryGeneratorAction::buildSource(const G4String& particleName, G4double kineticEnergy)
+void PrimaryGeneratorAction::buildSource(const G4String& particleName,
+                                         G4double kineticEnergy)
 {
   particleGun.SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle(particleName));
   particleGun.SetParticleEnergy(kineticEnergy*MeV); // The default unit for energy in Geant4 is MeV and it seems to convert all input energies into MeV
@@ -105,9 +101,17 @@ void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
   }
 }
 
-void PrimaryGeneratorAction::genMuFromSpectrum(const std::string& fileName)
+void PrimaryGeneratorAction::generateMuons(const std::string& generationType)
 {
-  // muonTreeContatiner(  );
+  if (generationType == "momentum") {
+    // TODO: Allow Entry of TFile and TTree name in macro
+    muonTreeContatiner.setPxPyPzBranchAddress("DC_MUSIC_sim_ND_Full_Info.root",
+                                              "MUSIC_OUTPUT");
+  } else {
+    std::cerr << "GenerationType used in genMuFromSpectrum() is not found."
+    << std::endl;
+    return;
+  }
   sourceType = "muonspectrum";
 }
 

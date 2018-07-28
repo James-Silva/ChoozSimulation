@@ -60,16 +60,19 @@ public:
     void SetGammaPointSource(G4ThreeVector pos);
     void SetGenerator(G4String generatorType);
     void setSourceThickness(G4double thickness);
-
-    // Sets the sourceType to "muonspectrum"
-    void genMuFromSpectrum(const std::string& fileName);
-
+    // Sets the sourceType to "muonspectrum" and how the muons are generated
+    void generateMuons(const std::string& generationType);
     G4ThreeVector GenerateSideWallEvent(G4double radius,G4double height,G4double offset);
     G4ThreeVector GenerateTopEvent(G4double radius,G4double height);
     G4ThreeVector GenerateIsotropicVector();
     virtual void print(std::ostream& output, double scalingUnit) const;//print in HEPEvt format if scalingUnit == CLHEP::GeV
+
 private:
     G4VUserPrimaryGeneratorAction*  particleSource;    //pointer a to G4  class
+    PrimaryGeneratorMessenger		messenger;
+    G4ParticleGun          		  particleGun;
+    DetectorConstruction*    	  detectorConstruction;
+    HistoManager*						    fHistoManager;
     TH1D 			                  h_Spectrum;
     std::vector<double> 	      vec_SpectralEnergies;
     std::vector<double> 	      vec_SpectralVals;
@@ -79,15 +82,11 @@ private:
     G4double                    sourceHeight;
     G4double 			              bottomProbability; //ratio of the bottom surface to the side surface
     G4double                    sourcethickness;
-    PrimaryGeneratorMessenger		messenger;
-    G4ParticleGun          		  particleGun;
-    DetectorConstruction*    	  detectorConstruction;
-    HistoManager*						    fHistoManager;
     G4ThreeVector               neutronsourcepos;
     G4ThreeVector               gammasourcepos;
+    bool                        logaxis;
+    // Usually set with a PGA Messenger command and used by GeneratePrimaries()
     G4String sourceType;
-    bool     logaxis;
-
     // Contains the TTree with the muon data. Data like momentum can be accessed.
     primarygentools::TTreeContainer muonTreeContatiner;
 

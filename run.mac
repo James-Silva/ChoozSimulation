@@ -32,6 +32,6 @@
 /ricochetchoozsim/generator/SetNeutronSource true
 /ricochetchoozsim/generator/setneutronsourcespectrum input_spectra/Joe-32GeV-10MeVthreshold.txt
 #/ricochetchoozsim/generator/SetNeutronSource_xlog true
-#/ricochetchoozsim/generator/genMuonFromSpectrum DC_MUSIC_sim_ND_Full_Info.root
+#/ricochetchoozsim/generator/generateMuon momentum
 
 /run/beamOn 10
