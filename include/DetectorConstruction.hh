@@ -64,6 +64,7 @@ public:
 	// Sets the logical volume of the outer detector (tubeLog)
 	void setOuterDetectorMaterial(const std::string& mat) {
 	  if (outerLog) outerLog->SetMaterial(G4Material::GetMaterial(mat));
+		std::cout << outerLog->GetMaterial() << std::endl;
 	}
 	G4LogicalVolume* GetWorldVolume() {return logicWorld;}
 };
