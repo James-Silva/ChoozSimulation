@@ -20,24 +20,41 @@ namespace detectorcomponents {
 //    layerBuilder.AddG4Box("material", 50*mm, logicWorld;)
 //
 class LayerConstructor {
- public:
+public:
   LayerConstructor();
 
   // Places a G4Box at the origin of a given mother volume with a given
-  // material, thickness. Does not produce the box if it would have a length
-  // less than zero. Sets the color of each layer to orange.
-  // Decreases the member variable boxLength after each call by the created thickness.
+  // material, thickness. Sets the layer color using an internal method.
+  // Increases the member variable boxLength after each call by the created thickness.
   // This makes it easier to create a lot of layers and not worry about having
-  // to input the boxLength each time. The max box length is set in this class.
+  // to input the boxLength each time.
   // This method is called in the DetectorConstructor due to call from the
   // DetectorMessenger. Look in Detector Messenger for example.
-  void AddG4Box(const std::string& material, const double thickness,
-                G4LogicalVolume* mother);
-  void SetBoxLength(double length) { boxLength = length; }
- private:
+  void AddLayer(const std::string& material, G4LogicalVolume* mother);
+
+  // Produces a layer just like AddLayer(~), but it cuts out the top of the layer
+  void AddULayer(const std::string& material, G4LogicalVolume* mother);
+
+private:
+  // Sets various colors for different materials
   void setLayerColour(G4LogicalVolume* logic, const std::string& material);
+  // set in Detec. Messenger, new layers are created using this length
   double boxLength;
+  // Inner Cavity around the crystal that is not filled with a material
+  double cavityLength;
+  // Thickness of the layer that is added
+  double layerThickness;
+  // Used in naming shieldings that are added
   int layerNum;
+
+public:
+  void SetCavityLength(double clength) {
+    cavityLength = clength;
+    if (!boxLength) boxLength = clength;
+  }
+  // TODO: Add messenger command to be able to manually set this
+  void SetBoxLength(double blength) { boxLength = blength; }
+  void SetLayerThickness(double thick) { layerThickness = thick; }
 };
 
 // Hard coded values of the Giove Shielding used by the Very Near Site Detector.

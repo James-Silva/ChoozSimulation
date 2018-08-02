@@ -17,24 +17,49 @@
 
 namespace detectorcomponents {
 
-LayerConstructor::LayerConstructor() : boxLength(2*500*mm), layerNum(1) {}
+LayerConstructor::LayerConstructor(): layerNum(1) {}
 
-void LayerConstructor::AddG4Box(const std::string& material,
-                                const double thickness,
+// Create two solid G4Boxes that will be subtracted from each other.
+// The member variable boxLength is set in the middle of creating the solid.
+void LayerConstructor::AddLayer(const std::string& material,
                                 G4LogicalVolume* mother) {
-  if (boxLength - 2*thickness < 0) {
-    std::cout << "\n\nRequested layer " << std::to_string(layerNum) <<
-                  " addition is too large to be added\n\n" << std::endl;
-    return;
+  if (!boxLength || !cavityLength || !layerThickness) {
+    std::cerr << "\n\nEither the cavityLength, layerThickness, or boxLength "
+              << "was not correctly set using the messenger\n\n"<<std::endl;
+    std::exit(-1);
+  }
+  std::string layerName = "Shielding Layer "+ std::to_string(layerNum);
+
+  auto innerLayer = new G4Box("InLayer", boxLength/2, boxLength/2, boxLength/2);
+  boxLength = boxLength + 2*layerThickness;  //The member boxLength is increased
+  auto outerLayer = new G4Box("OutLayer", boxLength/2, boxLength/2, boxLength/2);
+  auto solid = new G4SubtractionSolid(layerName, outerLayer, innerLayer);
+
+  auto logic = new G4LogicalVolume(solid, G4Material::GetMaterial(material),
+                                  layerName);
+  new G4PVPlacement(0, {0,0,0}, logic, layerName, mother, false, 0, true);
+
+  this->setLayerColour(logic, material);
+  ++layerNum;
+}
+
+void LayerConstructor::AddULayer(const std::string& material,
+                                G4LogicalVolume* mother) {
+  if (!boxLength || !cavityLength || !layerThickness) {
+    std::cerr << "\n\nEither the cavityLength, layerThickness, or boxLength "
+              << "was not correctly set using the messenger\n\n"<<std::endl;
+    std::exit(-1);
   }
   std::string layerName = "Shieling Layer "+ std::to_string(layerNum);
-  // The member variable boxLength is set in the middle of creating the solid.
-  auto outerLayer = new G4Box("tempOuterLayer", boxLength/2, boxLength/2, boxLength/2);
-  boxLength = boxLength - 2*thickness;  // The boxLength is decremented
-  auto innerLayer = new G4Box("tempInnerLayer", boxLength/2, boxLength/2, boxLength/2);
 
+  auto cutOut = new G4Box("topBox", cavityLength/2, cavityLength/2, boxLength/2);
+  auto innerLayer = new G4Box("InLayer", boxLength/2, boxLength/2, boxLength/2);
+  boxLength = boxLength + 2*layerThickness;  //The member boxLength is increased
+  auto outerLayer = new G4Box("OutLayer", boxLength/2, boxLength/2, boxLength/2);
   auto solid = new G4SubtractionSolid(layerName, outerLayer, innerLayer);
-  auto logic = new G4LogicalVolume(solid, G4Material::GetMaterial(material),
+  auto uShapeSolid = new G4SubtractionSolid(layerName, solid, cutOut, 0,
+                                            {0,0,layerThickness});
+  auto logic = new G4LogicalVolume(uShapeSolid, G4Material::GetMaterial(material),
                                    layerName);
   new G4PVPlacement(0, {0,0,0}, logic, layerName, mother, false, 0, true);
 
@@ -238,4 +263,4 @@ void ConstructPbSheilding(const double innerR, const double outerR,
 	fullshieldTubeLog->SetVisAttributes(visshieldTube);
 }
 
-}
+} // namespace detectorcomponents
