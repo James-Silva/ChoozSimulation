@@ -1,6 +1,3 @@
-#include "DetectorMessenger.hh"
-#include "DetectorConstruction.hh"
-#include "Shieldings.hh"
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithAnInteger.hh"
@@ -11,16 +8,20 @@
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWith3Vector.hh"
 
+#include "DetectorConstruction.hh"
+#include "DetectorMessenger.hh"
+#include "RicochetADR.hh"
+
 using namespace std;
 
 DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
-    :G4UImessenger(), fDetector(Det), layerThickness(0)
+    :G4UImessenger(), fDetector(Det)
 {
   fDetDir = new G4UIdirectory("/ricochetchoozsim/detector/");
   fDetDir->SetGuidance("detector control");
   //////////////////////////////////////////////////////////////////////////////
-  fshieldDir = new G4UIdirectory("/ricochetchoozsim/shielding/");
-  fshieldDir->SetGuidance("shielding control");
+  fShieldDir = new G4UIdirectory("/ricochetchoozsim/shielding/");
+  fShieldDir->SetGuidance("shielding control");
   //////////////////////////////////////////////////////////////////////////////
   shieldingCmdPb =
     new G4UIcmdWith3VectorAndUnit("/ricochetchoozsim/shielding/setPbshielding",
@@ -42,14 +43,16 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
 
   /////////////Commands to add layers areound the cyrstal///////////////////////
   /// Example ///
-  // /ricochetchoozsim/shielding/setLayerLength 1. m        //Sets the layer length that the new layer is subtracted from
-  // /ricochetchoozsim/shielding/setLayerThickness 50 mm   //Sets the thickness of the Layers added
-  // /ricochetchoozsim/shielding/addLayerWithMaterial Pol  //Adds the layers with a specified material (1m->.95m)
-  setLayerLengthCmd =
-    new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setLayerLength",
+  // /ricochetchoozsim/shielding/setCavityLength 30. cm
+  // /ricochetchoozsim/shielding/setLayerThickness 5 cm
+  // /ricochetchoozsim/shielding/addLayerWithMaterial Pol
+  // /ricochetchoozsim/shielding/addLayerWithMaterial G4_WATER
+  // /ricochetchoozsim/shielding/add_U_LayerWithMaterial G4_Pb
+  setCavityLengthCmd =
+    new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setCavityLength",
                                   this);
-  setLayerLengthCmd->
-    SetGuidance("Set the layer length before a layer is subtracted from it. Default 1m.");
+  setCavityLengthCmd->
+    SetGuidance("Set the cavity length before a layers are added to it. Default 1m.");
 
   setLayerThicknessCmd =
     new G4UIcmdWithADoubleAndUnit("/ricochetchoozsim/shielding/setLayerThickness",
@@ -63,32 +66,38 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction* Det)
   addLayerWithMaterialCmd->
     SetGuidance("Add a Layer centered around the origin of the world.");
 
-  ////Commands to set the material from the outer rock to the inner crystal/////
-  outerDetectorMaterialCmd =
-    new G4UIcmdWithAString("/ricochetchoozsim/detector/setOuterDetectorMaterial",
+  add_U_LayerWithMaterialCmd =
+    new G4UIcmdWithAString("/ricochetchoozsim/shielding/add_U_LayerWithMaterial",
                            this);
-  outerDetectorMaterialCmd->
-    SetGuidance("Set Outer Detector Material. Default Air.");
+  add_U_LayerWithMaterialCmd->
+    SetGuidance("Add a Layer centered around the origin of the world.");
 
   ////////////////////////Construct the ADR/////////////////////////////////////
   condtructADRCmd =
     new G4UIcmdWithABool("/ricochetchoozsim/detector/constructADR", this);
   condtructADRCmd->SetGuidance("Construct ADR (true or false)");
   condtructADRCmd->SetDefaultValue("false");
-}
 
+  ////Commands to set the material from the outer rock to the inner crystal/////
+  outerDetectorMaterialCmd =
+    new G4UIcmdWithAString("/ricochetchoozsim/detector/setOuterDetectorMaterial",
+                           this);
+  outerDetectorMaterialCmd->
+    SetGuidance("Set Outer Detector Material. Default Air.");
+}
 
 DetectorMessenger::~DetectorMessenger()
 {
   delete fDetDir;
-  delete fshieldDir;
+  delete fShieldDir;
   delete shieldingCmdPb;
   delete shieldingCmdPoly;
   delete setLayerThicknessCmd;
   delete addLayerWithMaterialCmd;
+  delete add_U_LayerWithMaterialCmd;
   delete outerDetectorMaterialCmd;
   delete condtructADRCmd;
-  delete setLayerLengthCmd;
+  delete setCavityLengthCmd;
 }
 
 
@@ -111,21 +120,22 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 	else if (command == setcrystalmaterial) {
     fDetector->SetCrystalMaterial(newValue);
   }
+  else if (command == setCavityLengthCmd) {
+    fShieldBuilder.SetCavityLength(setCavityLengthCmd->GetNewDoubleValue(newValue));
+  }
   else if (command == setLayerThicknessCmd) {
-    this->layerThickness = setLayerThicknessCmd->GetNewDoubleValue(newValue);
+    fShieldBuilder.SetLayerThickness(setLayerThicknessCmd->GetNewDoubleValue(newValue));
   }
   else if (command == addLayerWithMaterialCmd) {
-    if (layerThickness > 0) fDetector->AddLayer(newValue, layerThickness);
-    else std::cerr<<"\n\nThickness not set. Layer not created.\n\n"<<std::endl;
+    fShieldBuilder.AddLayer(newValue, fDetector->GetWorldVolume());
   }
-  else if (command == setLayerLengthCmd) {
-    fDetector->SetLayerLength(setLayerThicknessCmd->GetNewDoubleValue(newValue));
+  else if (command == add_U_LayerWithMaterialCmd) {
+    fShieldBuilder.AddULayer(newValue, fDetector->GetWorldVolume());
   }
   else if (command == outerDetectorMaterialCmd) {
     fDetector->setOuterDetectorMaterial(newValue);
   }
-  if(command == condtructADRCmd && newValue == "true")
-  {
-    fDetector->ConstructADR();
+  else if(command == condtructADRCmd && newValue == "true") {
+    detectorcomponents::ConstructADR(fDetector->GetWorldVolume());
   }
 }
