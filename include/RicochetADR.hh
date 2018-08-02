@@ -4,10 +4,6 @@
 #define RICOCHET_ADR_H 1
 
 class G4LogicalVolume;
-class G4VPhysicalVolume;
-class G4Box;
-class G4Tubs;
-class G4SubtractionSolid;
 
 namespace detectorcomponents {
 
