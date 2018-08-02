@@ -25,6 +25,9 @@ class DetectorMessenger;
 //		G4RunManager runManager;
 //		runManager.SetUserInitialization(new DetectorConstruction());
 //
+// Builds the world volume and the rock pit, concrete jacket, water/air pit,
+// and the crystal detector. Shieldings around the detector can be created
+// using macro commands with the messenger.
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
 public:
@@ -36,48 +39,32 @@ public:
 	// shieldings or ADR.
 	virtual G4VPhysicalVolume* Construct() ;
 
-	// Adds a G4Box of a given material and thickness around the origin.
-	// Can be called multiple times to create multiple layers without
-	// specifing positions of each one.
-	// Example: // Creates two 50mm thick Pb G4Boxes less than a predefined max
-	//          // boxLength defined in the Shieldings class.
-	//		detectorcomponents::LayerConstructor shieldBuilder; // In header
-	//		AddLayer("G4_Pb",50*mm,"G4Box");
-	//		AddLayer("G4_Pb",50*mm,"G4Box");
-	void AddLayer(const std::string& material, double thickness);
-
-	// The G4Box created in AddLayer subtracts its thickness from a default value
-	// of 1m. That value is changed with SetLayerLength and this method is called
-	// from the messenger class. It must be called before AddLayer to effect the
-	// layer that is being added.
-	void SetLayerLength(double length);
-
-	// Original Fridge surrounding the crystal detector
-	void ConstructADR() ;
-
 private:
 	// Creates the world. Fills the logicWorld and physicalWorld variables.
-	void InitializeWorld() ;
+	void InitializeWorld();
 	// Rock pit made of rock near the Chooz near site
-	void ConstructPit() ;
-	// Water or Air tube that surrounds the inner crystal detector
-	void ConstructOuterDetectors() ;
-	G4VPhysicalVolume*  ConstructDetectors() ;
-	G4VPhysicalVolume*  ConstructSingleDetector() ;
-	G4VPhysicalVolume*  ConstructNuDetector() ;
+	void ConstructPit();
+	// Water or Air or Galactic tube that surrounds the inner crystal detector
+	void ConstructOuterDetectors();
+	// Produces an array of crystals that are sensitve detectors
+	G4VPhysicalVolume*  ConstructDetectors();
+	// Produces a single crystal that is a sensitve detector
+	G4VPhysicalVolume*  ConstructSingleDetector();
+	G4VPhysicalVolume*  ConstructNuDetector();
 
 	DetectorMessenger* 									 detectorMessenger;
 	G4LogicalVolume*										 logicWorld;
 	G4VPhysicalVolume* 						 		   physicalWorld;
-	G4Material* 											   outerDetectorMaterial;
-	G4LogicalVolume*										 tubeLog;
+	G4LogicalVolume*										 outerLog;
 	std::vector<G4LogicalVolume*>	  		 v_CrystalBoxesLog;
-	detectorcomponents::LayerConstructor shieldBuilder;
 
 public:
 	// Changes the center crystal detector material to Os, Zn. or Zr
-	void SetCrystalMaterial(G4String Material) ;
-	void setOuterDetectorMaterial(const std::string& mat);
+	void SetCrystalMaterial(G4String Material);
+	// Sets the logical volume of the outer detector (tubeLog)
+	void setOuterDetectorMaterial(const std::string& mat) {
+	  if (outerLog) outerLog->SetMaterial(G4Material::GetMaterial(mat));
+	}
 	G4LogicalVolume* GetWorldVolume() {return logicWorld;}
 };
 

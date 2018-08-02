@@ -29,17 +29,17 @@ using namespace std;
 
 DetectorConstruction::DetectorConstruction()
 :G4VUserDetectorConstruction(),
- detectorMessenger(new DetectorMessenger(this)),
- outerDetectorMaterial(G4Material::GetMaterial("G4_AIR"))
+ detectorMessenger(new DetectorMessenger(this))
 {}
 
 DetectorConstruction::~DetectorConstruction() { delete detectorMessenger; }
 
+// Automatically called by G4RunManager
 G4VPhysicalVolume*  DetectorConstruction::Construct()  {
   InitializeWorld();
 	ConstructPit(); //Rock Surrounding the Detector
 	ConstructOuterDetectors(); //Air around the crystal
-  auto phystest = ConstructDetectors();
+  auto phystest = ConstructDetectors(); // Build the crystal
 
   return phystest;
 }
@@ -111,30 +111,14 @@ void DetectorConstruction::ConstructOuterDetectors() {
 																	 4200*mm,startAngle, spanningAngleFull);
 	auto tubeSolid = new G4SubtractionSolid("OuterDetector", TempTube_outer,
 																					TempTube_inner,0,vec_offset);
-	tubeLog = new G4LogicalVolume(tubeSolid,
-																		 outerDetectorMaterial,
+	outerLog = new G4LogicalVolume(tubeSolid,
+																		 G4Material::GetMaterial("G4_AIR"),
 																		 "OuterDetector");
-	new G4PVPlacement(0,vec_zero, tubeLog, "OuterDetector",logicWorld, false,0,true);
+	new G4PVPlacement(0,vec_zero, outerLog, "OuterDetector",logicWorld, false,0,true);
 
   G4VisAttributes visTube(G4Colour(1.,1.,0.,0.4));
   visTube.SetForceAuxEdgeVisible(true);
-	tubeLog->SetVisAttributes(visTube);
-}
-
-void DetectorConstruction::setOuterDetectorMaterial(const std::string& mat) {
-  if (!tubeLog) tubeLog->SetMaterial(G4Material::GetMaterial(mat));
-}
-
-void DetectorConstruction::AddLayer(const std::string& material, const double thickness) {
-	shieldBuilder.AddG4Box(material, thickness, logicWorld);
-}
-
-void DetectorConstruction::SetLayerLength(double length) {
-  shieldBuilder.SetBoxLength(length);
-}
-
-void DetectorConstruction::ConstructADR()  {
-	detectorcomponents::ConstructADR(logicWorld);
+	outerLog->SetVisAttributes(visTube);
 }
 
 G4VPhysicalVolume*  DetectorConstruction::ConstructDetectors()  {
@@ -201,7 +185,6 @@ G4VPhysicalVolume*  DetectorConstruction::ConstructNuDetector()  {
 
   return physicalWorld;
 }
-
 
 void DetectorConstruction::SetCrystalMaterial(G4String Material)  {
   if (Material == "Os" || Material == "Zn" || Material == "Zr") {
