@@ -46,7 +46,7 @@ void LayerConstructor::AddLayer(const std::string& material,
 
 void LayerConstructor::AddULayer(const std::string& material,
                                 G4LogicalVolume* mother) {
-  if (!boxLength || !cavityLength || !layerThickness) {
+  if (boxLength == -1 || cavityLength == -1 || layerThickness == -1) {
     std::cerr << "\n\nEither the cavityLength, layerThickness, or boxLength "
               << "was not correctly set using the messenger\n\n"<<std::endl;
     std::exit(-1);
