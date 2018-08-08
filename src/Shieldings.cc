@@ -17,13 +17,14 @@
 
 namespace detectorcomponents {
 
-LayerConstructor::LayerConstructor(): layerNum(1) {}
+LayerConstructor::LayerConstructor(): layerNum(1), boxLength(-1),
+                                      cavityLength(-1), layerThickness(-1) {}
 
 // Create two solid G4Boxes that will be subtracted from each other.
 // The member variable boxLength is set in the middle of creating the solid.
 void LayerConstructor::AddLayer(const std::string& material,
                                 G4LogicalVolume* mother) {
-  if (!boxLength || !cavityLength || !layerThickness) {
+  if (boxLength == -1 || cavityLength == -1 || layerThickness == -1) {
     std::cerr << "\n\nEither the cavityLength, layerThickness, or boxLength "
               << "was not correctly set using the messenger\n\n"<<std::endl;
     std::exit(-1);

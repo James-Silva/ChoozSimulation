@@ -38,19 +38,19 @@ public:
 private:
   // Sets various colors for different materials
   void setLayerColour(G4LogicalVolume* logic, const std::string& material);
+  // Used in naming shieldings that are added
+  int layerNum;
   // set in Detec. Messenger, new layers are created using this length
   double boxLength;
   // Inner Cavity around the crystal that is not filled with a material
   double cavityLength;
   // Thickness of the layer that is added
   double layerThickness;
-  // Used in naming shieldings that are added
-  int layerNum;
 
 public:
   void SetCavityLength(double clength) {
     cavityLength = clength;
-    if (!boxLength) boxLength = clength;
+    if (boxLength == -1) boxLength = clength;
   }
   // TODO: Add messenger command to be able to manually set this
   void SetBoxLength(double blength) { boxLength = blength; }
