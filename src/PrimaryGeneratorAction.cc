@@ -50,7 +50,9 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   {
     particleGun.SetParticleDefinition(G4ParticleTable::GetParticleTable()->FindParticle("mu-"));
     particleGun.SetParticlePosition(this->GenerateTopEvent(sourceRadius, sourceHeight/2));
+    std::cout.setstate(std::ios_base::failbit); // Surpress SetParticleMomentum Output
     particleGun.SetParticleMomentum(muonTreeContatiner.getMomentumVec()*GeV);
+    std::cout.clear(); // Surpress SetParticleMomentum Output
     particleGun.GeneratePrimaryVertex(anEvent);
   }
   else if(sourceType == "gammapoint")
