@@ -105,6 +105,8 @@ void PrimaryGeneratorAction::SetGenerator(G4String generatorType)
 
 void PrimaryGeneratorAction::generateMuons(const std::string& generationType)
 {
+  // Other ways to get the data of muons are added here in the future
+  // Ex. from Energy and Direction or from a text file rather than a root file
   if (generationType == "momentum") {
     // TODO: Allow Entry of TFile and TTree name in macro
     muonTreeContatiner.setPxPyPzBranchAddress("DC_MUSIC_sim_ND_Full_Info.root",
